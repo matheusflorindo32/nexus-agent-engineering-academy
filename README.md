@@ -27,6 +27,12 @@ tags:
   <img alt="Docs: pt-BR canonical" src="https://img.shields.io/badge/docs-pt--BR%20canonical-f59e0b.svg">
 </p>
 
+<p align="center">
+  <img src="assets/architecture/nexus-system-light-3d.png" width="100%" alt="Infográfico claro em estilo 3D que apresenta entradas, plataforma NEXUS, governança, dados, ciclo de melhoria, princípios, fluxo de aprendizagem, impacto e resultados.">
+</p>
+
+<p align="center"><em>Mapa visual canônico do ecossistema NEXUS — arquitetura, aprendizagem, governança e impacto.</em></p>
+
 > [!IMPORTANT]
 > A NEXUS ensina decisões de engenharia transferíveis entre ferramentas. APIs mudam; invariantes arquiteturais,
 > modelos de ameaça, contratos e métodos de avaliação permanecem.
