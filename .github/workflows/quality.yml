@@ -1,12 +1,17 @@
 name: NEXUS Quality
 
 on:
+  workflow_dispatch:
   push:
     branches: [main, audit/premium-elite-v1]
   pull_request:
 
 permissions:
   contents: read
+
+concurrency:
+  group: nexus-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   validate:
@@ -52,4 +57,4 @@ jobs:
           node-version: '22'
 
       - name: Type-check TypeScript example
-        run: npx --yes -p typescript@5.8.3 tsc --noEmit --target ES2022 --lib ES2022,DOM examples/safe_tool_boundary.ts
+        run: npx --yes --package typescript@5.8.3 tsc --noEmit --target ES2022 --lib ES2022,DOM examples/safe_tool_boundary.ts
