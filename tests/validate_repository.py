@@ -1,8 +1,8 @@
 """Validate the NEXUS documentation foundation using only Python's stdlib."""
-
 from __future__ import annotations
 
 from pathlib import Path
+import json
 import re
 import sys
 from urllib.parse import unquote
@@ -15,7 +15,16 @@ CONTENT_ROOTS = (
 REQUIRED_ROOT_ENTRIES = {
     "README.md", "ROADMAP.md", "CONTRIBUTING.md", "SECURITY.md",
     "CHANGELOG.md", "LICENSE", "CODE_OF_CONDUCT.md", ".github", "tests",
-    "AGENTS.md", *CONTENT_ROOTS,
+    "AGENTS.md", "datasets", *CONTENT_ROOTS,
+}
+REQUIRED_EXECUTABLES = {
+    "examples/minimal_readonly_agent.py",
+    "examples/context_retriever.py",
+    "examples/safe_tool_boundary.py",
+    "examples/safe_tool_boundary.ts",
+    "examples/deterministic_loop.py",
+    "datasets/lab-201-context-fixtures.json",
+    ".github/workflows/quality.yml",
 }
 REQUIRED_FRONTMATTER = {"id", "title", "lang", "status"}
 ALLOWED_LANGS = {"pt-BR", "en", "es"}
@@ -140,8 +149,24 @@ def check_agent_specs(errors: list[str]) -> None:
             errors.append(f"{path.relative_to(ROOT)}: agent spec incompleta: {', '.join(sorted(missing))}")
 
 
+def check_executables(errors: list[str]) -> None:
+    for relative in sorted(REQUIRED_EXECUTABLES):
+        path = ROOT / relative
+        if not path.is_file() or path.stat().st_size == 0:
+            errors.append(f"artefato executável obrigatório ausente ou vazio: {relative}")
+    dataset = ROOT / "datasets/lab-201-context-fixtures.json"
+    if dataset.exists():
+        try:
+            data = json.loads(dataset.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            errors.append(f"{dataset.relative_to(ROOT)}: JSON inválido: {exc}")
+        else:
+            if not isinstance(data, dict) or "chunks" not in data:
+                errors.append(f"{dataset.relative_to(ROOT)}: contrato exige objeto com campo chunks")
+
+
 def check_secrets(errors: list[str]) -> None:
-    text_extensions = {".md", ".py", ".yml", ".yaml", ".json", ".toml", ".txt"}
+    text_extensions = {".md", ".py", ".ts", ".yml", ".yaml", ".json", ".toml", ".txt"}
     ignored = {".git", ".venv", "node_modules"}
     for path in ROOT.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in text_extensions:
@@ -168,6 +193,7 @@ def main() -> int:
     check_links(files, errors)
     check_modules(errors)
     check_agent_specs(errors)
+    check_executables(errors)
     check_secrets(errors)
     if errors:
         print(f"NEXUS validation failed with {len(errors)} error(s):")
@@ -177,7 +203,7 @@ def main() -> int:
     print(
         "NEXUS validation passed: "
         f"{len(files)} Markdown files; structure, metadata, IDs, links, modules, "
-        "agent specs and secret scan OK."
+        "agent specs, executable contracts and secret scan OK."
     )
     return 0
 
