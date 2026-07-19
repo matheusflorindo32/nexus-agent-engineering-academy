@@ -1,6 +1,6 @@
 ---
 id: platforms.kimi
-name: Ecossistema Kimi
+title: Ecossistema Kimi
 lang: pt-BR
 status: review
 version: 0.1.0

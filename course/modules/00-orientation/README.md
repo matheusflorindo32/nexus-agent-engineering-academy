@@ -22,6 +22,16 @@ learning_outcomes:
 
 Ao final, você deverá conseguir entrar em qualquer projeto agentic, identificar seus componentes, executar uma verificação mínima e explicar uma decisão de engenharia de forma auditável.
 
+## Objetivos
+
+- Navegar a arquitetura NEXUS e rastrear seus contratos.
+- Executar o validador local e registrar evidências reproduzíveis.
+- Aplicar o ciclo hipótese–experimento–evidência–revisão.
+
+## Pré-requisitos
+
+Nenhum; este é o ponto de entrada do currículo.
+
 ## Mapa visual de aprendizagem
 
 ![Mapa manuscrito do ecossistema NEXUS com curso, agentes, loops, plataformas, governança, conhecimento e melhoria contínua.](../../../assets/architecture/nexus-system-handwritten.png)
@@ -110,7 +120,7 @@ Use [`templates/adr.md`](../../../templates/adr.md) para registrar uma decisão 
 
 Execute o [LAB-000](../../../labs/LAB-000-repository-orientation.md).
 
-## Desafio de 20 minutos
+## Laboratório — desafio de 20 minutos
 
 Escolha um conceito entre **loop**, **tool**, **MCP**, **avaliação** ou **segurança**. Encontre:
 
@@ -141,7 +151,7 @@ Entregue um diagrama Mermaid com esses cinco pontos.
 
 </details>
 
-## Entrega obrigatória
+## Projeto — entrega obrigatória
 
 - ADR preenchido;
 - saída do validador;

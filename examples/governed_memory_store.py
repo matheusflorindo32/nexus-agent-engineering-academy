@@ -15,7 +15,7 @@ from typing import Iterable
 
 
 BLOCKED_PATTERNS = (
-    r"ignore\s+(all|todas?|previous|anteriores?)\s+instructions?",
+    r"ignore\s+(all|todas?|previous|anteriores?)\s+(?:as\s+)?(instructions?|instruções?)",
     r"system\s+prompt",
     r"api[_ -]?key",
     r"password|senha|token",

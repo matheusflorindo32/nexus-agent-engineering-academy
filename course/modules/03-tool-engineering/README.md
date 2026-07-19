@@ -23,6 +23,16 @@ learning_outcomes:
 
 Projetar ferramentas estreitas, observáveis e interrompíveis, nas quais o modelo propõe intenção, mas código determinístico valida identidade, escopo, autorização, parâmetros e efeitos.
 
+## Objetivos
+
+- Projetar tools como fronteiras explícitas de autoridade.
+- Validar entradas, aprovações, efeitos e reconciliação fora do modelo.
+- Demonstrar idempotência, observabilidade e parada segura sob falha.
+
+## Pré-requisitos
+
+[Módulo 02](../02-context-engineering/README.md); schemas, APIs e testes automatizados.
+
 ## Arquitetura de referência
 
 ```mermaid

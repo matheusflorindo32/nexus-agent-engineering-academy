@@ -10,7 +10,7 @@ risk_level: low
 
 # LAB-000 — Orientação no repositório
 
-## Objetivo
+## Missão
 
 Validar que a arquitetura NEXUS permite rastrear um conceito desde sua definição até uma prática verificável.
 
@@ -47,7 +47,7 @@ Registre a saída antes de continuar.
 7. Desenhe o caminho em Mermaid.
 8. Registre o tempo gasto e qualquer navegação ambígua.
 
-## Modelo de evidência
+## Evidências
 
 ```markdown
 - Commit: `<sha>`

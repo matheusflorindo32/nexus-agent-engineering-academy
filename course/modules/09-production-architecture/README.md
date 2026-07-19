@@ -26,6 +26,10 @@ learning_outcomes:
 - Implementar health checks que distinguem processo vivo de serviço útil.
 - Planejar degradação segura, disaster recovery e resposta a incidentes.
 
+## Pré-requisitos
+
+[Módulo 08](../08-guardrails-security-engineering/README.md); SLI/SLO, segurança operacional e avaliação de release.
+
 ## Arquitetura de referência NEXUS
 
 ```mermaid

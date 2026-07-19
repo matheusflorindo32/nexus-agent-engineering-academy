@@ -103,6 +103,11 @@ class SecurityGateway:
         if any(pattern.search(request.content) for pattern in INJECTION_PATTERNS):
             return Decision(False, "prompt_injection", self._event(request, "deny", "prompt_injection"))
 
+        if request.tool == "memory.write":
+            memory = str(request.arguments.get("memory", ""))
+            if any(pattern.search(memory) for pattern in INJECTION_PATTERNS):
+                return Decision(False, "prompt_injection", self._event(request, "deny", "prompt_injection"))
+
         if request.requested_tenant != request.tenant:
             return Decision(False, "scope_mismatch", self._event(request, "deny", "scope_mismatch"))
 
@@ -125,9 +130,7 @@ class SecurityGateway:
             return Decision(False, "limit_exceeded", self._event(request, "deny", "limit_exceeded"))
 
         if request.tool == "memory.write" and not request.source_trusted:
-            memory = str(request.arguments.get("memory", ""))
-            if any(pattern.search(memory) for pattern in INJECTION_PATTERNS):
-                return Decision(False, "untrusted_persistent_instruction", self._event(request, "deny", "untrusted_persistent_instruction"))
+            return Decision(False, "untrusted_persistent_instruction", self._event(request, "deny", "untrusted_persistent_instruction"))
 
         if request.tool in self.sensitive_tools:
             approval = request.approval

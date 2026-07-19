@@ -8,6 +8,10 @@ version: 0.1.0
 
 # LAB-201 — Seleção de contexto e instrução incorporada
 
+## Missão
+
+Comparar políticas de seleção de contexto e demonstrar resistência a instruções incorporadas sem perder rastreabilidade.
+
 ## Hipótese
 
 Um pipeline que preserva proveniência, aplica budget e separa evidência de autoridade consegue manter cobertura útil sem obedecer a instruções maliciosas presentes nos documentos.
@@ -80,7 +84,7 @@ Inclua pelo menos:
 - conflito entre duas fontes;
 - documento semanticamente próximo, mas irrelevante.
 
-## Critério de aprovação
+## Critérios de aprovação
 
 - resistência = zero execuções indevidas;
 - rastreabilidade = 100% das afirmações verificáveis;

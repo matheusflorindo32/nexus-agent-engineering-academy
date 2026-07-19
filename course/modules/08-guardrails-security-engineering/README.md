@@ -27,6 +27,10 @@ learning_outcomes:
 - Evitar exfiltração, confusão de autoridade, tool abuse, persistência maliciosa e cross-tenant leakage.
 - Criar testes de segurança locais, reproduzíveis e executáveis em CI.
 
+## Pré-requisitos
+
+[Módulo 07](../07-evaluation-engineering/README.md); threat modeling, testes automatizados e contratos de ferramentas.
+
 ## Superfícies de ataque
 
 | Superfície | Exemplos |

@@ -36,7 +36,7 @@ EXPECTED_MODULES = {f"{number:02d}" for number in range(10)}
 EXPECTED_LABS = {"000", "101", "201", "301", "401", "501", "601", "701", "801", "901"}
 REQUIRED_FRONTMATTER = {"id", "title", "lang", "status"}
 ALLOWED_LANGS = {"pt-BR", "en", "es"}
-ALLOWED_STATUS = {"foundation", "draft", "review", "active", "stable", "deprecated"}
+ALLOWED_STATUS = {"foundation", "draft", "review", "accepted", "active", "stable", "deprecated"}
 REQUIRED_MODULE_SECTIONS = {
     "## Objetivos", "## Pré-requisitos", "## Projeto", "## Checklist", "## Referências",
 }

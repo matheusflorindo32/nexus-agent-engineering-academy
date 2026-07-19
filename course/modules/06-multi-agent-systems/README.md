@@ -26,6 +26,10 @@ learning_outcomes:
 - Isolar contexto e memória para reduzir vazamento, contaminação e ampliação de privilégios.
 - Medir coordenação por resultado, custo, latência, conflitos, retrabalho e segurança.
 
+## Pré-requisitos
+
+[Módulo 05](../05-memory-engineering/README.md); contratos de agente, ferramentas seguras e memória governada.
+
 ## Quando usar múltiplos agentes
 
 Use múltiplos agentes somente quando pelo menos uma condição puder ser demonstrada:

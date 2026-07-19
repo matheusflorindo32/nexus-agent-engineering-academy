@@ -9,6 +9,10 @@ estimated_minutes: 75
 
 # LAB-101 — Contrato de agente
 
+## Missão
+
+Transformar um pedido ambíguo em um contrato de agente read-only, testável e governado por aprovação humana.
+
 ## Hipótese
 
 Restrições explícitas, baseline e testes de recusa reduzem divergência e risco antes da escolha de modelo ou framework.

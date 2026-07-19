@@ -1,7 +1,7 @@
 type Action = "label_record" | "archive_record";
 type Scope = "training";
 
-type Request = {
+type ToolBoundaryRequest = {
   action: Action;
   recordId: string;
   scope: Scope;
@@ -25,7 +25,7 @@ class ToolError extends Error {
   }
 }
 
-function stablePayload(request: Request): string {
+function stablePayload(request: ToolBoundaryRequest): string {
   return JSON.stringify({
     action: request.action,
     idempotencyKey: request.idempotencyKey,
@@ -45,7 +45,7 @@ class SafeToolBoundary {
   private readonly idempotency = new Map<string, string>();
   private readonly effects: Array<{ action: Action; recordId: string; label?: string }> = [];
 
-  private validate(request: Request): void {
+  private validate(request: ToolBoundaryRequest): void {
     if (!request.recordId.startsWith("rec-")) {
       throw new ToolError("validation_error", "invalid recordId");
     }
@@ -57,7 +57,7 @@ class SafeToolBoundary {
     }
   }
 
-  async preview(request: Request): Promise<Preview> {
+  async preview(request: ToolBoundaryRequest): Promise<Preview> {
     this.validate(request);
     return {
       effect: request.action,
@@ -69,7 +69,7 @@ class SafeToolBoundary {
     };
   }
 
-  async execute(request: Request, approvalHash?: string): Promise<Record<string, unknown>> {
+  async execute(request: ToolBoundaryRequest, approvalHash?: string): Promise<Record<string, unknown>> {
     const preview = await this.preview(request);
     const payloadHash = preview.previewHash;
     const prior = this.idempotency.get(request.idempotencyKey);
@@ -99,7 +99,7 @@ class SafeToolBoundary {
 
 async function selfTest(): Promise<void> {
   const tool = new SafeToolBoundary();
-  const request: Request = {
+  const request: ToolBoundaryRequest = {
     action: "label_record",
     recordId: "rec-001",
     scope: "training",

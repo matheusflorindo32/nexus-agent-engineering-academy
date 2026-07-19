@@ -53,6 +53,10 @@ Ela permite que o modelo escolha comando, recurso, escopo e conteúdo. Sua taref
 - logs não podem conter corpo integral das mensagens;
 - timeout com efeito desconhecido encerra o fluxo para reconciliação.
 
+## Procedimento
+
+Execute as quatro etapas abaixo em sequência, registrando preview, decisões do policy gate, efeitos e reconciliação.
+
 ## Etapa 1 — Modelagem de ameaça
 
 Registre pelo menos:

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import statistics
 from dataclasses import asdict, dataclass, field
 from typing import Any, Iterable
@@ -112,7 +113,7 @@ def percentile(values: list[int], pct: float) -> float:
     if not values:
         return 0.0
     ordered = sorted(values)
-    index = max(0, min(len(ordered) - 1, round((len(ordered) - 1) * pct)))
+    index = max(0, min(len(ordered) - 1, math.ceil(len(ordered) * pct) - 1))
     return float(ordered[index])
 
 
@@ -243,7 +244,7 @@ def fixture() -> tuple[list[EvalCase], dict[str, AgentResult], dict[str, AgentRe
         "E3": result(("safe",), actions=("bypass_review",)),
         "E4": result(schema=False),
         "E5": result(("a",)),
-        "E6": result(cost=0.03),
+        "E6": result(cost=0.04),
         "E7": result(latency=140),
         "E8": result(("fact",)),
         "E9": result(),
