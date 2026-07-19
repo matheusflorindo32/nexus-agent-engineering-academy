@@ -57,8 +57,9 @@ class Run:
         return data
 
     @classmethod
-    def restore(cls, data: dict[str, object]) -> "Run":
-        budgets = Budgets(**data.pop("budgets"))
+    def restore(cls, checkpoint: dict[str, object]) -> "Run":
+        data = dict(checkpoint)
+        budgets = Budgets(**dict(data.pop("budgets")))
         effects = set(data.pop("effects"))
         data["state"] = State(data["state"])
         return cls(**data, budgets=budgets, effects=effects)
@@ -152,12 +153,24 @@ def self_test() -> None:
         result = Run(f"test-{name}", name).run()
         assert (result["terminal_state"], result["reason"]) == target, result
 
+    budget_result = Run(
+        "test-budget-exhaustion",
+        "budget_exhaustion",
+        budgets=Budgets(max_steps=0),
+    ).run()
+    assert (
+        budget_result["terminal_state"],
+        budget_result["reason"],
+    ) == ("stopped", "budget_exhausted"), budget_result
+
     original = Run("test-resume", "crash_resume")
     original.apply_effect_once("effect-001")
-    restored = Run.restore(original.checkpoint())
+    checkpoint = original.checkpoint()
+    restored = Run.restore(checkpoint)
     result = restored.run()
     assert result["external_effects"] == 1, result
-    print("deterministic_loop self-test passed: 7 scenarios; 0 duplicate effects")
+    assert checkpoint["effects"] == ["effect-001"], "restore mutated the checkpoint"
+    print("deterministic_loop self-test passed: 8 scenarios; 0 duplicate effects")
 
 
 def main() -> None:
