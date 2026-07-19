@@ -25,10 +25,10 @@ jobs:
         run: python tests/validate_repository.py
 
       - name: Minimal read-only agent
-        run: python examples/minimal_readonly_agent.py --self-test
+        run: python examples/minimal_readonly_agent.py --demo
 
       - name: Context retriever
-        run: python examples/context_retriever.py --self-test
+        run: python examples/context_retriever.py
 
       - name: Safe tool boundary
         run: python examples/safe_tool_boundary.py --self-test
@@ -52,4 +52,4 @@ jobs:
           node-version: '22'
 
       - name: Type-check TypeScript example
-        run: npx --yes typescript@5.8.3 --noEmit --target ES2022 --lib ES2022,DOM examples/safe_tool_boundary.ts
+        run: npx --yes -p typescript@5.8.3 tsc --noEmit --target ES2022 --lib ES2022,DOM examples/safe_tool_boundary.ts
