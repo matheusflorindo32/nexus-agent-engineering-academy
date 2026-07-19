@@ -29,11 +29,12 @@ REQUIRED_EXECUTABLES = {
     "examples/evaluation_harness.py",
     "examples/security_guardrails.py",
     "examples/production_runtime.py",
+    "examples/observability_pipeline.py",
     "datasets/lab-201-context-fixtures.json",
     ".github/workflows/quality.yml",
 }
-EXPECTED_MODULES = {f"{number:02d}" for number in range(10)}
-EXPECTED_LABS = {"000", "101", "201", "301", "401", "501", "601", "701", "801", "901"}
+EXPECTED_MODULES = {f"{number:02d}" for number in range(11)}
+EXPECTED_LABS = {"000", "101", "201", "301", "401", "501", "601", "701", "801", "901", "1001"}
 REQUIRED_FRONTMATTER = {"id", "title", "lang", "status"}
 ALLOWED_LANGS = {"pt-BR", "en", "es"}
 ALLOWED_STATUS = {"foundation", "draft", "review", "accepted", "active", "stable", "deprecated"}
@@ -155,7 +156,7 @@ def check_modules(errors: list[str]) -> None:
 def check_labs(errors: list[str]) -> None:
     present: set[str] = set()
     for path in sorted((ROOT / "labs").glob("LAB-*.md")):
-        match = re.match(r"LAB-(\d{3})-", path.name)
+        match = re.match(r"LAB-(\d{3,4})-", path.name)
         if match:
             present.add(match.group(1))
         text = path.read_text(encoding="utf-8")
@@ -244,7 +245,7 @@ def main() -> int:
         return 1
     print(
         "NEXUS Premium Elite validation passed: "
-        f"{len(files)} Markdown files; Modules 00-09; LAB-000 through LAB-901; "
+        f"{len(files)} Markdown files; Modules 00-10; LAB-000 through LAB-1001; "
         "structure, metadata, IDs, links, contracts, executables and secret scan OK."
     )
     return 0
