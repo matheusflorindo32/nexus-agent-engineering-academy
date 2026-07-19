@@ -1,134 +1,129 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
   <title id="title">NEXUS Agent Engineering Academy</title>
-  <desc id="desc">Hero editorial premium com tipografia dominante, núcleo NEXUS animado e indicadores amplos de Agent, Context, Tools, Loops e MCP.</desc>
+  <desc id="desc">Hero editorial premium com tipografia dominante, espaço negativo amplo e núcleo NEXUS animado isolado à direita.</desc>
 
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#050713"/>
-      <stop offset="0.55" stop-color="#0b1024"/>
-      <stop offset="1" stop-color="#11162d"/>
+      <stop offset="0.58" stop-color="#090d1d"/>
+      <stop offset="1" stop-color="#10152b"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#6c7cff"/>
-      <stop offset="0.55" stop-color="#62ddff"/>
-      <stop offset="1" stop-color="#9d7cff"/>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6677ff" stop-opacity=".18"/>
+      <stop offset=".55" stop-color="#67e2ff" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#9c7dff" stop-opacity=".18"/>
     </linearGradient>
     <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity=".12"/>
-      <stop offset="1" stop-color="#ffffff" stop-opacity=".035"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".025"/>
     </linearGradient>
-    <radialGradient id="core" cx="35%" cy="28%" r="72%">
-      <stop offset="0" stop-color="#e6fbff"/>
-      <stop offset="0.18" stop-color="#7de8ff"/>
-      <stop offset="0.5" stop-color="#5e7cff"/>
-      <stop offset="1" stop-color="#642bd4"/>
+    <radialGradient id="core" cx="34%" cy="27%" r="74%">
+      <stop offset="0" stop-color="#ecfdff"/>
+      <stop offset=".17" stop-color="#8beaff"/>
+      <stop offset=".48" stop-color="#617dff"/>
+      <stop offset="1" stop-color="#5d2bc7"/>
     </radialGradient>
-    <radialGradient id="coreShadow" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#5adfff" stop-opacity=".42"/>
-      <stop offset="1" stop-color="#5adfff" stop-opacity="0"/>
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#57ddff" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#57ddff" stop-opacity="0"/>
     </radialGradient>
-    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
-      <path d="M48 0H0V48" fill="none" stroke="#8da0ff" stroke-opacity=".045" stroke-width="1"/>
+    <pattern id="grid" width="52" height="52" patternUnits="userSpaceOnUse">
+      <path d="M52 0H0V52" fill="none" stroke="#91a0e8" stroke-opacity=".035" stroke-width="1"/>
     </pattern>
-    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#000" flood-opacity=".42"/>
+    <filter id="shadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="24" stdDeviation="30" flood-color="#000" flood-opacity=".48"/>
     </filter>
     <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
-      <feGaussianBlur stdDeviation="14" result="b"/>
+      <feGaussianBlur stdDeviation="13" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <style>
       .sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
-      .ring-a { transform-origin: 890px 220px; animation: spin 22s linear infinite; }
-      .ring-b { transform-origin: 890px 220px; animation: spinReverse 30s linear infinite; }
-      .pulse { transform-origin: 890px 220px; animation: breathe 5s ease-in-out infinite; }
-      .dash { animation: dash 10s linear infinite; }
-      .status { animation: blink 2.8s ease-in-out infinite; }
-      .scan { animation: scan 7s ease-in-out infinite; }
-      @keyframes spin { to { transform:rotate(360deg); } }
-      @keyframes spinReverse { to { transform:rotate(-360deg); } }
-      @keyframes breathe { 0%,100% { opacity:.34; transform:scale(.96); } 50% { opacity:.72; transform:scale(1.06); } }
-      @keyframes dash { to { stroke-dashoffset:-120; } }
-      @keyframes blink { 0%,100% { opacity:.45; } 50% { opacity:1; } }
-      @keyframes scan { 0%,100% { transform:translateX(-140px); opacity:0; } 15%,70% { opacity:.16; } 85% { transform:translateX(1280px); opacity:0; } }
+      .orbit-a { transform-origin: 985px 222px; animation: spin 28s linear infinite; }
+      .orbit-b { transform-origin: 985px 222px; animation: reverse 38s linear infinite; }
+      .aura { transform-origin: 985px 222px; animation: breathe 6s ease-in-out infinite; }
+      .status { animation: blink 3s ease-in-out infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes reverse { to { transform: rotate(-360deg); } }
+      @keyframes breathe { 0%,100% { opacity:.3; transform:scale(.97); } 50% { opacity:.62; transform:scale(1.045); } }
+      @keyframes blink { 0%,100% { opacity:.42; } 50% { opacity:1; } }
       @media (prefers-reduced-motion: reduce) {
-        .ring-a,.ring-b,.pulse,.dash,.status,.scan { animation:none !important; }
+        .orbit-a,.orbit-b,.aura,.status { animation:none !important; }
       }
     </style>
   </defs>
 
-  <rect x="1" y="1" width="1198" height="518" rx="30" fill="url(#bg)"/>
-  <rect x="1" y="1" width="1198" height="518" rx="30" fill="url(#grid)"/>
-  <rect x="1.5" y="1.5" width="1197" height="517" rx="29" fill="none" stroke="url(#accent)" stroke-opacity=".58" stroke-width="2"/>
+  <rect x="1" y="1" width="1198" height="558" rx="32" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1198" height="558" rx="32" fill="url(#grid)"/>
+  <rect x="1.5" y="1.5" width="1197" height="557" rx="31" fill="none" stroke="url(#edge)" stroke-width="2"/>
 
-  <circle cx="890" cy="220" r="210" fill="url(#coreShadow)" opacity=".55"/>
-  <path d="M40 410C260 360 440 390 620 430S960 490 1160 430" fill="none" stroke="#6adfff" stroke-opacity=".12" stroke-width="2" stroke-dasharray="8 14" class="dash"/>
+  <ellipse cx="1000" cy="225" rx="245" ry="245" fill="url(#aura)" opacity=".54"/>
 
   <g>
-    <text x="64" y="82" class="mono" fill="#70e8ff" font-size="14" font-weight="700" letter-spacing="3.5">NEXUS / AGENT ENGINEERING ACADEMY</text>
-    <text x="64" y="160" class="sans" fill="#f7f9ff" font-size="66" font-weight="850" letter-spacing="-2.2">Build agent systems</text>
-    <text x="64" y="226" class="sans" fill="#f7f9ff" font-size="66" font-weight="850" letter-spacing="-2.2">that survive production.</text>
-    <text x="64" y="282" class="sans" fill="#a7b2d1" font-size="22" font-weight="500">Contracts, control, evaluation and evidence — engineered as one system.</text>
+    <text x="66" y="72" class="mono" fill="#74e6ff" font-size="13" font-weight="700" letter-spacing="3.4">NEXUS / AGENT ENGINEERING ACADEMY</text>
 
-    <g transform="translate(64 322)">
-      <rect width="176" height="46" rx="23" fill="url(#glass)" stroke="#6f80ff" stroke-opacity=".4"/>
-      <circle cx="25" cy="23" r="5" fill="#59e4b7" class="status"/>
-      <text x="43" y="29" class="sans" fill="#eef3ff" font-size="15" font-weight="750">CONTROLLED</text>
+    <text x="66" y="157" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">Build agent systems</text>
+    <text x="66" y="225" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">that survive</text>
+    <text x="66" y="293" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">production.</text>
+
+    <text x="66" y="342" class="sans" fill="#aab5d2" font-size="21" font-weight="500">Engineering AI with contracts, control and evidence.</text>
+
+    <g transform="translate(66 378)">
+      <rect width="170" height="44" rx="22" fill="url(#glass)" stroke="#7284ff" stroke-opacity=".42"/>
+      <circle cx="24" cy="22" r="5" fill="#59e5b9" class="status"/>
+      <text x="42" y="28" class="sans" fill="#eef3ff" font-size="14" font-weight="760" letter-spacing=".4">CONTROLLED</text>
     </g>
-    <g transform="translate(252 322)">
-      <rect width="196" height="46" rx="23" fill="url(#glass)" stroke="#6f80ff" stroke-opacity=".28"/>
-      <text x="24" y="29" class="sans" fill="#eef3ff" font-size="15" font-weight="750">PRODUCTION-GRADE</text>
+    <g transform="translate(248 378)">
+      <rect width="190" height="44" rx="22" fill="url(#glass)" stroke="#7284ff" stroke-opacity=".25"/>
+      <text x="24" y="28" class="sans" fill="#eef3ff" font-size="14" font-weight="760" letter-spacing=".35">PRODUCTION-GRADE</text>
     </g>
   </g>
 
   <g filter="url(#shadow)">
-    <circle class="pulse" cx="890" cy="220" r="142" fill="#4e74ff" opacity=".28" filter="url(#glow)"/>
-    <circle cx="890" cy="220" r="108" fill="url(#core)"/>
-    <circle cx="890" cy="220" r="88" fill="#0b1024" fill-opacity=".22" stroke="#edfaff" stroke-opacity=".42" stroke-width="1.5"/>
+    <circle class="aura" cx="985" cy="222" r="148" fill="#5577ff" opacity=".28" filter="url(#glow)"/>
+    <circle cx="985" cy="222" r="101" fill="url(#core)"/>
+    <circle cx="985" cy="222" r="82" fill="#0b1024" fill-opacity=".2" stroke="#edfaff" stroke-opacity=".42" stroke-width="1.5"/>
 
-    <g class="ring-a" opacity=".82">
-      <circle cx="890" cy="220" r="132" fill="none" stroke="#70e8ff" stroke-opacity=".75" stroke-width="1.4" stroke-dasharray="7 16"/>
-      <circle cx="890" cy="88" r="5" fill="#dffbff" filter="url(#glow)"/>
+    <g class="orbit-a" opacity=".78">
+      <circle cx="985" cy="222" r="128" fill="none" stroke="#72e7ff" stroke-opacity=".74" stroke-width="1.35" stroke-dasharray="7 17"/>
+      <circle cx="985" cy="94" r="4.5" fill="#e3fcff" filter="url(#glow)"/>
     </g>
-    <g class="ring-b" opacity=".5">
-      <ellipse cx="890" cy="220" rx="166" ry="88" fill="none" stroke="#9d7cff" stroke-width="1.2" stroke-dasharray="3 14"/>
-      <circle cx="1056" cy="220" r="4" fill="#bba7ff" filter="url(#glow)"/>
+    <g class="orbit-b" opacity=".45">
+      <ellipse cx="985" cy="222" rx="159" ry="82" fill="none" stroke="#a58aff" stroke-width="1.1" stroke-dasharray="3 15"/>
+      <circle cx="1144" cy="222" r="4" fill="#c3b2ff" filter="url(#glow)"/>
     </g>
 
-    <path d="M890 158l54 31v62l-54 31-54-31v-62z" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="2.2"/>
-    <path d="M890 158v62m54-31l-54 31-54-31m54 31v62" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="1.3"/>
-    <text x="890" y="215" text-anchor="middle" class="sans" fill="#fff" font-size="24" font-weight="900" letter-spacing="2.8">NEXUS</text>
-    <text x="890" y="242" text-anchor="middle" class="mono" fill="#c7f6ff" font-size="10" font-weight="700" letter-spacing="2.2">CONTROL PLANE</text>
+    <path d="M985 166l49 28v56l-49 28-49-28v-56z" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="2.1"/>
+    <path d="M985 166v56m49-28l-49 28-49-28m49 28v56" fill="none" stroke="#fff" stroke-opacity=".36" stroke-width="1.2"/>
+    <text x="985" y="217" text-anchor="middle" class="sans" fill="#fff" font-size="22" font-weight="900" letter-spacing="2.7">NEXUS</text>
+    <text x="985" y="243" text-anchor="middle" class="mono" fill="#cbf7ff" font-size="9.5" font-weight="700" letter-spacing="2">CONTROL PLANE</text>
   </g>
 
-  <g transform="translate(680 390)">
-    <rect width="438" height="76" rx="22" fill="url(#glass)" stroke="#87a1ff" stroke-opacity=".22"/>
-    <g transform="translate(26 18)">
-      <text class="mono" fill="#7986aa" font-size="10" letter-spacing="1.6">CORE DOMAINS</text>
-      <text y="32" class="sans" fill="#f4f7ff" font-size="20" font-weight="800">Agent · Context · Tools · Loops · MCP</text>
-    </g>
-  </g>
+  <g transform="translate(66 478)">
+    <line x1="0" y1="-23" x2="1068" y2="-23" stroke="#7c89ae" stroke-opacity=".2"/>
 
-  <g transform="translate(64 430)">
-    <line x1="0" y1="0" x2="556" y2="0" stroke="#7280a8" stroke-opacity=".2"/>
-    <g transform="translate(0 24)">
-      <text class="sans" fill="#f7f9ff" font-size="24" font-weight="850">12</text>
-      <text x="42" y="-1" class="mono" fill="#8894b4" font-size="10" letter-spacing="1.4">MODULES</text>
+    <g>
+      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">12</text>
+      <text x="43" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">MODULES</text>
     </g>
-    <g transform="translate(142 24)">
-      <text class="sans" fill="#f7f9ff" font-size="24" font-weight="850">155+</text>
-      <text x="68" y="-1" class="mono" fill="#8894b4" font-size="10" letter-spacing="1.4">HOURS</text>
+    <g transform="translate(178 0)">
+      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">155+</text>
+      <text x="70" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">HOURS</text>
     </g>
-    <g transform="translate(318 24)">
-      <text class="sans" fill="#f7f9ff" font-size="24" font-weight="850">9+</text>
-      <text x="46" y="-1" class="mono" fill="#8894b4" font-size="10" letter-spacing="1.4">PLATFORMS</text>
+    <g transform="translate(390 0)">
+      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">9+</text>
+      <text x="48" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">PLATFORMS</text>
     </g>
-    <g transform="translate(480 24)">
-      <text class="sans" fill="#f7f9ff" font-size="24" font-weight="850">∞</text>
-      <text x="32" y="-1" class="mono" fill="#8894b4" font-size="10" letter-spacing="1.4">LOOPS</text>
+    <g transform="translate(590 0)">
+      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">∞</text>
+      <text x="34" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">LOOPS</text>
+    </g>
+    <g transform="translate(778 0)">
+      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">APACHE 2.0</text>
+      <text x="0" y="24" class="mono" fill="#6f7b9d" font-size="9.5" letter-spacing="1.45">OPEN SOURCE LICENSE</text>
     </g>
   </g>
 
-  <rect class="scan" x="-120" y="2" width="90" height="516" fill="url(#accent)" opacity="0"/>
+  <text x="1134" y="532" text-anchor="end" class="mono" fill="#5f6c8e" font-size="9.5" letter-spacing="1.6">CONTRACTS · CONTROL · EVIDENCE</text>
 </svg>
