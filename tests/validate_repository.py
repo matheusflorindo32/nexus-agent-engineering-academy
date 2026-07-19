@@ -1,7 +1,8 @@
-"""Validate the NEXUS documentation foundation using only Python's stdlib."""
+"""Validate the NEXUS Premium Elite foundation using Python's stdlib only."""
 from __future__ import annotations
 
 from pathlib import Path
+import ast
 import json
 import re
 import sys
@@ -23,15 +24,24 @@ REQUIRED_EXECUTABLES = {
     "examples/safe_tool_boundary.py",
     "examples/safe_tool_boundary.ts",
     "examples/deterministic_loop.py",
+    "examples/governed_memory_store.py",
+    "examples/governed_multi_agent_orchestrator.py",
+    "examples/evaluation_harness.py",
+    "examples/security_guardrails.py",
+    "examples/production_runtime.py",
     "datasets/lab-201-context-fixtures.json",
     ".github/workflows/quality.yml",
 }
+EXPECTED_MODULES = {f"{number:02d}" for number in range(10)}
+EXPECTED_LABS = {"000", "101", "201", "301", "401", "501", "601", "701", "801", "901"}
 REQUIRED_FRONTMATTER = {"id", "title", "lang", "status"}
 ALLOWED_LANGS = {"pt-BR", "en", "es"}
 ALLOWED_STATUS = {"foundation", "draft", "review", "active", "stable", "deprecated"}
 REQUIRED_MODULE_SECTIONS = {
-    "## Objetivos", "## Pré-requisitos", "## Laboratórios", "## Projeto",
-    "## Checklist", "## Bibliografia", "## Referências",
+    "## Objetivos", "## Pré-requisitos", "## Projeto", "## Checklist", "## Referências",
+}
+REQUIRED_LAB_SECTIONS = {
+    "## Missão", "## Critérios de aprovação", "## Evidências",
 }
 REQUIRED_AGENT_FIELDS = {
     "objective", "non_goals", "inputs", "outputs", "tools", "permissions",
@@ -125,15 +135,38 @@ def check_links(files: list[Path], errors: list[str]) -> None:
 
 def check_modules(errors: list[str]) -> None:
     modules_root = ROOT / "course" / "modules"
-    if not modules_root.exists():
-        return
+    present: set[str] = set()
     for path in sorted(modules_root.glob("*/README.md")):
+        prefix = path.parent.name.split("-", 1)[0]
+        present.add(prefix)
         text = path.read_text(encoding="utf-8")
         missing = [heading for heading in REQUIRED_MODULE_SECTIONS if heading not in text]
         if missing:
             errors.append(f"{path.relative_to(ROOT)}: seções ausentes: {', '.join(sorted(missing))}")
+        if "## Laboratório" not in text and "## Laboratórios" not in text:
+            errors.append(f"{path.relative_to(ROOT)}: referência de laboratório ausente")
         if "## Critérios de excelência" not in text and "## Avaliação" not in text:
             errors.append(f"{path.relative_to(ROOT)}: módulo sem critérios explícitos de avaliação")
+    missing_modules = EXPECTED_MODULES - present
+    if missing_modules:
+        errors.append(f"módulos obrigatórios ausentes: {', '.join(sorted(missing_modules))}")
+
+
+def check_labs(errors: list[str]) -> None:
+    present: set[str] = set()
+    for path in sorted((ROOT / "labs").glob("LAB-*.md")):
+        match = re.match(r"LAB-(\d{3})-", path.name)
+        if match:
+            present.add(match.group(1))
+        text = path.read_text(encoding="utf-8")
+        missing = [heading for heading in REQUIRED_LAB_SECTIONS if heading not in text]
+        if missing:
+            errors.append(f"{path.relative_to(ROOT)}: seções ausentes: {', '.join(sorted(missing))}")
+        if "## Comando" not in text and "## Procedimento" not in text:
+            errors.append(f"{path.relative_to(ROOT)}: procedimento ou comando ausente")
+    missing_labs = EXPECTED_LABS - present
+    if missing_labs:
+        errors.append(f"laboratórios obrigatórios ausentes: {', '.join(sorted(missing_labs))}")
 
 
 def check_agent_specs(errors: list[str]) -> None:
@@ -154,6 +187,14 @@ def check_executables(errors: list[str]) -> None:
         path = ROOT / relative
         if not path.is_file() or path.stat().st_size == 0:
             errors.append(f"artefato executável obrigatório ausente ou vazio: {relative}")
+    for path in sorted((ROOT / "examples").glob("*.py")):
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        except SyntaxError as exc:
+            errors.append(f"{path.relative_to(ROOT)}: Python inválido: {exc}")
+            continue
+        if ast.get_docstring(tree) is None:
+            errors.append(f"{path.relative_to(ROOT)}: docstring de módulo ausente")
     dataset = ROOT / "datasets/lab-201-context-fixtures.json"
     if dataset.exists():
         try:
@@ -192,6 +233,7 @@ def main() -> int:
     check_frontmatter(files, errors)
     check_links(files, errors)
     check_modules(errors)
+    check_labs(errors)
     check_agent_specs(errors)
     check_executables(errors)
     check_secrets(errors)
@@ -201,9 +243,9 @@ def main() -> int:
             print(f"- {error}")
         return 1
     print(
-        "NEXUS validation passed: "
-        f"{len(files)} Markdown files; structure, metadata, IDs, links, modules, "
-        "agent specs, executable contracts and secret scan OK."
+        "NEXUS Premium Elite validation passed: "
+        f"{len(files)} Markdown files; Modules 00-09; LAB-000 through LAB-901; "
+        "structure, metadata, IDs, links, contracts, executables and secret scan OK."
     )
     return 0
 
