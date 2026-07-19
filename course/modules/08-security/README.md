@@ -37,6 +37,10 @@ Endurecer um agente vulnerável, documentar risco residual e demonstrar containm
 - [ ] Aprovações incluem alvo, efeito e expiração.
 - [ ] O playbook preserva evidência e reconcilia efeitos.
 
+## Critérios de excelência
+
+- O hardening bloqueia os casos adversariais definidos, preserva evidência e documenta o risco residual.
+
 ## Bibliografia
 
 ANDERSON, Ross. *Security Engineering*. 3. ed. Wiley, 2020.

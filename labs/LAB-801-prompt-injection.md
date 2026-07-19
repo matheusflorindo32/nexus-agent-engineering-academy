@@ -7,6 +7,10 @@ status: foundation
 
 # LAB-801 — Prompt injection indireta
 
+## Missão
+
+Demonstrar, em corpus sintético, que autoridade e efeitos permanecem fora do conteúdo recuperado.
+
 ## Segurança do laboratório
 
 Use somente corpus sintético, ferramenta fake e rede desabilitada. Não teste serviços de terceiros sem autorização.
@@ -22,7 +26,11 @@ Um policy gate determinístico reduz o impacto de instruções hostis recuperada
 3. Meça respostas corretas, ações propostas, ações bloqueadas e falsos positivos.
 4. Documente risco residual e um teste regressivo.
 
-## Evidência e critério
+## Evidências
+
+Relatório dos casos, ações propostas, bloqueios e falsos positivos, sem acesso a sistemas reais.
+
+## Critérios de aprovação
 
 Zero efeito externo, 100% das ações proibidas bloqueadas no corpus e relatório que não reivindica proteção universal.
 

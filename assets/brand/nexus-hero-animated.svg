@@ -1,129 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
   <title id="title">NEXUS Agent Engineering Academy</title>
   <desc id="desc">Hero editorial premium com tipografia dominante, espaço negativo amplo e núcleo NEXUS animado isolado à direita.</desc>
-
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#050713"/>
-      <stop offset="0.58" stop-color="#090d1d"/>
-      <stop offset="1" stop-color="#10152b"/>
-    </linearGradient>
-    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#6677ff" stop-opacity=".18"/>
-      <stop offset=".55" stop-color="#67e2ff" stop-opacity=".8"/>
-      <stop offset="1" stop-color="#9c7dff" stop-opacity=".18"/>
-    </linearGradient>
-    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity=".1"/>
-      <stop offset="1" stop-color="#ffffff" stop-opacity=".025"/>
-    </linearGradient>
-    <radialGradient id="core" cx="34%" cy="27%" r="74%">
-      <stop offset="0" stop-color="#ecfdff"/>
-      <stop offset=".17" stop-color="#8beaff"/>
-      <stop offset=".48" stop-color="#617dff"/>
-      <stop offset="1" stop-color="#5d2bc7"/>
-    </radialGradient>
-    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#57ddff" stop-opacity=".32"/>
-      <stop offset="1" stop-color="#57ddff" stop-opacity="0"/>
-    </radialGradient>
-    <pattern id="grid" width="52" height="52" patternUnits="userSpaceOnUse">
-      <path d="M52 0H0V52" fill="none" stroke="#91a0e8" stroke-opacity=".035" stroke-width="1"/>
-    </pattern>
-    <filter id="shadow" x="-60%" y="-60%" width="220%" height="220%">
-      <feDropShadow dx="0" dy="24" stdDeviation="30" flood-color="#000" flood-opacity=".48"/>
-    </filter>
-    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
-      <feGaussianBlur stdDeviation="13" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <style>
-      .sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-      .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
-      .orbit-a { transform-origin: 985px 222px; animation: spin 28s linear infinite; }
-      .orbit-b { transform-origin: 985px 222px; animation: reverse 38s linear infinite; }
-      .aura { transform-origin: 985px 222px; animation: breathe 6s ease-in-out infinite; }
-      .status { animation: blink 3s ease-in-out infinite; }
-      @keyframes spin { to { transform: rotate(360deg); } }
-      @keyframes reverse { to { transform: rotate(-360deg); } }
-      @keyframes breathe { 0%,100% { opacity:.3; transform:scale(.97); } 50% { opacity:.62; transform:scale(1.045); } }
-      @keyframes blink { 0%,100% { opacity:.42; } 50% { opacity:1; } }
-      @media (prefers-reduced-motion: reduce) {
-        .orbit-a,.orbit-b,.aura,.status { animation:none !important; }
-      }
-    </style>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#050713"/><stop offset="0.58" stop-color="#090d1d"/><stop offset="1" stop-color="#10152b"/></linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6677ff" stop-opacity=".18"/><stop offset=".55" stop-color="#67e2ff" stop-opacity=".8"/><stop offset="1" stop-color="#9c7dff" stop-opacity=".18"/></linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".1"/><stop offset="1" stop-color="#ffffff" stop-opacity=".025"/></linearGradient>
+    <radialGradient id="core" cx="34%" cy="27%" r="74%"><stop offset="0" stop-color="#ecfdff"/><stop offset=".17" stop-color="#8beaff"/><stop offset=".48" stop-color="#617dff"/><stop offset="1" stop-color="#5d2bc7"/></radialGradient>
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#57ddff" stop-opacity=".32"/><stop offset="1" stop-color="#57ddff" stop-opacity="0"/></radialGradient>
+    <pattern id="grid" width="52" height="52" patternUnits="userSpaceOnUse"><path d="M52 0H0V52" fill="none" stroke="#91a0e8" stroke-opacity=".035" stroke-width="1"/></pattern>
+    <filter id="shadow" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="24" stdDeviation="30" flood-color="#000" flood-opacity=".48"/></filter>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="13" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <style>.sans{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}.orbit-a{transform-origin:985px 222px;animation:spin 28s linear infinite}.orbit-b{transform-origin:985px 222px;animation:reverse 38s linear infinite}.aura{transform-origin:985px 222px;animation:breathe 6s ease-in-out infinite}.status{animation:blink 3s ease-in-out infinite}@keyframes spin{to{transform:rotate(360deg)}}@keyframes reverse{to{transform:rotate(-360deg)}}@keyframes breathe{0%,100%{opacity:.3;transform:scale(.97)}50%{opacity:.62;transform:scale(1.045)}}@keyframes blink{0%,100%{opacity:.42}50%{opacity:1}}@media (prefers-reduced-motion:reduce){.orbit-a,.orbit-b,.aura,.status{animation:none!important}}</style>
   </defs>
-
-  <rect x="1" y="1" width="1198" height="558" rx="32" fill="url(#bg)"/>
-  <rect x="1" y="1" width="1198" height="558" rx="32" fill="url(#grid)"/>
-  <rect x="1.5" y="1.5" width="1197" height="557" rx="31" fill="none" stroke="url(#edge)" stroke-width="2"/>
-
+  <rect x="1" y="1" width="1198" height="558" rx="32" fill="url(#bg)"/><rect x="1" y="1" width="1198" height="558" rx="32" fill="url(#grid)"/><rect x="1.5" y="1.5" width="1197" height="557" rx="31" fill="none" stroke="url(#edge)" stroke-width="2"/>
   <ellipse cx="1000" cy="225" rx="245" ry="245" fill="url(#aura)" opacity=".54"/>
-
-  <g>
-    <text x="66" y="72" class="mono" fill="#74e6ff" font-size="13" font-weight="700" letter-spacing="3.4">NEXUS / AGENT ENGINEERING ACADEMY</text>
-
-    <text x="66" y="157" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">Build agent systems</text>
-    <text x="66" y="225" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">that survive</text>
-    <text x="66" y="293" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">production.</text>
-
-    <text x="66" y="342" class="sans" fill="#aab5d2" font-size="21" font-weight="500">Engineering AI with contracts, control and evidence.</text>
-
-    <g transform="translate(66 378)">
-      <rect width="170" height="44" rx="22" fill="url(#glass)" stroke="#7284ff" stroke-opacity=".42"/>
-      <circle cx="24" cy="22" r="5" fill="#59e5b9" class="status"/>
-      <text x="42" y="28" class="sans" fill="#eef3ff" font-size="14" font-weight="760" letter-spacing=".4">CONTROLLED</text>
-    </g>
-    <g transform="translate(248 378)">
-      <rect width="190" height="44" rx="22" fill="url(#glass)" stroke="#7284ff" stroke-opacity=".25"/>
-      <text x="24" y="28" class="sans" fill="#eef3ff" font-size="14" font-weight="760" letter-spacing=".35">PRODUCTION-GRADE</text>
-    </g>
-  </g>
-
-  <g filter="url(#shadow)">
-    <circle class="aura" cx="985" cy="222" r="148" fill="#5577ff" opacity=".28" filter="url(#glow)"/>
-    <circle cx="985" cy="222" r="101" fill="url(#core)"/>
-    <circle cx="985" cy="222" r="82" fill="#0b1024" fill-opacity=".2" stroke="#edfaff" stroke-opacity=".42" stroke-width="1.5"/>
-
-    <g class="orbit-a" opacity=".78">
-      <circle cx="985" cy="222" r="128" fill="none" stroke="#72e7ff" stroke-opacity=".74" stroke-width="1.35" stroke-dasharray="7 17"/>
-      <circle cx="985" cy="94" r="4.5" fill="#e3fcff" filter="url(#glow)"/>
-    </g>
-    <g class="orbit-b" opacity=".45">
-      <ellipse cx="985" cy="222" rx="159" ry="82" fill="none" stroke="#a58aff" stroke-width="1.1" stroke-dasharray="3 15"/>
-      <circle cx="1144" cy="222" r="4" fill="#c3b2ff" filter="url(#glow)"/>
-    </g>
-
-    <path d="M985 166l49 28v56l-49 28-49-28v-56z" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="2.1"/>
-    <path d="M985 166v56m49-28l-49 28-49-28m49 28v56" fill="none" stroke="#fff" stroke-opacity=".36" stroke-width="1.2"/>
-    <text x="985" y="217" text-anchor="middle" class="sans" fill="#fff" font-size="22" font-weight="900" letter-spacing="2.7">NEXUS</text>
-    <text x="985" y="243" text-anchor="middle" class="mono" fill="#cbf7ff" font-size="9.5" font-weight="700" letter-spacing="2">CONTROL PLANE</text>
-  </g>
-
-  <g transform="translate(66 478)">
-    <line x1="0" y1="-23" x2="1068" y2="-23" stroke="#7c89ae" stroke-opacity=".2"/>
-
-    <g>
-      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">12</text>
-      <text x="43" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">MODULES</text>
-    </g>
-    <g transform="translate(178 0)">
-      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">155+</text>
-      <text x="70" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">HOURS</text>
-    </g>
-    <g transform="translate(390 0)">
-      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">9+</text>
-      <text x="48" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">PLATFORMS</text>
-    </g>
-    <g transform="translate(590 0)">
-      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">∞</text>
-      <text x="34" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">LOOPS</text>
-    </g>
-    <g transform="translate(778 0)">
-      <text class="sans" fill="#f8faff" font-size="25" font-weight="850">APACHE 2.0</text>
-      <text x="0" y="24" class="mono" fill="#6f7b9d" font-size="9.5" letter-spacing="1.45">OPEN SOURCE LICENSE</text>
-    </g>
-  </g>
-
+  <g><text x="66" y="72" class="mono" fill="#74e6ff" font-size="13" font-weight="700" letter-spacing="3.4">NEXUS / AGENT ENGINEERING ACADEMY</text><text x="66" y="157" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">Build agent systems</text><text x="66" y="225" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">that survive</text><text x="66" y="293" class="sans" fill="#f8faff" font-size="68" font-weight="860" letter-spacing="-2.5">production.</text><text x="66" y="342" class="sans" fill="#aab5d2" font-size="21" font-weight="500">Engineering AI with contracts, control and evidence.</text><g transform="translate(66 378)"><rect width="170" height="44" rx="22" fill="url(#glass)" stroke="#7284ff" stroke-opacity=".42"/><circle cx="24" cy="22" r="5" fill="#59e5b9" class="status"/><text x="42" y="28" class="sans" fill="#eef3ff" font-size="14" font-weight="760" letter-spacing=".4">CONTROLLED</text></g><g transform="translate(248 378)"><rect width="190" height="44" rx="22" fill="url(#glass)" stroke="#7284ff" stroke-opacity=".25"/><text x="24" y="28" class="sans" fill="#eef3ff" font-size="14" font-weight="760" letter-spacing=".35">PRODUCTION-GRADE</text></g></g>
+  <g filter="url(#shadow)"><circle class="aura" cx="985" cy="222" r="148" fill="#5577ff" opacity=".28" filter="url(#glow)"/><circle cx="985" cy="222" r="101" fill="url(#core)"/><circle cx="985" cy="222" r="82" fill="#0b1024" fill-opacity=".2" stroke="#edfaff" stroke-opacity=".42" stroke-width="1.5"/><g class="orbit-a" opacity=".78"><circle cx="985" cy="222" r="128" fill="none" stroke="#72e7ff" stroke-opacity=".74" stroke-width="1.35" stroke-dasharray="7 17"/><circle cx="985" cy="94" r="4.5" fill="#e3fcff" filter="url(#glow)"/></g><g class="orbit-b" opacity=".45"><ellipse cx="985" cy="222" rx="159" ry="82" fill="none" stroke="#a58aff" stroke-width="1.1" stroke-dasharray="3 15"/><circle cx="1144" cy="222" r="4" fill="#c3b2ff" filter="url(#glow)"/></g><path d="M985 166l49 28v56l-49 28-49-28v-56z" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="2.1"/><path d="M985 166v56m49-28l-49 28-49-28m49 28v56" fill="none" stroke="#fff" stroke-opacity=".36" stroke-width="1.2"/><text x="985" y="217" text-anchor="middle" class="sans" fill="#fff" font-size="22" font-weight="900" letter-spacing="2.7">NEXUS</text><text x="985" y="243" text-anchor="middle" class="mono" fill="#cbf7ff" font-size="9.5" font-weight="700" letter-spacing="2">CONTROL PLANE</text></g>
+  <g transform="translate(66 478)"><line x1="0" y1="-23" x2="1068" y2="-23" stroke="#7c89ae" stroke-opacity=".2"/><g><text class="sans" fill="#f8faff" font-size="25" font-weight="850">12</text><text x="43" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">MODULES</text></g><g transform="translate(178 0)"><text class="sans" fill="#f8faff" font-size="25" font-weight="850">155+</text><text x="70" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">HOURS</text></g><g transform="translate(390 0)"><text class="sans" fill="#f8faff" font-size="25" font-weight="850">9+</text><text x="48" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">PLATFORMS</text></g><g transform="translate(590 0)"><text class="sans" fill="#f8faff" font-size="25" font-weight="850">∞</text><text x="34" y="-1" class="mono" fill="#8995b5" font-size="10" letter-spacing="1.5">LOOPS</text></g><g transform="translate(778 0)"><text class="sans" fill="#f8faff" font-size="25" font-weight="850">APACHE 2.0</text><text x="0" y="24" class="mono" fill="#6f7b9d" font-size="9.5" letter-spacing="1.45">OPEN SOURCE LICENSE</text></g></g>
   <text x="1134" y="532" text-anchor="end" class="mono" fill="#5f6c8e" font-size="9.5" letter-spacing="1.6">CONTRACTS · CONTROL · EVIDENCE</text>
 </svg>

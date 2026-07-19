@@ -1,0 +1,65 @@
+version: 0.3.0
+updated_at: 2026-07-19
+policy: docs/standards/visual-evidence-policy.md
+assets:
+  - id: asset.brand.nexus-logo
+    path: assets/brand/nexus-logo.svg
+    type: logo
+    purpose: Identidade visual do projeto.
+    source: original
+    author: NEXUS Agent Engineering Academy
+    license: project-brand-restricted
+    ai_generated: false
+    alt_pt_BR: Logotipo da NEXUS Agent Engineering Academy.
+    alt_en: NEXUS Agent Engineering Academy logo.
+    alt_es: Logotipo de NEXUS Agent Engineering Academy.
+    reviewed: true
+    reviewed_at: 2026-07-19
+    notes: Uso permitido no contexto do projeto; não implica cessão ampla da marca.
+
+  - id: asset.architecture.system-light-3d
+    path: assets/architecture/nexus-system-light-3d.png
+    type: architecture-infographic
+    purpose: Visão principal e integrada da arquitetura, aprendizagem, governança, dados, loops e resultados da NEXUS.
+    source: generated-for-project
+    author: Matheus Florindo de Deus e OpenAI
+    license: project-use
+    ai_generated: true
+    canonical: true
+    palette: light
+    status: published
+    alt_pt_BR: Infográfico claro em estilo 3D que apresenta entradas, plataforma NEXUS, governança, dados, ciclo de melhoria, princípios, fluxo de aprendizagem, impacto e resultados.
+    alt_en: Light 3D infographic showing inputs, the NEXUS platform, governance, data, the improvement loop, principles, learning flow, impact and outcomes.
+    alt_es: Infografía clara en 3D que muestra entradas, plataforma NEXUS, gobernanza, datos, ciclo de mejora, principios, flujo de aprendizaje, impacto y resultados.
+    reviewed: true
+    reviewed_at: 2026-07-19
+    target_uses:
+      - README principal
+      - abertura do curso
+      - site de documentação
+      - apresentações
+      - PDF institucional
+    notes: Asset visual canônico publicado. Ainda gerar derivados WebP, responsivo e mobile após revisão tipográfica em 100% de zoom.
+
+  - id: asset.architecture.system-handwritten
+    path: assets/architecture/nexus-system-handwritten.png
+    type: learning-map
+    purpose: Explicação pedagógica, bastidores, design thinking e comparação entre rascunho e arquitetura final.
+    source: generated-for-project
+    author: Matheus Florindo de Deus e OpenAI
+    license: project-use
+    ai_generated: true
+    canonical: false
+    palette: paper-light
+    status: published
+    alt_pt_BR: Mapa manuscrito do ecossistema NEXUS com curso, agentes, loops, plataformas, governança, conhecimento e melhoria contínua.
+    alt_en: Handwritten NEXUS ecosystem map with course, agents, loops, platforms, governance, knowledge and continuous improvement.
+    alt_es: Mapa manuscrito del ecosistema NEXUS con curso, agentes, loops, plataformas, gobernanza, conocimiento y mejora continua.
+    reviewed: true
+    reviewed_at: 2026-07-19
+    target_uses:
+      - Módulo 00
+      - design thinking
+      - aulas e vídeos
+      - redes sociais
+    notes: Material secundário publicado; não substitui o infográfico claro 3D no README principal.

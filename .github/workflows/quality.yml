@@ -1,0 +1,77 @@
+name: NEXUS Quality
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, audit/premium-elite-v1]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-python:
+    name: Contracts and Python self-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Repository contracts
+        run: python tests/validate_repository.py
+
+      - name: Compile Python sources
+        run: python -m compileall -q examples tests
+
+      - name: Minimal read-only agent
+        run: python examples/minimal_readonly_agent.py --demo
+
+      - name: Context retriever
+        run: python examples/context_retriever.py
+
+      - name: Safe tool boundary
+        run: python examples/safe_tool_boundary.py --self-test
+
+      - name: Deterministic loop
+        run: python examples/deterministic_loop.py --self-test
+
+      - name: Governed memory
+        run: python examples/governed_memory_store.py --self-test
+
+      - name: Governed multi-agent orchestration
+        run: python examples/governed_multi_agent_orchestrator.py --self-test
+
+      - name: Evaluation harness
+        run: python examples/evaluation_harness.py --self-test
+
+      - name: Security guardrails
+        run: python examples/security_guardrails.py --self-test
+
+      - name: Production runtime
+        run: python examples/production_runtime.py --self-test
+
+  typescript-contract:
+    name: TypeScript boundary contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Type-check TypeScript example
+        run: npx --yes --package typescript@5.8.3 tsc --noEmit --strict --target ES2022 --lib ES2022,DOM examples/safe_tool_boundary.ts

@@ -37,6 +37,10 @@ Sistema com contratos de handoff, isolamento de capacidade, trace causal e fallb
 - [ ] Agentes não podem autoampliar capacidade.
 - [ ] Deadlock, livelock e mensagem duplicada foram testados.
 
+## Critérios de excelência
+
+- O ganho sobre o baseline single-agent é mensurável e os handoffs permanecem rastreáveis e limitados por capacidade.
+
 ## Bibliografia
 
 WOOLDRIDGE, Michael. *An Introduction to MultiAgent Systems*. 2. ed. Wiley, 2009.

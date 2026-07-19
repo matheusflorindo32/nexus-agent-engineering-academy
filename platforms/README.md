@@ -2,22 +2,23 @@
 id: platforms.index
 title: Matriz de plataformas
 lang: pt-BR
-status: foundation
+status: review
+version: 0.2.0
 ---
 
 # Plataformas e adapters
 
-Esta matriz é um backlog verificável, não uma alegação de equivalência. `planned` significa apenas que a estrutura
-aceita um adapter futuro. Capacidades mudam; confirme a documentação oficial e registre a data antes de ensinar.
+Esta matriz é um backlog verificável, não uma alegação de equivalência. `planned` significa apenas que a estrutura aceita um adapter futuro. Capacidades mudam; confirme a documentação oficial e registre a data antes de ensinar.
 
-| Plataforma | Tipo | Adapter | Status inicial |
+| Plataforma | Tipo | Adapter | Status |
 |---|---|---|---|
 | ChatGPT | produto | `chatgpt/` | planned |
 | OpenAI Agents SDK | SDK | `openai-agents-sdk/` | foundation |
 | Codex | agente de software | `codex/` | planned |
 | Claude / Claude Code | produto/agente | `anthropic/` | planned |
 | Gemini / Gemini CLI | produto/agente | `google/` | planned |
-| Kimi | produto/modelo | `kimi/` | research-required |
+| Kimi K3 / K3 Swarm / Agent / Code / API | modelo, produto, agente, CLI e API | [`kimi/`](kimi/README.md) | review |
+| Kimi-Dev | modelo/repositório open source de software engineering | `kimi-dev/` | research-required |
 | OpenClaw | projeto | `openclaw/` | research-required |
 | Hermes | projeto | `hermes/` | research-required |
 | CrewAI | framework | `crewai/` | planned |
@@ -41,3 +42,6 @@ Cada diretório deve conter um `README.md` com:
 
 Use [adapter-template.md](adapter-template.md). Nunca condicione o currículo core à disponibilidade de um fornecedor.
 
+## Matriz detalhada
+
+Consulte a [matriz comparativa de capacidades](capability-matrix.md). Toda célula verificada deve apontar para evidência reproduzível e possuir data de expiração.

@@ -38,6 +38,10 @@ Entregar sistema executável, demo segura, eval report, threat model, runbook, A
 - [ ] Operador consegue observar, pausar, retomar e reverter.
 - [ ] Outra pessoa reproduz a demo sem segredo compartilhado.
 
+## Critérios de excelência
+
+- A entrega integra avaliação, segurança, operação e rollback com evidência suficiente para reprodução independente.
+
 ## Bibliografia
 
 FORD, Neal et al. *Software Architecture: The Hard Parts*. O’Reilly, 2021.

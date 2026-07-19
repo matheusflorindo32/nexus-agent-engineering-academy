@@ -37,6 +37,10 @@ Definir SLOs e alertas acionáveis, demonstrando investigação e mitigação de
 - [ ] Prompts/outputs sensíveis não vazam por padrão.
 - [ ] Alertas apontam para runbooks testados.
 
+## Critérios de excelência
+
+- Sinais, alertas e runbooks permitem diagnosticar e mitigar o incidente simulado sem expor dados sensíveis.
+
 ## Bibliografia
 
 BEYER, Betsy et al. *Site Reliability Engineering*. O’Reilly, 2016.

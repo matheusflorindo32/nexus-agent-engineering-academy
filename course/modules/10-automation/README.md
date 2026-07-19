@@ -37,6 +37,10 @@ Automação que processa evento, usa agente apenas na decisão ambígua, exige a
 - [ ] Estado e ownership de cada etapa estão visíveis.
 - [ ] Existe caminho manual quando IA/dependência falha.
 
+## Critérios de excelência
+
+- Reentrega, concorrência e falha parcial não duplicam efeitos, e o rollback permanece demonstrável.
+
 ## Bibliografia
 
 HOHPE, Gregor; WOOLF, Bobby. *Enterprise Integration Patterns*. Addison-Wesley, 2003.

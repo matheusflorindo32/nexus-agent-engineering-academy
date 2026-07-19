@@ -1,103 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" width="100%">
   <defs>
-    <!-- Background gradient -->
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="320" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0a0a0f"/>
-      <stop offset="40%" stop-color="#111118"/>
-      <stop offset="100%" stop-color="#0f0f16"/>
-    </linearGradient>
-    
-    <!-- Logo gradient -->
-    <linearGradient id="logoGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#a0a8ff"/>
-      <stop offset="100%" stop-color="#4a5fff"/>
-    </linearGradient>
-    
-    <!-- Title gradient -->
-    <linearGradient id="titleGrad" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#e0e0ff"/>
-      <stop offset="50%" stop-color="#a0a8ff"/>
-      <stop offset="100%" stop-color="#6a7fff"/>
-    </linearGradient>
-    
-    <!-- Divider gradient -->
-    <linearGradient id="divGrad" x1="0" y1="0" x2="120" y2="0" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="transparent"/>
-      <stop offset="50%" stop-color="#4a5fff"/>
-      <stop offset="100%" stop-color="transparent"/>
-    </linearGradient>
-    
-    <!-- Glow filter -->
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="320" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#0a0a0f"/><stop offset="40%" stop-color="#111118"/><stop offset="100%" stop-color="#0f0f16"/></linearGradient>
+    <linearGradient id="logoGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#a0a8ff"/><stop offset="100%" stop-color="#4a5fff"/></linearGradient>
+    <linearGradient id="titleGrad" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e0e0ff"/><stop offset="50%" stop-color="#a0a8ff"/><stop offset="100%" stop-color="#6a7fff"/></linearGradient>
+    <linearGradient id="divGrad" x1="0" y1="0" x2="120" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="transparent"/><stop offset="50%" stop-color="#4a5fff"/><stop offset="100%" stop-color="transparent"/></linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0L0 0 0 40" fill="none" stroke="#ffffff" stroke-width="0.5"/></pattern>
   </defs>
-
-  <!-- Background -->
-  <rect width="880" height="320" rx="16" fill="url(#bg)" stroke="#22222e" stroke-width="2"/>
-  
-  <!-- Subtle grid pattern -->
-  <g opacity="0.03">
-    <defs>
-      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-width="0.5"/>
-      </pattern>
-    </defs>
-    <rect width="880" height="320" fill="url(#grid)"/>
-  </g>
-
-  <!-- Logo: NEXUS mark -->
-  <g transform="translate(440, 85)" filter="url(#glow)">
-    <!-- Outer hexagon frame -->
-    <path d="M-40 -23 L0 -46 L40 -23 L40 23 L0 46 L-40 23 Z" 
-          fill="none" stroke="url(#logoGrad)" stroke-width="2" opacity="0.6"/>
-    <!-- Inner N shape -->
-    <path d="M-20 15 L-20 -15 L0 0 L20 -15 L20 15" 
-          fill="none" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- Center dot -->
-    <circle cx="0" cy="0" r="4" fill="#6a7fff"/>
-  </g>
-
-  <!-- Title: NEXUS -->
-  <text x="440" y="165" 
-        font-family="'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif" 
-        font-size="52" font-weight="700" 
-        fill="url(#titleGrad)" 
-        text-anchor="middle" letter-spacing="-2">NEXUS</text>
-
-  <!-- Subtitle line 1 -->
-  <text x="440" y="200" 
-        font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" 
-        font-size="18" font-weight="600" 
-        fill="#c0c5ff" 
-        text-anchor="middle">Agent Engineering Academy</text>
-  
-  <!-- Subtitle line 2 -->
-  <text x="440" y="225" 
-        font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" 
-        font-size="14" font-weight="400" 
-        fill="#8a8faa" 
-        text-anchor="middle">From first loop to production-grade multi-agent systems.</text>
-
-  <!-- Divider -->
+  <rect width="880" height="320" rx="16" fill="url(#bg)" stroke="#22222e" stroke-width="2"/><rect width="880" height="320" fill="url(#grid)" opacity="0.03"/>
+  <g transform="translate(440,85)" filter="url(#glow)"><path d="M-40-23L0-46 40-23 40 23 0 46-40 23Z" fill="none" stroke="url(#logoGrad)" stroke-width="2" opacity="0.6"/><path d="M-20 15V-15L0 0 20-15V15" fill="none" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="0" cy="0" r="4" fill="#6a7fff"/></g>
+  <text x="440" y="165" font-family="'Space Grotesk','Inter',sans-serif" font-size="52" font-weight="700" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">NEXUS</text>
+  <text x="440" y="200" font-family="'Inter',sans-serif" font-size="18" font-weight="600" fill="#c0c5ff" text-anchor="middle">Agent Engineering Academy</text>
+  <text x="440" y="225" font-family="'Inter',sans-serif" font-size="14" fill="#8a8faa" text-anchor="middle">From first loop to production-grade multi-agent systems.</text>
   <rect x="380" y="245" width="120" height="2" fill="url(#divGrad)" rx="1"/>
-
-  <!-- Tagline -->
-  <text x="440" y="270" 
-        font-family="'SF Mono', 'Fira Code', monospace" 
-        font-size="13" font-weight="500" 
-        fill="#6a7fff" 
-        text-anchor="middle">Engineering rigor · Multi-platform · Vendor-independent · Evidence-backed</text>
-
-  <!-- Meta tags at bottom -->
-  <text x="440" y="300" 
-        font-family="'SF Mono', 'Fira Code', monospace" 
-        font-size="11" font-weight="400" 
-        fill="#555570" 
-        text-anchor="middle">markdown · obsidian · python · mermaid · github-actions</text>
+  <text x="440" y="270" font-family="'SF Mono','Fira Code',monospace" font-size="13" font-weight="500" fill="#6a7fff" text-anchor="middle">Engineering rigor · Multi-platform · Vendor-independent · Evidence-backed</text>
+  <text x="440" y="300" font-family="'SF Mono','Fira Code',monospace" font-size="11" fill="#555570" text-anchor="middle">markdown · obsidian · python · mermaid · github-actions</text>
 </svg>

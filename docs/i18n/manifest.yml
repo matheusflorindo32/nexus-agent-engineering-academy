@@ -1,5 +1,6 @@
 schema_version: 1
 canonical_language: pt-BR
+updated_at: 2026-07-19
 languages:
   en:
     label: English
@@ -9,17 +10,50 @@ languages:
     label: Español
     root: docs/i18n/es
     status: planned
+parity_rules:
+  stable_ids: true
+  preserve_code: true
+  preserve_relative_links: true
+  technical_review_required: true
+  stale_when_source_version_changes: true
 documents:
   - id: nexus.home
     source: README.md
+    source_version: 0.1.0
     en: missing
     es: missing
   - id: architecture.overview
     source: docs/architecture/overview.md
+    source_version: 0.1.0
     en: missing
     es: missing
   - id: course.index
     source: course/README.md
+    source_version: 0.1.0
     en: missing
     es: missing
-
+  - id: course.module.00-orientation
+    source: course/modules/00-orientation/README.md
+    source_version: 0.2.0
+    en: missing
+    es: missing
+  - id: course.module.01-agent-foundations
+    source: course/modules/01-agent-foundations/README.md
+    source_version: 0.2.0
+    en: missing
+    es: missing
+  - id: lab.000.repository-orientation
+    source: labs/LAB-000-repository-orientation.md
+    source_version: 0.2.0
+    en: missing
+    es: missing
+  - id: lab.101.agent-contract
+    source: labs/LAB-101-agent-contract.md
+    source_version: 0.2.0
+    en: missing
+    es: missing
+  - id: standards.visual-evidence
+    source: docs/standards/visual-evidence-policy.md
+    source_version: 0.1.0
+    en: missing
+    es: missing

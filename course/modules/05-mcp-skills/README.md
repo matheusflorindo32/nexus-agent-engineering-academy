@@ -37,6 +37,10 @@ Servidor MCP mínimo com allowlist, entradas validadas, autorização adequada a
 - [ ] O host mantém consentimento e isolamento.
 - [ ] Tokens são validados para o recurso correto.
 
+## Critérios de excelência
+
+- O servidor demonstra negociação de capacidade, least privilege e falha segura com evidência reproduzível.
+
 ## Bibliografia
 
 FIELDING, Roy T. *Architectural Styles and the Design of Network-based Software Architectures*. 2000.

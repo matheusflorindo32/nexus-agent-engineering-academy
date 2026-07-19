@@ -37,6 +37,10 @@ Suíte reproduzível que compara baseline e agente, registra configuração e bl
 - [ ] Métrica tem definição e limiar justificado.
 - [ ] Falhas são inspecionáveis, não apenas um score agregado.
 
+## Critérios de excelência
+
+- A suíte bloqueia regressões críticas com dataset versionado, métricas justificadas e resultados inspecionáveis.
+
 ## Bibliografia
 
 JURAN, Joseph M.; GODFREY, A. Blanton. *Juran’s Quality Handbook*. McGraw-Hill, 1999.
