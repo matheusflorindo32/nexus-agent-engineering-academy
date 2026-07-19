@@ -1,111 +1,19 @@
 <div align="center">
 
-<!-- NEXUS Brand Header — Inline HTML/CSS for Visual Impact -->
-<style>
-  .nexus-header {
-    font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    text-align: center;
-    padding: 2.5rem 1rem 1.5rem;
-    background: linear-gradient(180deg, #0a0a0f 0%, #111118 40%, #0f0f16 100%);
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    border: 1px solid #22222e;
-  }
-  .nexus-logo {
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 1.5rem;
-    display: block;
-  }
-  .nexus-title {
-    font-size: 3.2rem;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    background: linear-gradient(135deg, #e0e0ff 0%, #a0a8ff 50%, #6a7fff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 0.5rem 0;
-    line-height: 1.1;
-  }
-  .nexus-subtitle {
-    font-size: 1.15rem;
-    color: #8a8faa;
-    font-weight: 400;
-    letter-spacing: 0.02em;
-    margin: 0 0 1.5rem 0;
-    line-height: 1.5;
-    max-width: 640px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .nexus-badges {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-  .nexus-badges img {
-    height: 22px;
-    border-radius: 4px;
-    opacity: 0.9;
-    transition: opacity 0.2s;
-  }
-  .nexus-badges img:hover {
-    opacity: 1;
-  }
-  .nexus-divider {
-    width: 80px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #4a5fff, transparent);
-    margin: 1.5rem auto;
-    border: none;
-  }
-  .nexus-meta {
-    font-size: 0.85rem;
-    color: #555570;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    margin-top: 1rem;
-  }
-</style>
+<img src="assets/nexus-header.svg" width="100%" alt="NEXUS Agent Engineering Academy"/>
 
-<div class="nexus-header">
-  <svg class="nexus-logo" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="96" height="96" rx="16" fill="#111118" stroke="#22222e" stroke-width="1"/>
-    <path d="M28 68L48 28L68 68H58L48 48L38 68H28Z" fill="url(#nexusGrad)"/>
-    <circle cx="48" cy="48" r="3" fill="#6a7fff"/>
-    <defs>
-      <linearGradient id="nexusGrad" x1="28" y1="28" x2="68" y2="68" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#a0a8ff"/>
-        <stop offset="1" stop-color="#4a5fff"/>
-      </linearGradient>
-    </defs>
-  </svg>
+<br/>
 
-  <h1 class="nexus-title">NEXUS</h1>
-  <p class="nexus-subtitle">
-    <strong>Agent Engineering Academy</strong><br>
-    <span style="font-size:0.95em;">From first loop to production-grade multi-agent systems.</span>
-  </p>
-  <div class="nexus-divider"></div>
-  <p class="nexus-subtitle" style="font-size:1rem; color:#6a7fff; font-weight:500;">
-    Engineering rigor. Multi-platform. Vendor-independent. Evidence-backed.
-  </p>
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-4a5fff?style=flat-square&logo=apache&logoColor=white" alt="License"/></a>
+<a href="#"><img src="https://img.shields.io/badge/Status-Foundation%20Phase-6a7fff?style=flat-square" alt="Status"/></a>
+<a href="#"><img src="https://img.shields.io/badge/Contributions-Welcome-8a8faa?style=flat-square&logo=github&logoColor=white" alt="Contributions"/></a>
+<a href="#"><img src="https://img.shields.io/badge/Languages-pt--BR%20%7C%20en%20%7C%20es-a0a8ff?style=flat-square" alt="Languages"/></a>
+<a href="#"><img src="https://img.shields.io/badge/CI-GitHub%20Actions-22222e?style=flat-square&logo=githubactions&logoColor=white" alt="CI"/></a>
+<a href="SECURITY.md"><img src="https://img.shields.io/badge/Security-Audited-ff6b6b?style=flat-square&logo=shield&logoColor=white" alt="Security"/></a>
 
-  <div class="nexus-badges">
-    <img src="https://img.shields.io/badge/License-Apache%202.0-4a5fff?style=flat-square&logo=apache&logoColor=white" alt="License"/>
-    <img src="https://img.shields.io/badge/Status-Foundation%20Phase-6a7fff?style=flat-square" alt="Status"/>
-    <img src="https://img.shields.io/badge/Contributions-Welcome-8a8faa?style=flat-square&logo=github&logoColor=white" alt="Contributions"/>
-    <img src="https://img.shields.io/badge/Languages-pt--BR%20%7C%20en%20%7C%20es-a0a8ff?style=flat-square" alt="Languages"/>
-    <img src="https://img.shields.io/badge/CI-GitHub%20Actions-22222e?style=flat-square&logo=githubactions&logoColor=white" alt="CI"/>
-    <img src="https://img.shields.io/badge/Security-Audited-ff6b6b?style=flat-square&logo=shield&logoColor=white" alt="Security"/>
-  </div>
+<br/>
 
-  <p class="nexus-meta">
-    <code>markdown</code> · <code>obsidian</code> · <code>python</code> · <code>mermaid</code> · <code>github-actions</code>
-  </p>
-</div>
+`markdown` · `obsidian` · `python` · `mermaid` · `github-actions`
 
 </div>
 
