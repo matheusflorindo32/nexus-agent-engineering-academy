@@ -15,11 +15,11 @@ flowchart LR
     M01 --> M02[02 Contexto]
     M02 --> M03[03 Tools]
     M03 --> M04[04 Loops]
-    M04 --> M05[05 MCP e Skills]
-    M05 --> M06[06 Avaliação]
-    M06 --> M07[07 Observabilidade e SRE]
-    M07 --> M08[08 Segurança]
-    M08 --> M09[09 Multiagentes e Produção]
+    M04 --> M05[05 Memória]
+    M05 --> M06[06 Multiagentes]
+    M06 --> M07[07 Avaliação]
+    M07 --> M08[08 Guardrails e Segurança]
+    M08 --> M09[09 Arquitetura de Produção]
     M09 --> M10[10 Observability Engineering]
     M10 --> M11[11 Automação]
     M11 --> M12[12 Capstone]
@@ -32,14 +32,18 @@ flowchart LR
 | [02 — Context Engineering](modules/02-context-engineering/README.md) | 10 h | pipeline de contexto avaliado |
 | [03 — Tools](modules/03-tool-engineering/README.md) | 10 h | ferramenta segura e testada |
 | [04 — Loop Engineering](modules/04-loop-engineering/README.md) | 12 h | loop com budgets e recovery |
-| [05 — MCP e Skills](modules/05-mcp-skills/README.md) | 12 h | servidor/adaptação controlada |
-| [06 — Avaliação](modules/06-evaluation/README.md) | 12 h | eval suite reproduzível |
-| [07 — Observabilidade e SRE](modules/07-observability-sre/README.md) | 12 h | SLOs, traces e runbook |
-| [08 — Segurança](modules/08-security/README.md) | 14 h | threat model + adversarial tests |
-| [09 — Multiagentes](modules/09-multi-agent-systems/README.md) | 14 h | baseline e coordenação medida |
+| [05 — Memory Engineering](modules/05-memory-engineering/README.md) | 12 h | memória governada e testada |
+| [06 — Multi-Agent Systems](modules/06-multi-agent-systems/README.md) | 14 h | coordenação mensurável e governada |
+| [07 — Evaluation Engineering](modules/07-evaluation-engineering/README.md) | 12 h | eval suite reproduzível |
+| [08 — Guardrails e Security Engineering](modules/08-guardrails-security-engineering/README.md) | 14 h | threat model + adversarial tests |
+| [09 — Production Architecture](modules/09-production-architecture/README.md) | 14 h | runtime production-ready e rollback |
 | [10 — Observability Engineering](modules/10-observability-engineering/README.md) | 14 h | pipeline de telemetria segura e correlacionada |
 | [11 — Automação](modules/11-automation/README.md) | 12 h | workflow idempotente |
 | [12 — Capstone](modules/12-capstone/README.md) | 30–60 h | sistema production-grade |
+
+## Especializações preservadas
+
+Conteúdos históricos complementares foram preservados em [especializações](specializations/README.md), sem reutilizar números reservados pela trilha principal.
 
 ## Regra de unicidade
 
