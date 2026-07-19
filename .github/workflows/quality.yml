@@ -3,7 +3,7 @@ name: NEXUS Quality
 on:
   workflow_dispatch:
   push:
-    branches: [main, audit/premium-elite-v1, feat/module-10-observability-engineering]
+    branches: [main, audit/premium-elite-v1, feat/module-10-observability-engineering, fix/curriculum-observability-contracts]
   pull_request:
 
 permissions:
@@ -28,7 +28,19 @@ jobs:
           python-version: '3.12'
 
       - name: Repository contracts
-        run: python tests/validate_repository.py
+        shell: bash
+        run: |
+          set -o pipefail
+          python tests/validate_repository.py 2>&1 | tee validation-report.txt
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-validation-report
+          path: validation-report.txt
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Compile Python sources
         run: python -m compileall -q examples tests
