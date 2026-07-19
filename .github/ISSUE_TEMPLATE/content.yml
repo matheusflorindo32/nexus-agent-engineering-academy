@@ -1,0 +1,33 @@
+name: Melhoria de conteúdo
+description: Corrigir ou aprofundar material educacional com evidência.
+title: "docs: "
+labels: [documentation]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Arquivo ou ID
+      placeholder: course.module.04-loop-engineering
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema
+      description: Explique imprecisão, lacuna pedagógica ou link quebrado.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidência primária
+      description: URL oficial, RFC, artigo ou livro; inclua versão/data.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+    validations:
+      required: true
+

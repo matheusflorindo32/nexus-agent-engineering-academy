@@ -1,0 +1,34 @@
+name: Bug reproduzível
+description: Reportar falha em teste, exemplo, automação ou estrutura.
+title: "fix: "
+labels: [bug]
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reprodução mínima
+      description: Inclua comandos e entradas sanitizadas.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Esperado e observado
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Ambiente e versões
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Segurança
+      options:
+        - label: O relato não contém segredos nem dados pessoais.
+          required: true
+        - label: Não se trata de vulnerabilidade que exige relato privado.
+          required: true
+

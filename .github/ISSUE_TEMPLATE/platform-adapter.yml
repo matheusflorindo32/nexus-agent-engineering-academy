@@ -1,0 +1,31 @@
+name: Novo adapter de plataforma
+description: Propor suporte documentado a uma plataforma.
+title: "adapter: "
+labels: [platform, proposal]
+body:
+  - type: input
+    id: platform
+    attributes:
+      label: Plataforma e produto exato
+    validations:
+      required: true
+  - type: input
+    id: official
+    attributes:
+      label: Documentação oficial
+    validations:
+      required: true
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Capacidades NEXUS mapeadas
+      description: Liste suporte, lacunas, versão e data verificada.
+    validations:
+      required: true
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: Estratégia de testes e manutenção
+    validations:
+      required: true
+
