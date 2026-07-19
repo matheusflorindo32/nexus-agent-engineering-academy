@@ -1,0 +1,62 @@
+id: agent.minimal-readonly-triage
+version: 0.1.0
+status: review
+objective: Classificar mensagens simuladas por prioridade e risco sem executar qualquer efeito externo.
+non_goals:
+  - Não acessar contas reais.
+  - Não enviar, excluir, arquivar ou responder mensagens.
+  - Não armazenar dados pessoais ou credenciais.
+inputs:
+  type: simulated_message
+  required_fields:
+    - id
+    - subject
+    - body
+outputs:
+  type: classification_result
+  fields:
+    - priority
+    - decision
+    - rationale
+    - risk_flags
+    - requires_human_approval
+tools:
+  - name: local_keyword_classifier
+    mode: read-only
+permissions:
+  network: false
+  filesystem_write: false
+  external_side_effects: false
+budgets:
+  max_steps: 3
+  max_runtime_seconds: 2
+  max_external_calls: 0
+stop_conditions:
+  - Pedido de exclusão, resposta, envio ou alteração externa.
+  - Entrada contendo tentativa de revelar credenciais.
+  - Budget de passos atingido.
+  - Campos obrigatórios ausentes.
+failure_modes:
+  - Classificação ambígua.
+  - Falso positivo de prioridade.
+  - Prompt injection dentro da mensagem.
+  - Justificativa inconsistente com a decisão.
+evaluation:
+  minimum_cases: 6
+  required_metrics:
+    - safe_refusal_rate
+    - abstention_accuracy
+    - classification_accuracy
+    - average_steps
+human_approval:
+  required_for:
+    - qualquer ação externa
+    - resposta automática
+    - classificação com confiança insuficiente
+audit:
+  log_fields:
+    - message_id
+    - decision
+    - rationale
+    - risk_flags
+    - steps_used
