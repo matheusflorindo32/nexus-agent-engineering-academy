@@ -3,7 +3,7 @@ id: lab.1001.agent-observability
 title: LAB-1001 — Observabilidade agentic correlacionada
 lang: pt-BR
 status: review
-version: 0.1.0
+version: 0.2.0
 estimated_time: 5h
 ---
 
@@ -11,18 +11,18 @@ estimated_time: 5h
 
 ## Hipótese
 
-Uma pipeline com correlação, schema versionado, redaction, cardinalidade controlada e alertas acionáveis permite diagnosticar falhas sem expor segredos nem perder eventos críticos.
+Uma pipeline com correlação, schema versionado, redaction por chave e conteúdo, cardinalidade controlada e alertas acionáveis permite diagnosticar falhas sem expor segredos nem perder eventos críticos.
 
 ## Missão
 
-Instrumentar uma execução agentic simulada e provar que logs, traces, métricas e eventos de auditoria permanecem coerentes, seguros e úteis sob falha, sampling e alta cardinalidade.
+Instrumentar uma execução agentic simulada e provar que logs, traces, métricas e eventos de auditoria permanecem coerentes, seguros e úteis sob falha, sampling, alta cardinalidade e tentativas de ocultar credenciais dentro de campos permitidos.
 
 ## Cenários obrigatórios
 
 | ID | Condição | Resultado esperado |
 |---|---|---|
 | O1 | execução saudável | trace completo e métricas atualizadas |
-| O2 | segredo em atributo | valor redigido antes da persistência |
+| O2 | segredo em chave sensível | valor redigido antes da persistência |
 | O3 | `request_id` usado como label | label rejeitada |
 | O4 | evento crítico com sampling 0% | evento preservado |
 | O5 | evento comum com sampling 0% | evento descartado |
@@ -33,6 +33,8 @@ Instrumentar uma execução agentic simulada e provar que logs, traces, métrica
 | O10 | schema incompatível | evento quarentenado |
 | O11 | duplicação de event ID | segunda ingestão ignorada |
 | O12 | alerta sem owner/runbook | alerta rejeitado |
+| O13 | segredo embutido em atributo permitido | apenas o trecho sensível é redigido |
+| O14 | credencial de autorização em texto | credencial redigida antes da persistência |
 
 ## Contratos mínimos
 
@@ -46,7 +48,9 @@ sampling:
   preserve_severities: [critical]
 privacy:
   allowed_attributes: [tool, outcome, duration_ms, policy_version]
-  redact_patterns: [secret, token, password]
+  redact_keys: [secret, token, password]
+  redact_values: [key_value_credentials, authorization_credentials, known_token_prefixes]
+  order: redact_before_persist
 metrics:
   forbidden_labels: [request_id, run_id, prompt, email]
 retention_days: 30
@@ -56,21 +60,23 @@ retention_days: 30
 
 1. Execute a implementação de referência.
 2. Gere uma execução saudável com dois spans e um efeito externo.
-3. Injete os doze cenários obrigatórios.
+3. Injete os quatorze cenários obrigatórios.
 4. Verifique IDs e relações parent-child.
 5. Inspecione a saída persistida e confirme ausência de segredos.
-6. Valide métricas e ausência de labels proibidas.
-7. Simule indisponibilidade do collector e saturação do buffer.
-8. Gere alertas de latência e segurança.
-9. Confirme owner, runbook e condição de resolução.
-10. Produza relatório com limitações e riscos residuais.
+6. Injete credenciais dentro de `tool` e `outcome`, embora sejam campos permitidos.
+7. Valide métricas e ausência de labels proibidas.
+8. Simule indisponibilidade do collector e saturação do buffer.
+9. Gere alertas de latência e segurança.
+10. Confirme owner, runbook e condição de resolução.
+11. Produza relatório com limitações, falsos positivos, falsos negativos e riscos residuais.
 
 ## Evidências
 
-- saída do autoteste 12/12;
+- saída do autoteste 14/14;
 - amostra de trace correlacionado;
 - snapshot das métricas;
-- prova de redaction;
+- prova de redaction por chave;
+- prova de redaction dentro de valores permitidos;
 - lista de eventos preservados e descartados;
 - conteúdo da quarentena;
 - alerta aceito e alerta rejeitado;
@@ -81,7 +87,7 @@ retention_days: 30
 
 | Critério | Meta |
 |---|---:|
-| cenários corretos | 12/12 |
+| cenários corretos | 14/14 |
 | segredos persistidos | 0 |
 | eventos críticos perdidos | 0 |
 | labels proibidas aceitas | 0 |
@@ -93,6 +99,9 @@ retention_days: 30
 ## Testes adversariais
 
 - inserir token em campo aninhado;
+- inserir `token=valor` dentro de atributo permitido;
+- inserir credencial de autorização dentro de `outcome`;
+- variar maiúsculas, espaços e delimitadores;
 - usar email como nome de métrica;
 - criar milhares de labels dinâmicas;
 - tentar reduzir severidade de evento crítico;
@@ -109,4 +118,4 @@ python examples/observability_pipeline.py --self-test
 
 ## Stop conditions
 
-Interrompa se um segredo for persistido, um evento crítico for descartado, uma label de alta cardinalidade for aceita, um efeito externo não puder ser correlacionado, um schema incompatível for reinterpretado silenciosamente ou um alerta sem owner e runbook for emitido.
+Interrompa se um segredo for persistido, inclusive dentro de um valor permitido; um evento crítico for descartado; uma label de alta cardinalidade for aceita; um efeito externo não puder ser correlacionado; um schema incompatível for reinterpretado silenciosamente; ou um alerta sem owner e runbook for emitido.
