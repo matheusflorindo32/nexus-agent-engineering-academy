@@ -7,43 +7,34 @@ import re
 import sys
 from urllib.parse import unquote
 
-
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT_ROOTS = (
-    "agents",
-    "course",
-    "docs",
-    "examples",
-    "labs",
-    "loops",
-    "platforms",
-    "projects",
-    "templates",
+    "agents", "course", "docs", "examples", "labs", "loops",
+    "platforms", "projects", "templates",
 )
 REQUIRED_ROOT_ENTRIES = {
-    "README.md",
-    "ROADMAP.md",
-    "CONTRIBUTING.md",
-    "SECURITY.md",
-    "CHANGELOG.md",
-    "LICENSE",
-    "CODE_OF_CONDUCT.md",
-    ".github",
-    "tests",
-    *CONTENT_ROOTS,
+    "README.md", "ROADMAP.md", "CONTRIBUTING.md", "SECURITY.md",
+    "CHANGELOG.md", "LICENSE", "CODE_OF_CONDUCT.md", ".github", "tests",
+    "AGENTS.md", *CONTENT_ROOTS,
 }
 REQUIRED_FRONTMATTER = {"id", "title", "lang", "status"}
+ALLOWED_LANGS = {"pt-BR", "en", "es"}
+ALLOWED_STATUS = {"foundation", "draft", "review", "active", "stable", "deprecated"}
 REQUIRED_MODULE_SECTIONS = {
-    "## Objetivos",
-    "## Pré-requisitos",
-    "## Laboratórios",
-    "## Projeto",
-    "## Checklist",
-    "## Bibliografia",
-    "## Referências",
+    "## Objetivos", "## Pré-requisitos", "## Laboratórios", "## Projeto",
+    "## Checklist", "## Bibliografia", "## Referências",
+}
+REQUIRED_AGENT_FIELDS = {
+    "objective", "non_goals", "inputs", "outputs", "tools", "permissions",
+    "budgets", "stop_conditions", "failure_modes", "evaluation",
 }
 LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9.-]*$")
+SECRET_PATTERNS = {
+    "OpenAI-style key": re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b"),
+    "GitHub token": re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"),
+    "Private key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
+}
 
 
 def parse_frontmatter(text: str) -> dict[str, str] | None:
@@ -64,11 +55,12 @@ def markdown_files() -> list[Path]:
     roots = [ROOT / name for name in CONTENT_ROOTS]
     files = [ROOT / name for name in (
         "README.md", "ROADMAP.md", "CONTRIBUTING.md", "SECURITY.md",
-        "CHANGELOG.md", "CODE_OF_CONDUCT.md"
+        "CHANGELOG.md", "CODE_OF_CONDUCT.md", "AGENTS.md",
     )]
     for root in roots:
-        files.extend(root.rglob("*.md"))
-    return sorted(set(files))
+        if root.exists():
+            files.extend(root.rglob("*.md"))
+    return sorted(set(path for path in files if path.exists()))
 
 
 def check_frontmatter(files: list[Path], errors: list[str]) -> None:
@@ -90,6 +82,12 @@ def check_frontmatter(files: list[Path], errors: list[str]) -> None:
             errors.append(f"{relative}: id duplicado com {seen[doc_id].relative_to(ROOT)}: {doc_id}")
         elif doc_id:
             seen[doc_id] = path
+        lang = data.get("lang")
+        if lang and lang not in ALLOWED_LANGS:
+            errors.append(f"{relative}: lang não suportado: {lang}")
+        status = data.get("status")
+        if status and status not in ALLOWED_STATUS:
+            errors.append(f"{relative}: status não suportado: {status}")
 
 
 def normalized_link_target(raw: str) -> str:
@@ -117,11 +115,43 @@ def check_links(files: list[Path], errors: list[str]) -> None:
 
 
 def check_modules(errors: list[str]) -> None:
-    for path in sorted((ROOT / "course" / "modules").glob("*/README.md")):
+    modules_root = ROOT / "course" / "modules"
+    if not modules_root.exists():
+        return
+    for path in sorted(modules_root.glob("*/README.md")):
         text = path.read_text(encoding="utf-8")
         missing = [heading for heading in REQUIRED_MODULE_SECTIONS if heading not in text]
         if missing:
             errors.append(f"{path.relative_to(ROOT)}: seções ausentes: {', '.join(sorted(missing))}")
+        if "## Critérios de excelência" not in text and "## Avaliação" not in text:
+            errors.append(f"{path.relative_to(ROOT)}: módulo sem critérios explícitos de avaliação")
+
+
+def check_agent_specs(errors: list[str]) -> None:
+    for path in sorted((ROOT / "agents").rglob("*.yml")) + sorted((ROOT / "agents").rglob("*.yaml")):
+        text = path.read_text(encoding="utf-8")
+        keys = {
+            line.split(":", 1)[0].strip()
+            for line in text.splitlines()
+            if ":" in line and not line.startswith((" ", "\t", "-", "#"))
+        }
+        missing = REQUIRED_AGENT_FIELDS - keys
+        if missing:
+            errors.append(f"{path.relative_to(ROOT)}: agent spec incompleta: {', '.join(sorted(missing))}")
+
+
+def check_secrets(errors: list[str]) -> None:
+    text_extensions = {".md", ".py", ".yml", ".yaml", ".json", ".toml", ".txt"}
+    ignored = {".git", ".venv", "node_modules"}
+    for path in ROOT.rglob("*"):
+        if not path.is_file() or path.suffix.lower() not in text_extensions:
+            continue
+        if any(part in ignored for part in path.parts):
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for label, pattern in SECRET_PATTERNS.items():
+            if pattern.search(text):
+                errors.append(f"{path.relative_to(ROOT)}: possível segredo detectado ({label})")
 
 
 def check_structure(errors: list[str]) -> None:
@@ -137,15 +167,20 @@ def main() -> int:
     check_frontmatter(files, errors)
     check_links(files, errors)
     check_modules(errors)
+    check_agent_specs(errors)
+    check_secrets(errors)
     if errors:
         print(f"NEXUS validation failed with {len(errors)} error(s):")
         for error in errors:
             print(f"- {error}")
         return 1
-    print(f"NEXUS validation passed: {len(files)} Markdown files, unique IDs, links and module contracts OK.")
+    print(
+        "NEXUS validation passed: "
+        f"{len(files)} Markdown files; structure, metadata, IDs, links, modules, "
+        "agent specs and secret scan OK."
+    )
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-
