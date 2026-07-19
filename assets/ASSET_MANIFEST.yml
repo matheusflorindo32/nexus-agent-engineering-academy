@@ -1,4 +1,4 @@
-version: 0.2.0
+version: 0.3.0
 updated_at: 2026-07-19
 policy: docs/standards/visual-evidence-policy.md
 assets:
@@ -27,7 +27,7 @@ assets:
     ai_generated: true
     canonical: true
     palette: light
-    status: approved-pending-binary-upload
+    status: published
     alt_pt_BR: Infográfico claro em estilo 3D que apresenta entradas, plataforma NEXUS, governança, dados, ciclo de melhoria, princípios, fluxo de aprendizagem, impacto e resultados.
     alt_en: Light 3D infographic showing inputs, the NEXUS platform, governance, data, the improvement loop, principles, learning flow, impact and outcomes.
     alt_es: Infografía clara en 3D que muestra entradas, plataforma NEXUS, gobernanza, datos, ciclo de mejora, principios, flujo de aprendizaje, impacto y resultados.
@@ -39,7 +39,7 @@ assets:
       - site de documentação
       - apresentações
       - PDF institucional
-    notes: Asset visual canônico aprovado. Antes da publicação final, realizar revisão tipográfica em 100% de zoom e gerar derivados responsivos.
+    notes: Asset visual canônico publicado. Ainda gerar derivados WebP, responsivo e mobile após revisão tipográfica em 100% de zoom.
 
   - id: asset.architecture.system-handwritten
     path: assets/architecture/nexus-system-handwritten.png
@@ -51,7 +51,7 @@ assets:
     ai_generated: true
     canonical: false
     palette: paper-light
-    status: approved-pending-binary-upload
+    status: published
     alt_pt_BR: Mapa manuscrito do ecossistema NEXUS com curso, agentes, loops, plataformas, governança, conhecimento e melhoria contínua.
     alt_en: Handwritten NEXUS ecosystem map with course, agents, loops, platforms, governance, knowledge and continuous improvement.
     alt_es: Mapa manuscrito del ecosistema NEXUS con curso, agentes, loops, plataformas, gobernanza, conocimiento y mejora continua.
@@ -62,4 +62,4 @@ assets:
       - design thinking
       - aulas e vídeos
       - redes sociais
-    notes: Material secundário; não substituirá o infográfico claro 3D no README principal.
+    notes: Material secundário publicado; não substitui o infográfico claro 3D no README principal.
