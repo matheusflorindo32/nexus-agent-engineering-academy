@@ -72,8 +72,10 @@ flowchart TB
     Q -. qualidade .-> R
 ```
 
-Leia a [decisão arquitetural completa](docs/architecture/overview.md) e as
-[regras editoriais](docs/standards/content-standard.md).
+Leia a [decisão arquitetural completa](docs/architecture/overview.md), as
+[regras editoriais](docs/standards/content-standard.md), o [contrato dos agentes](AGENTS.md), o
+[loop mestre de qualidade](loops/master-quality-loop.md) e a
+[auditoria Premium Elite](docs/governance/PREMIUM_ELITE_AUDIT.md).
 
 ## Diferenciais
 
@@ -135,7 +137,7 @@ Consulte a [matriz e o contrato de adapter](platforms/README.md).
 ## Começar
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/matheusflorindo32/nexus-agent-engineering-academy.git
 cd nexus-agent-engineering-academy
 python tests/validate_repository.py
 ```
@@ -151,8 +153,8 @@ Foundation → Core Curriculum → Production Engineering → Ecosystem → Stab
 ## Contribuir
 
 Contribuições de conteúdo, revisão científica, segurança, adapters, acessibilidade e tradução são bem-vindas.
-Antes de começar, leia [CONTRIBUTING.md](CONTRIBUTING.md), o [Código de Conduta](CODE_OF_CONDUCT.md) e
-[SECURITY.md](SECURITY.md).
+Antes de começar, leia [CONTRIBUTING.md](CONTRIBUTING.md), o [Código de Conduta](CODE_OF_CONDUCT.md),
+[SECURITY.md](SECURITY.md) e [AGENTS.md](AGENTS.md).
 
 ## Idiomas
 
@@ -170,4 +172,3 @@ automaticamente direitos de uso além do necessário para atribuição e referê
 ---
 
 <p align="center"><strong>NEXUS</strong> — aprenda a construir agentes que você consegue explicar, avaliar e parar.</p>
-
