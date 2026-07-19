@@ -3,7 +3,7 @@ name: NEXUS Quality
 on:
   workflow_dispatch:
   push:
-    branches: [main, audit/premium-elite-v1]
+    branches: [main, audit/premium-elite-v1, feat/module-10-observability-engineering]
   pull_request:
 
 permissions:
@@ -59,6 +59,9 @@ jobs:
 
       - name: Production runtime
         run: python examples/production_runtime.py --self-test
+
+      - name: Observability pipeline
+        run: python examples/observability_pipeline.py --self-test
 
   typescript-contract:
     name: TypeScript boundary contract
