@@ -11,7 +11,14 @@ from typing import Any
 ALLOWED_ATTRIBUTES = {"tool", "outcome", "duration_ms", "policy_version"}
 FORBIDDEN_LABELS = {"request_id", "run_id", "prompt", "email"}
 SENSITIVE_KEY = re.compile(r"secret|token|password", re.IGNORECASE)
+SENSITIVE_VALUE_PATTERNS = (
+    re.compile(r"(?i)\b(?:token|secret|password)\s*[:=]\s*[^\s,;]+"),
+    re.compile(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+"),
+    re.compile(r"\bsk-[A-Za-z0-9_-]{8,}\b"),
+    re.compile(r"\bgh[pousr]_[A-Za-z0-9]{8,}\b"),
+)
 SUPPORTED_SCHEMA = "nexus.telemetry.v1"
+REDACTED = "[REDACTED]"
 
 
 @dataclass(frozen=True)
@@ -51,13 +58,24 @@ class ObservabilityPipeline:
         self.metrics: dict[str, int] = {}
         self.alerts: list[Alert] = []
 
+    @staticmethod
+    def _redact_text(value: str) -> str:
+        redacted = value
+        for pattern in SENSITIVE_VALUE_PATTERNS:
+            redacted = pattern.sub(REDACTED, redacted)
+        return redacted
+
     def _redact(self, value: Any, key: str = "") -> Any:
         if SENSITIVE_KEY.search(key):
-            return "[REDACTED]"
+            return REDACTED
         if isinstance(value, dict):
             return {k: self._redact(v, k) for k, v in value.items()}
         if isinstance(value, list):
             return [self._redact(item, key) for item in value]
+        if isinstance(value, tuple):
+            return tuple(self._redact(item, key) for item in value)
+        if isinstance(value, str):
+            return self._redact_text(value)
         return value
 
     def _sampled(self, event: Event) -> bool:
@@ -159,7 +177,7 @@ def run_self_tests() -> None:
 
     p = ObservabilityPipeline()
     p.ingest(make_event("o2", token="sensitive-value", tool="catalog.read"))
-    results.append(("O2 redaction", p.persisted[0]["attributes"]["token"] == "[REDACTED]"))
+    results.append(("O2 sensitive key redaction", p.persisted[0]["attributes"]["token"] == REDACTED))
 
     p = ObservabilityPipeline()
     try:
@@ -209,6 +227,16 @@ def run_self_tests() -> None:
     except ValueError:
         ok = True
     results.append(("O12 invalid alert rejected", ok))
+
+    p = ObservabilityPipeline()
+    p.ingest(make_event("o13", tool="catalog.read token=abc123", outcome="success"))
+    tool_value = p.persisted[0]["attributes"]["tool"]
+    results.append(("O13 embedded key-value secret redacted", "abc123" not in tool_value and REDACTED in tool_value))
+
+    p = ObservabilityPipeline()
+    p.ingest(make_event("o14", tool="catalog.read", outcome="Bearer demoCredential123"))
+    outcome_value = p.persisted[0]["attributes"]["outcome"]
+    results.append(("O14 authorization credential redacted", "demoCredential123" not in outcome_value and REDACTED in outcome_value))
 
     failed = [name for name, passed in results if not passed]
     for name, passed in results:
