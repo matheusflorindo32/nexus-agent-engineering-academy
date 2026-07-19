@@ -1,0 +1,18 @@
+version: 0.1.0
+updated_at: 2026-07-19
+policy: docs/standards/visual-evidence-policy.md
+assets:
+  - id: asset.brand.nexus-logo
+    path: assets/brand/nexus-logo.svg
+    type: logo
+    purpose: Identidade visual do projeto.
+    source: original
+    author: NEXUS Agent Engineering Academy
+    license: project-brand-restricted
+    ai_generated: false
+    alt_pt_BR: Logotipo da NEXUS Agent Engineering Academy.
+    alt_en: NEXUS Agent Engineering Academy logo.
+    alt_es: Logotipo de NEXUS Agent Engineering Academy.
+    reviewed: true
+    reviewed_at: 2026-07-19
+    notes: Uso permitido no contexto do projeto; não implica cessão ampla da marca.
