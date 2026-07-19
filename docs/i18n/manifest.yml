@@ -1,0 +1,25 @@
+schema_version: 1
+canonical_language: pt-BR
+languages:
+  en:
+    label: English
+    root: docs/i18n/en
+    status: planned
+  es:
+    label: Español
+    root: docs/i18n/es
+    status: planned
+documents:
+  - id: nexus.home
+    source: README.md
+    en: missing
+    es: missing
+  - id: architecture.overview
+    source: docs/architecture/overview.md
+    en: missing
+    es: missing
+  - id: course.index
+    source: course/README.md
+    en: missing
+    es: missing
+

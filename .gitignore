@@ -1,0 +1,30 @@
+# Operating systems and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Runtime and build artifacts
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+coverage/
+dist/
+build/
+.cache/
+
+# Codex workspace-only folders
+work/
+outputs/
+

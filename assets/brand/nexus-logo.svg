@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 260" role="img" aria-labelledby="title desc">
+  <title id="title">NEXUS Agent Engineering Academy</title>
+  <desc id="desc">Temporary logo: connected nodes forming an N beside the NEXUS wordmark.</desc>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="260" rx="32" fill="#08111f"/>
+  <g stroke="url(#g)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M65 195V65l130 130V65"/>
+  </g>
+  <g fill="#e5f3ff" font-family="Inter,Segoe UI,sans-serif">
+    <text x="260" y="130" font-size="88" font-weight="800" letter-spacing="10">NEXUS</text>
+    <text x="265" y="184" font-size="27" letter-spacing="5">AGENT ENGINEERING ACADEMY</text>
+  </g>
+  <circle cx="65" cy="65" r="14" fill="#22d3ee"/>
+  <circle cx="65" cy="195" r="14" fill="#8b5cf6"/>
+  <circle cx="195" cy="65" r="14" fill="#8b5cf6"/>
+  <circle cx="195" cy="195" r="14" fill="#22d3ee"/>
+</svg>
+
