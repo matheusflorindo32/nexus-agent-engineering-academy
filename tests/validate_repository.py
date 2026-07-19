@@ -33,8 +33,8 @@ REQUIRED_EXECUTABLES = {
     "datasets/lab-201-context-fixtures.json",
     ".github/workflows/quality.yml",
 }
-EXPECTED_MODULES = {f"{number:02d}" for number in range(11)}
-EXPECTED_LABS = {"000", "101", "201", "301", "401", "501", "601", "701", "801", "901", "1001"}
+EXPECTED_MODULES = {f"{number:02d}" for number in range(13)}
+EXPECTED_LABS = {"000", "101", "201", "301", "401", "501", "601", "701", "801", "901", "1001", "1101"}
 REQUIRED_FRONTMATTER = {"id", "title", "lang", "status"}
 ALLOWED_LANGS = {"pt-BR", "en", "es"}
 ALLOWED_STATUS = {"foundation", "draft", "review", "accepted", "active", "stable", "deprecated"}
@@ -137,8 +137,16 @@ def check_links(files: list[Path], errors: list[str]) -> None:
 def check_modules(errors: list[str]) -> None:
     modules_root = ROOT / "course" / "modules"
     present: set[str] = set()
+    owners: dict[str, Path] = {}
     for path in sorted(modules_root.glob("*/README.md")):
         prefix = path.parent.name.split("-", 1)[0]
+        if prefix in owners:
+            errors.append(
+                f"número de módulo duplicado {prefix}: "
+                f"{owners[prefix].relative_to(ROOT)} e {path.relative_to(ROOT)}"
+            )
+        else:
+            owners[prefix] = path
         present.add(prefix)
         text = path.read_text(encoding="utf-8")
         missing = [heading for heading in REQUIRED_MODULE_SECTIONS if heading not in text]
@@ -155,10 +163,19 @@ def check_modules(errors: list[str]) -> None:
 
 def check_labs(errors: list[str]) -> None:
     present: set[str] = set()
+    owners: dict[str, Path] = {}
     for path in sorted((ROOT / "labs").glob("LAB-*.md")):
         match = re.match(r"LAB-(\d{3,4})-", path.name)
         if match:
-            present.add(match.group(1))
+            lab_number = match.group(1)
+            if lab_number in owners:
+                errors.append(
+                    f"número de laboratório duplicado {lab_number}: "
+                    f"{owners[lab_number].relative_to(ROOT)} e {path.relative_to(ROOT)}"
+                )
+            else:
+                owners[lab_number] = path
+            present.add(lab_number)
         text = path.read_text(encoding="utf-8")
         missing = [heading for heading in REQUIRED_LAB_SECTIONS if heading not in text]
         if missing:
@@ -245,8 +262,8 @@ def main() -> int:
         return 1
     print(
         "NEXUS Premium Elite validation passed: "
-        f"{len(files)} Markdown files; Modules 00-10; LAB-000 through LAB-1001; "
-        "structure, metadata, IDs, links, contracts, executables and secret scan OK."
+        f"{len(files)} Markdown files; Modules 00-12; LAB-000 through LAB-1101; "
+        "unique numbering, structure, metadata, IDs, links, contracts, executables and secret scan OK."
     )
     return 0
 
