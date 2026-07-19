@@ -12,7 +12,7 @@ tags:
 ---
 
 <p align="center">
-  <img src="assets/brand/nexus-logo.svg" width="760" alt="NEXUS Agent Engineering Academy">
+  <img src="assets/brand/nexus-hero-animated.svg" width="100%" alt="NEXUS Agent Engineering Academy — sistemas de agentes com contratos, controle e evidência">
 </p>
 
 <p align="center">
@@ -99,9 +99,9 @@ Leia a [decisão arquitetural completa](docs/architecture/overview.md), as
 | Fase | Módulos | Resultado |
 |---|---|---|
 | I — Fundamentos | 00–02 | Modelar agentes, contexto e ferramentas com contratos explícitos. |
-| II — Loops e protocolos | 03–05 | Projetar loops controláveis, MCP e skills portáveis. |
-| III — Produção | 06–08 | Avaliar, observar, proteger e operar agentes confiáveis. |
-| IV — Sistemas | 09–11 | Construir multiagentes, automações e capstone de produção. |
+| II — Loops, memória e coordenação | 03–06 | Projetar loops controláveis, memória governada e sistemas multiagente. |
+| III — Avaliação, segurança e produção | 07–09 | Avaliar, proteger e operar agentes com readiness, rollout e rollback. |
+| IV — Observabilidade e capstone | 10+ | Consolidar telemetria avançada, integrações e projeto final. |
 
 Comece pelo [mapa curricular](course/README.md). Cada módulo segue o
 [contrato pedagógico](course/module-template.md) e inclui objetivos, pré-requisitos, projeto, checklist, laboratórios,
