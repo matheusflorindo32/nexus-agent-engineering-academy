@@ -22,6 +22,13 @@ learning_outcomes:
 
 Ao final, você deverá conseguir entrar em qualquer projeto agentic, identificar seus componentes, executar uma verificação mínima e explicar uma decisão de engenharia de forma auditável.
 
+## Mapa visual de aprendizagem
+
+![Mapa manuscrito do ecossistema NEXUS com curso, agentes, loops, plataformas, governança, conhecimento e melhoria contínua.](../../../assets/architecture/nexus-system-handwritten.png)
+
+> [!TIP]
+> Use este mapa como orientação inicial. O infográfico claro 3D do README é a visão institucional canônica; esta versão manuscrita foi mantida para apoiar aprendizagem, design thinking e explicações em aula.
+
 ## O problema real
 
 Um agente pode parecer inteligente em uma demonstração e ainda ser inseguro, impossível de reproduzir ou difícil de manter. A NEXUS adota um princípio simples:
