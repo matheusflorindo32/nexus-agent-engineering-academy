@@ -1,6 +1,6 @@
 ---
 id: standards.visual-evidence
- title: Política de imagens e evidências visuais
+title: Política de imagens e evidências visuais
 lang: pt-BR
 status: review
 version: 0.1.0
