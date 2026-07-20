@@ -27,53 +27,17 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Repository contracts
-        shell: bash
-        run: |
-          set -o pipefail
-          python tests/validate_repository.py 2>&1 | tee validation-report.txt
+      - name: Run Python quality gates and collect evidence
+        run: python tests/run_quality_gates.py --output validation-evidence/python.json
 
       - name: Upload validation evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: nexus-validation-report
-          path: validation-report.txt
-          if-no-files-found: warn
+          name: nexus-python-validation-evidence
+          path: validation-evidence/python.json
+          if-no-files-found: error
           retention-days: 14
-
-      - name: Compile Python sources
-        run: python -m compileall -q examples tests
-
-      - name: Minimal read-only agent
-        run: python examples/minimal_readonly_agent.py --demo
-
-      - name: Context retriever
-        run: python examples/context_retriever.py
-
-      - name: Safe tool boundary
-        run: python examples/safe_tool_boundary.py --self-test
-
-      - name: Deterministic loop
-        run: python examples/deterministic_loop.py --self-test
-
-      - name: Governed memory
-        run: python examples/governed_memory_store.py --self-test
-
-      - name: Governed multi-agent orchestration
-        run: python examples/governed_multi_agent_orchestrator.py --self-test
-
-      - name: Evaluation harness
-        run: python examples/evaluation_harness.py --self-test
-
-      - name: Security guardrails
-        run: python examples/security_guardrails.py --self-test
-
-      - name: Production runtime
-        run: python examples/production_runtime.py --self-test
-
-      - name: Observability pipeline
-        run: python examples/observability_pipeline.py --self-test
 
   typescript-contract:
     name: TypeScript boundary contract
@@ -88,5 +52,54 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Type-check TypeScript example
-        run: npx --yes --package typescript@5.8.3 tsc --noEmit --strict --target ES2022 --lib ES2022,DOM examples/safe_tool_boundary.ts
+      - name: Set up Python for evidence generation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Type-check TypeScript example and collect evidence
+        shell: bash
+        run: |
+          mkdir -p validation-evidence
+          set +e
+          npx --yes --package typescript@5.8.3 tsc --noEmit --strict --target ES2022 --lib ES2022,DOM examples/safe_tool_boundary.ts
+          status=$?
+          export VALIDATION_STATUS="$status"
+          python - <<'PY'
+          import datetime
+          import json
+          import os
+          import platform
+          from pathlib import Path
+
+          evidence = {
+              "schema": "nexus.validation-evidence.v1",
+              "commit_sha": os.environ["GITHUB_SHA"],
+              "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              "environment": {
+                  "platform": platform.platform(),
+                  "node": os.popen("node --version").read().strip(),
+                  "runner_os": os.environ.get("RUNNER_OS", "unknown"),
+              },
+              "results": [{
+                  "name": "typescript-strict",
+                  "command": "npx --yes --package typescript@5.8.3 tsc --noEmit --strict --target ES2022 --lib ES2022,DOM examples/safe_tool_boundary.ts",
+                  "exit_code": int(os.environ["VALIDATION_STATUS"]),
+              }],
+              "failures": [] if os.environ["VALIDATION_STATUS"] == "0" else ["typescript-strict"],
+              "limitations": ["This job validates only the TypeScript boundary contract."],
+          }
+          Path("validation-evidence/typescript.json").write_text(
+              json.dumps(evidence, indent=2) + "\n", encoding="utf-8"
+          )
+          PY
+          exit "$status"
+
+      - name: Upload TypeScript validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-typescript-validation-evidence
+          path: validation-evidence/typescript.json
+          if-no-files-found: error
+          retention-days: 14
