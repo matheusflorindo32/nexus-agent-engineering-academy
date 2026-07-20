@@ -45,7 +45,7 @@ OPEN WORLDWIDE APPLICATION SECURITY PROJECT. *AI Agent Security Cheat Sheet*. [S
 
 ### Observabilidade
 
-CLOUD NATIVE COMPUTING FOUNDATION. *OpenTelemetry Specification*. [S. l.]: OpenTelemetry Authors, [s. d.]. Disponível em: https://opentelemetry.io/docs/specs/. Acesso em: 19 jul. 2026.
+CLOUD NATIVE COMPUTING FOUNDATION. *OpenTelemetry Specification*. Versão exibida na consulta: 1.59.0. [S. l.]: OpenTelemetry Authors, [s. d.]. Disponível em: https://opentelemetry.io/docs/specs/. Acesso em: 19 jul. 2026. Referência dinâmica: confirmar novamente a versão antes de sustentar requisito de release.
 
 NATIONAL INSTITUTE OF STANDARDS AND TECHNOLOGY. *Guide to Computer Security Log Management*. Gaithersburg: NIST, 2006. NIST Special Publication 800-92. DOI: https://doi.org/10.6028/NIST.SP.800-92. Acesso em: 19 jul. 2026.
 
@@ -89,7 +89,7 @@ Status: **PARCIALMENTE VERIFICADAS — confirmar no catálogo ABNT antes de decl
 | REF-001 | gestão de risco de IA | riscos devem ser governados, mapeados, medidos e geridos ao longo do ciclo de vida | NIST AI RMF 1.0 | VERIFICADA | 19 jul. 2026 |
 | REF-002 | IA generativa | riscos específicos de IA generativa exigem perfil complementar ao AI RMF | NIST AI 600-1 | VERIFICADA | 19 jul. 2026 |
 | REF-003 | segurança agentic | ferramentas exigem mínimo privilégio, validação, monitoramento e testes adversariais | OWASP AI Agent Security Cheat Sheet | VERIFICADA | 19 jul. 2026 |
-| REF-004 | observabilidade | traces, métricas e logs requerem contratos e semântica consistente | OpenTelemetry Specification | VERIFICADA | 19 jul. 2026 |
+| REF-004 | observabilidade | traces, métricas e logs requerem contratos e semântica consistente | OpenTelemetry Specification 1.59.0 exibida na consulta; página dinâmica | PARCIALMENTE VERIFICADA | 19 jul. 2026 |
 | REF-005 | logging seguro | gestão de logs deve considerar segurança, retenção e proteção de dados | NIST SP 800-92 | VERIFICADA | 19 jul. 2026 |
 | REF-006 | desenvolvimento seguro | práticas de segurança devem integrar o ciclo de desenvolvimento | NIST SP 800-218 | VERIFICADA | 19 jul. 2026 |
 | REF-007 | confiabilidade | SLOs, alertas e runbooks sustentam operação confiável | Google SRE | VERIFICADA POR OBRA PUBLICADA | 19 jul. 2026 |
