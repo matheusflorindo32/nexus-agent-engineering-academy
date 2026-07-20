@@ -41,9 +41,9 @@ flowchart LR
 | [11 — Automação](modules/11-automation/README.md) | 12 h | workflow idempotente |
 | [12 — Capstone](modules/12-capstone/README.md) | 30–60 h | sistema production-grade |
 
-## Especializações preservadas
+## Especializações e conteúdo histórico
 
-Conteúdos históricos complementares foram preservados em [especializações](specializations/README.md), sem reutilizar números reservados pela trilha principal.
+O [índice de especializações](specializations/README.md) registra conteúdos históricos consolidados e lacunas sem reutilizar números reservados pela trilha principal. Recuperabilidade no histórico Git não é tratada como equivalência editorial na árvore atual.
 
 ## Regra de unicidade
 

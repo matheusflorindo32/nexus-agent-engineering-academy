@@ -98,10 +98,10 @@ Leia a [decisão arquitetural completa](docs/architecture/overview.md), as
 
 | Fase | Módulos | Resultado |
 |---|---|---|
-| I — Fundamentos | 00–02 | Modelar agentes, contexto e ferramentas com contratos explícitos. |
-| II — Loops, memória e coordenação | 03–06 | Projetar loops controláveis, memória governada e sistemas multiagente. |
+| I — Fundamentos | 00–02 | Modelar agentes e contexto com contratos explícitos. |
+| II — Tools, loops, memória e coordenação | 03–06 | Projetar ferramentas seguras, loops controláveis, memória governada e sistemas multiagente. |
 | III — Avaliação, segurança e produção | 07–09 | Avaliar, proteger e operar agentes com readiness, rollout e rollback. |
-| IV — Observabilidade e capstone | 10+ | Consolidar telemetria avançada, integrações e projeto final. |
+| IV — Observabilidade, automação e capstone | 10–12 | Consolidar telemetria, automação confiável e projeto final. |
 
 Comece pelo [mapa curricular](course/README.md). Cada módulo segue o
 [contrato pedagógico](course/module-template.md) e inclui objetivos, pré-requisitos, projeto, checklist, laboratórios,

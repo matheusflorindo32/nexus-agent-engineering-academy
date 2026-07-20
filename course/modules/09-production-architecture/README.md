@@ -5,7 +5,7 @@ lang: pt-BR
 status: review
 version: 0.1.0
 estimated_time: 14h
-prerequisites: [course.module.08-guardrails-security]
+prerequisites: [course.module.08-guardrails-security-engineering]
 learning_outcomes:
   - projetar uma arquitetura agentic operável em produção
   - definir SLOs, health checks, rollout, rollback e degradação segura
@@ -28,7 +28,7 @@ learning_outcomes:
 
 ## Pré-requisitos
 
-[Módulo 08](../08-guardrails-security-engineering/README.md); SLI/SLO, segurança operacional e avaliação de release.
+[Módulo 08](../08-guardrails-security-engineering/README.md); segurança operacional e avaliação de release. SLI e SLO são introduzidos neste módulo.
 
 ## Arquitetura de referência NEXUS
 

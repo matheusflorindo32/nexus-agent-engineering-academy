@@ -43,6 +43,8 @@ Regras obrigatórias:
 4. conteúdo legado removido da árvore ativa permanece rastreável no histórico Git e deve ser registrado no guia de migração;
 5. novas especializações não podem reutilizar a numeração da trilha principal;
 6. o validador deve falhar diante de colisões, lacunas obrigatórias ou pré-requisitos inexistentes.
+7. laboratórios descritos sem arquivo canônico devem ser identificados como planejados, nunca como disponíveis;
+8. toda remoção ou consolidação deve mapear caminho e ID históricos para o destino ou registrar explicitamente a redução de conteúdo.
 
 ## Laboratórios canônicos afetados
 
@@ -87,6 +89,8 @@ Rejeitada porque converteria uma falha de contrato em falso negativo permanente.
 - nenhum `id` duplicado;
 - validador e workflows verdes no SHA final;
 - guia de migração publicado.
+- laboratórios planejados distinguíveis dos 12 laboratórios implementados;
+- cada caminho removido no PR #6 registrado no guia de migração.
 
 ## Evidência de teste
 
@@ -95,6 +99,8 @@ python tests/validate_repository.py
 ```
 
 O teste deve reprovar fixtures com prefixos duplicados e aprovar a árvore canônica.
+
+Também deve reprovar ID, slug e número duplicados, pré-requisito inexistente, frontmatter ausente, link interno quebrado e módulo ou LAB obrigatório ausente. A passagem da árvore real não substitui esses testes negativos.
 
 ## Referências
 
