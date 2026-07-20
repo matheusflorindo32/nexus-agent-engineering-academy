@@ -109,12 +109,12 @@ Foram priorizadas fontes primárias e oficiais: NIST, OWASP e OpenTelemetry. As 
 - a revisão não decide se MCP e Skills devem retornar como especialização;
 - LAB-1201 permanece planejado e fora dos LABs implementados.
 
-## Parecer preliminar
+## Parecer final baseado em gates
 
-**NÃO APROVADO**, condicionado ao encerramento dos achados P0–P2 e a:
+Os achados P0–P2 confirmados foram corrigidos com testes ou controles rastreáveis. O parecer é **APROVADO COM RESSALVAS PARA REVISÃO HUMANA** somente enquanto os três checks obrigatórios do SHA corrente do PR #8 permanecerem verdes, condicionado a:
 
 1. CI integralmente verde no SHA final;
-2. testes dedicados de sanitização, colisão de eventos e contratos negativos do validador;
+2. preservação dos testes dedicados de sanitização, colisão de eventos e contratos negativos do validador;
 3. conferência do diff final;
 4. nenhuma alteração direta na `main`;
 5. manutenção do PR como Draft;

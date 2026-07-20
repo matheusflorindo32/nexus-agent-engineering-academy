@@ -27,7 +27,7 @@ Manter a evolução da NEXUS dentro de limites explícitos, auditáveis e revers
 
 | ID | Risco | Severidade | Estado | Evidência atual | Ação obrigatória |
 |---|---|---:|---|---|---|
-| CTRL-001 | CI final ainda não executada no SHA definitivo | crítica | aberto | PR final ainda não criado | criar PR Draft contra a branch do PR #7 e obter todos os workflows verdes no mesmo SHA |
+| CTRL-001 | CI final no SHA corrente | crítica | controlado por gate | PR #8 Draft; snapshot `8e3543b` com três checks verdes | exigir os mesmos checks verdes após qualquer novo commit |
 | CTRL-002 | integração fora de ordem da pilha | alta | controlado | PR #7 depende do PR #6; branch final depende do PR #7 | seguir a ordem e os gates do guia de migração; não apontar o PR final para `main` |
 | CTRL-003 | dependência TypeScript obtida pela rede no CI | média | aberto | `npx` com versão fixada, sem lockfile | criar lockfile ou runner hermético antes de release |
 | CTRL-004 | ações GitHub referenciadas por tag | média | aberto | `actions/*@vN` | avaliar pin por SHA após verificação oficial |
@@ -42,9 +42,9 @@ Manter a evolução da NEXUS dentro de limites explícitos, auditáveis e revers
 
 | Portão | Critério | Estado |
 |---|---|---|
-| G1 — CI | execução visível e verde no SHA final | bloqueado até criação do PR final |
-| G2 — Integridade | validador, links, IDs, slugs, pré-requisitos e secret scan aprovados | aguardando CI final |
-| G3 — Testes | todos os autotestes Python, testes do validador e TypeScript aprovados | aguardando CI final |
+| G1 — CI | execução visível e verde no SHA corrente do PR #8 | snapshot `8e3543b` aprovado; revalidar após commit |
+| G2 — Integridade | validador, links, IDs, slugs, pré-requisitos e secret scan aprovados | aprovado no snapshot |
+| G3 — Testes | todos os autotestes Python, testes do validador e TypeScript aprovados | aprovado no snapshot |
 | G4 — Integração | base/head e ordem da pilha preservadas | controlado; execução depende de revisão humana |
 | G5 — Evidência | fontes e capacidades atuais verificadas | parcial |
 | G6 — Revisão externa | pelo menos um laboratório executado por terceiro | bloqueado |
