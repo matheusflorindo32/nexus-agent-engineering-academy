@@ -1,6 +1,6 @@
 ---
 id: docs.references.abnt
- title: Referências ABNT e matriz de verificação
+title: Referências ABNT e matriz de verificação
 lang: pt-BR
 status: review
 ---
@@ -41,7 +41,7 @@ AUTIO, Chloe et al. *Artificial Intelligence Risk Management Framework: Generati
 
 ### Segurança de agentes
 
-OPEN WORLDWIDE APPLICATION SECURITY PROJECT. *AI Agent Security Cheat Sheet*. [S. l.]: OWASP Cheat Sheet Series, [2026]. Disponível em: https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html. Acesso em: 19 jul. 2026.
+OPEN WORLDWIDE APPLICATION SECURITY PROJECT. *AI Agent Security Cheat Sheet*. [S. l.]: OWASP Cheat Sheet Series, [s. d.]. Disponível em: https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html. Acesso em: 19 jul. 2026.
 
 ### Observabilidade
 
