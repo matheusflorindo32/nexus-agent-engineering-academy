@@ -61,6 +61,8 @@ Rejeitada porque fontes externas e componentes internos podem produzir dados mal
 
 ## Critérios de aceite
 
+Os itens desta seção são requisitos de aceitação, não declaração de cobertura. O estado comprovado deve ser registrado na matriz de rastreabilidade e no readiness do mesmo SHA.
+
 - nenhum valor sintético sensível aparece em `persisted`, `buffer`, `quarantine`, `metrics`, `alerts` ou mensagens de erro;
 - texto seguro permanece disponível;
 - objetos de entrada permanecem inalterados;

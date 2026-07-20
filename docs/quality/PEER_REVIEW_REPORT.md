@@ -11,7 +11,8 @@ status: review
 
 - Repositório: `matheusflorindo32/nexus-agent-engineering-academy`
 - Base técnica auditada: PR #6, head inicial `2100dc77b836c9d08baf539c3c853417d912e6c7`
-- Branch documental: `audit/premium-elite-readiness-docs`
+- PR #7 auditado: `audit/premium-elite-readiness-docs`, head `a48fa0d1952c147d232424ea4323ec91407a4b83`, baseado no PR #6
+- Branch final em revisão: `fix/final-security-readiness`, baseada na head do PR #7
 - Escopo: taxonomia curricular, laboratórios, redaction, governança, referências e readiness
 
 ## Método
@@ -57,7 +58,31 @@ Segredos inseridos dentro de valores de atributos permitidos poderiam ser persis
 
 Eventos incompatíveis não podem ser armazenados crus apenas por estarem em quarentena.
 
-**Correção exigida:** redaction anterior à quarentena e teste dedicado.
+**Correção:** redaction anterior à quarentena e teste dedicado, sujeitos à CI do SHA final.
+
+### AUD-P2-005 — Migração e navegação curricular incompletas
+
+**Classificação:** confirmado.
+
+O guia anterior não mapeava individualmente os caminhos removidos, o catálogo omitia seis LABs existentes e o Módulo 12 apresentava `LAB-1201` como se estivesse disponível.
+
+**Correção:** mapeamento por caminho e ID, catálogo dos 12 LABs implementados e marcação explícita do LAB-1201 como planejado.
+
+### AUD-P2-006 — Equivalência não comprovada de MCP e Skills
+
+**Classificação:** confirmado como redução curricular documentada.
+
+O módulo histórico de MCP e Skills foi removido, mas seus objetivos de protocolo e empacotamento de skills não possuem equivalência integral nos módulos 03 e 04. O histórico Git permite recuperação, porém não torna o conteúdo disponível na árvore atual.
+
+**Adjudicação:** não inventar restauração nesta correção. Registrar o risco e exigir decisão humana sobre uma futura especialização sem número curricular.
+
+### AUD-P2-007 — Governança da pilha de PRs
+
+**Classificação:** confirmado.
+
+O readiness e o registro de controles não descreviam o estado da branch final nem a ordem segura PR final → PR #7 → PR #6 → `main`.
+
+**Correção:** identificar base/head, documentar gates intermediários e rollback não destrutivo por estágio.
 
 ## Contraditório e adjudicação
 
@@ -67,6 +92,8 @@ Eventos incompatíveis não podem ser armazenados crus apenas por estarem em qua
 | a redaction por chave seria suficiente com allowlist | rejeitada; valores de campos permitidos podem conter credenciais |
 | quarentena poderia armazenar evento original para investigação | rejeitada sem proteção adicional; preservação forense não autoriza persistência de segredo em claro |
 | documentação ABNT poderia declarar conformidade completa | rejeitada sem confirmação da edição vigente e acesso ao texto oficial |
+| o histórico Git equivaleria a preservação editorial de MCP/Skills | rejeitada; recuperabilidade não significa disponibilidade curricular |
+| LAB-1201 poderia ser tratado como existente por estar descrito | rejeitada; não há arquivo canônico nem implementação verificável |
 
 ## Revisão de referências
 
@@ -79,13 +106,15 @@ Foram priorizadas fontes primárias e oficiais: NIST, OWASP e OpenTelemetry. As 
 - não verifica links externos por disponibilidade contínua;
 - não declara conformidade jurídica ou normativa formal;
 - resultados de CI devem ser novamente confirmados no SHA final desta branch.
+- a revisão não decide se MCP e Skills devem retornar como especialização;
+- LAB-1201 permanece planejado e fora dos LABs implementados.
 
 ## Parecer preliminar
 
-**APROVADO COM RESSALVAS PARA REVISÃO HUMANA**, condicionado a:
+**NÃO APROVADO**, condicionado ao encerramento dos achados P0–P2 e a:
 
 1. CI integralmente verde no SHA final;
-2. teste dedicado de sanitização da quarentena;
+2. testes dedicados de sanitização, colisão de eventos e contratos negativos do validador;
 3. conferência do diff final;
 4. nenhuma alteração direta na `main`;
 5. manutenção do PR como Draft;
