@@ -10,9 +10,12 @@ from typing import Any
 
 ALLOWED_ATTRIBUTES = {"tool", "outcome", "duration_ms", "policy_version"}
 FORBIDDEN_LABELS = {"request_id", "run_id", "prompt", "email"}
-SENSITIVE_KEY = re.compile(r"secret|token|password", re.IGNORECASE)
+SENSITIVE_KEY = re.compile(r"secret|token|password|api[_-]?key|credential", re.IGNORECASE)
 SENSITIVE_VALUE_PATTERNS = (
-    re.compile(r"(?i)\b(?:token|secret|password)\s*[:=]\s*[^\s,;]+"),
+    re.compile(
+        r"(?i)\b(?:token|secret|password|api[_-]?key|apikey|access[_-]?token|"
+        r"refresh[_-]?token|client[_-]?secret)\s*[:=]\s*[^\s,;]+"
+    ),
     re.compile(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+"),
     re.compile(r"\bsk-[A-Za-z0-9_-]{8,}\b"),
     re.compile(r"\bgh[pousr]_[A-Za-z0-9]{8,}\b"),
@@ -53,7 +56,7 @@ class ObservabilityPipeline:
         self.collector_available = True
         self.persisted: list[dict[str, Any]] = []
         self.buffer: list[dict[str, Any]] = []
-        self.quarantine: list[Event] = []
+        self.quarantine: list[dict[str, Any]] = []
         self.seen_ids: set[str] = set()
         self.metrics: dict[str, int] = {}
         self.alerts: list[Alert] = []
@@ -95,12 +98,12 @@ class ObservabilityPipeline:
             if key in ALLOWED_ATTRIBUTES or SENSITIVE_KEY.search(key)
         }
         return {
-            "event_id": event.event_id,
-            "schema": event.schema,
-            "event_type": event.event_type,
-            "severity": event.severity,
-            "request_id": event.request_id,
-            "run_id": event.run_id,
+            "event_id": self._redact_text(event.event_id),
+            "schema": self._redact_text(event.schema),
+            "event_type": self._redact_text(event.event_type),
+            "severity": self._redact_text(event.severity),
+            "request_id": self._redact_text(event.request_id),
+            "run_id": self._redact_text(event.run_id),
             "attributes": attributes,
         }
 
@@ -108,15 +111,16 @@ class ObservabilityPipeline:
         if event.event_id in self.seen_ids:
             return "duplicate"
         self.seen_ids.add(event.event_id)
+
+        normalized = self._normalized(event)
         if event.schema != SUPPORTED_SCHEMA:
-            self.quarantine.append(event)
+            self.quarantine.append(normalized)
             return "quarantined"
         if not event.request_id or not event.run_id:
             raise ValueError("correlation IDs are required")
         if not self._sampled(event):
             return "sampled_out"
 
-        normalized = self._normalized(event)
         self.metrics[f"events.{event.event_type}"] = self.metrics.get(
             f"events.{event.event_type}", 0
         ) + 1
@@ -237,6 +241,22 @@ def run_self_tests() -> None:
     p.ingest(make_event("o14", tool="catalog.read", outcome="Bearer demoCredential123"))
     outcome_value = p.persisted[0]["attributes"]["outcome"]
     results.append(("O14 authorization credential redacted", "demoCredential123" not in outcome_value and REDACTED in outcome_value))
+
+    p = ObservabilityPipeline()
+    original = make_event(
+        "o15",
+        schema="nexus.telemetry.v0",
+        tool="catalog.read client_secret=synthetic-only",
+    )
+    status = p.ingest(original)
+    quarantined_tool = p.quarantine[0]["attributes"]["tool"]
+    results.append((
+        "O15 quarantine sanitized without mutating input",
+        status == "quarantined"
+        and "synthetic-only" not in quarantined_tool
+        and REDACTED in quarantined_tool
+        and original.attributes["tool"].endswith("synthetic-only"),
+    ))
 
     failed = [name for name, passed in results if not passed]
     for name, passed in results:
