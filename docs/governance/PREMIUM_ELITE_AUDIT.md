@@ -1,7 +1,7 @@
 ---
 id: governance.premium-elite-audit
 content_id: governance.premium-elite-audit
-version: 0.2.0
+version: 0.3.0
 title: Auditoria Premium Elite da Fundação
 lang: pt-BR
 status: active
@@ -43,7 +43,7 @@ A nota definitiva permanece condicionada à execução do CI, teste externo dos 
 | Dimensão | Evidência observada | Avaliação |
 |---|---|---:|
 | Arquitetura | Separação entre docs, course, agents, loops, labs, projects, platforms e tests | Excelente |
-| Currículo | Progressão 00–11 com entregas observáveis | Excelente |
+| Currículo | Progressão 00–12 com entregas observáveis; LAB-1201 ainda planejado | Muito boa, com risco MCP/Skills documentado |
 | Segurança | Segurança tratada como bloqueio, não conteúdo opcional | Excelente |
 | Longevidade | Markdown, YAML, Mermaid, IDs estáveis e links relativos | Excelente |
 | Internacionalização | pt-BR canônico e manifesto versionado para en/es | Muito boa |
@@ -58,10 +58,10 @@ A nota definitiva permanece condicionada à execução do CI, teste externo dos 
 
 - [x] Implementar pelo menos um módulo completo, executável e avaliado de ponta a ponta.
 - [x] Criar testes automáticos para links internos e metadados obrigatórios.
-- [ ] Publicar política de fontes com hierarquia, data de acesso, versionamento e tratamento de divergências.
+- [x] Publicar política de fontes com hierarquia, data de acesso, versionamento e tratamento de divergências.
 - [x] Criar contrato operacional de agentes e loop de auditoria reproduzível.
 - [x] Definir política de imagens, licenças, texto alternativo e rastreabilidade.
-- [ ] Executar CI com sucesso após a expansão do validador.
+- [ ] Executar CI com sucesso no SHA final após a expansão do validador.
 - [ ] Registrar revisão humana externa de pelo menos um laboratório.
 
 ### P1 — alta prioridade
@@ -83,7 +83,9 @@ A nota definitiva permanece condicionada à execução do CI, teste externo dos 
 
 ## Rubrica Premium Elite
 
-| Critério | Peso | Nota inicial | Estado atual estimado* |
+As notas abaixo são a estimativa interna histórica da rodada anterior e não foram recalculadas nesta revisão. Elas não representam readiness atual nem substituem os gates do registro de controle.
+
+| Critério | Peso | Nota inicial | Estado anterior estimado* |
 |---|---:|---:|---:|
 | Correção técnica | 20% | 9,0 | 9,1 |
 | Arquitetura e manutenção | 15% | 9,4 | 9,5 |
