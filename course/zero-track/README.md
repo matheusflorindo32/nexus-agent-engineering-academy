@@ -9,7 +9,7 @@ status: review
 
 A Trilha Zero prepara pessoas sem experiência prévia em programação para entrar no currículo NEXUS com menos dependência de ajuda externa.
 
-> **Estado:** piloto. A existência destes materiais não significa validação pedagógica concluída.
+> **Estado:** piloto. A implementação do conteúdo não significa validação pedagógica concluída.
 
 ## Para quem é
 
@@ -41,12 +41,18 @@ Não avance apenas porque leu. Avance quando conseguir produzir a evidência sol
 | [Z06](Z06-seguranca-e-segredos/README.md) | segurança básica e proteção de segredos | política curta, `.gitignore` e varredura sintética |
 | [Z07](Z07-clonar-executar-testar-corrigir/README.md) | clonar, executar, testar e corrigir | baseline, diff pequeno e evidência antes/depois |
 | [Z08](Z08-primeiro-workflow/README.md) | primeiro workflow determinístico | execução, falha, retry idempotente e testes |
+| [Z09](Z09-primeiro-agente/README.md) | primeiro agente simples | contrato, self-test, recusa e limitação documentada |
 
-## Unidade planejada
+## Conclusão da trilha
 
-- Z09 — primeiro agente simples.
+Depois de Z09, complete:
 
-## Gate de saída desta etapa
+1. [Projeto integrador](INTEGRATIVE_PROJECT.md);
+2. [Avaliação de saída](EXIT_ASSESSMENT.md);
+3. revisão de segurança e evidência;
+4. classificação `REVISAR`, `PRONTO_COM_APOIO` ou `PRONTO`.
+
+## Gate de saída
 
 A pessoa pode avançar quando consegue:
 
@@ -54,14 +60,17 @@ A pessoa pode avançar quando consegue:
 - navegar por pastas sem interface gráfica;
 - criar, ler, mover e excluir arquivos de teste;
 - explicar a diferença entre Git e GitHub;
-- criar um repositório local, registrar um commit e abrir uma branch;
-- executar um script Python e interpretar um traceback;
+- criar repositório local, commit e branch;
+- executar Python e interpretar traceback;
 - diferenciar Markdown, JSON e YAML;
 - explicar requisição, resposta, autenticação e autorização;
 - proteger credenciais em código, configuração e logs;
-- clonar, testar e corrigir um projeto sem enfraquecer os testes;
-- modelar um workflow com stop conditions e idempotência;
-- mostrar evidências do que executou.
+- clonar, testar e corrigir sem enfraquecer testes;
+- modelar workflow com stop conditions e idempotência;
+- explicar objetivo, ferramentas, orçamento, recusas e parada de um agente;
+- concluir o projeto integrador;
+- atingir pelo menos nível funcional em todos os critérios da avaliação;
+- mostrar evidências reproduzíveis e sanitizadas.
 
 ## Segurança
 
@@ -70,3 +79,7 @@ A pessoa pode avançar quando consegue:
 - use somente pastas de laboratório;
 - registre erros e dúvidas em vez de ocultá-los;
 - pare quando houver risco de perda de dados ou exposição de segredo.
+
+## Limitação atual
+
+A Trilha Zero está implementada em estado de revisão. Ela ainda precisa de piloto com alunos reais, medição de abandono, teste de acessibilidade e revisão pedagógica externa antes de ser declarada validada para iniciantes absolutos.
