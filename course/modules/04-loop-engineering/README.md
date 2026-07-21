@@ -3,7 +3,7 @@ id: course.module.04-loop-engineering
 title: 04 — Loop Engineering
 lang: pt-BR
 status: review
-version: 0.2.0
+version: 0.3.0
 estimated_time: 12h
 prerequisites: [course.module.03-tool-engineering]
 learning_outcomes:
@@ -11,36 +11,92 @@ learning_outcomes:
   - implementar budgets, stop conditions e circuit breakers
   - provar terminação em sucesso, falha e estagnação
   - retomar execução por checkpoint sem duplicar efeitos
+  - produzir evidência de progresso, parada e recuperação
 ---
 
 # 04 — Loop Engineering
 
 > [!IMPORTANT]
-> Um loop confiável não é aquele que insiste até obter uma resposta. É aquele que sabe continuar, aguardar, concluir e parar com justificativa auditável.
+> Um loop confiável não insiste indefinidamente. Ele continua apenas enquanto existe progresso mensurável, autoridade válida, orçamento disponível e risco aceitável.
 
-## Objetivos
+## Para quem é este módulo
 
-- Modelar o loop agentic como máquina de estados explícita.
-- Implementar budgets multidimensionais, stop conditions, checkpoint, retry e circuit breaker.
-- Demonstrar terminação em cenários de sucesso, estagnação, falha e necessidade de aprovação humana.
-- Produzir relatório de término tipado com evidências, custos e razão de parada.
+Este módulo é destinado a estudantes que já conseguem:
 
-## Pré-requisitos
+- explicar contrato, permissões e efeitos de uma tool;
+- validar JSON e interpretar erros básicos em Python;
+- distinguir retry, nova execução e efeito externo;
+- registrar evidências técnicas em Markdown e JSON.
 
-[Módulo 03](../03-tool-engineering/README.md); exceções, funções puras, JSON e testes básicos.
+Quem ainda não domina esses pontos deve concluir a [Trilha Zero](../../zero-track/README.md) e revisar o [Módulo 03](../03-tool-engineering/README.md).
 
-## O problema real
+## Resultado final observável
 
-Loops implícitos criam quatro riscos recorrentes:
+Ao final, você deverá entregar um loop local, determinístico e retomável que:
 
-1. **não terminação** — o sistema continua sem limite verificável;
-2. **efeitos duplicados** — retry repete uma ação externa;
-3. **estagnação mascarada** — etapas parecem diferentes, mas não produzem progresso;
-4. **falha sem diagnóstico** — o sistema para sem explicar estado, custo ou causa.
+- use máquina de estados explícita;
+- termine em todos os cenários testados;
+- detecte estagnação por critério mensurável;
+- imponha budgets multidimensionais;
+- bloqueie retries inseguros;
+- use circuit breaker;
+- serialize checkpoint versionado;
+- retome sem duplicar efeitos;
+- produza relatório terminal auditável.
 
-A NEXUS exige que qualquer loop declare estados, transições, budgets, falhas e condições de parada antes de ser conectado a ferramentas externas.
+## Diagnóstico inicial
 
-## Modelo de estados NEXUS
+Antes de começar, responda sem consultar o material:
+
+1. Qual a diferença entre retry, replay e retomada?
+2. Quando uma resposta diferente não representa progresso?
+3. O que deve acontecer após um timeout com efeito desconhecido?
+4. Por que `max_steps` sozinho é insuficiente?
+5. Quais dados mínimos precisam existir em um checkpoint?
+
+Registre as respostas. Repita o diagnóstico ao concluir o módulo.
+
+## Missão do módulo
+
+Construir um loop que possa ser explicado, testado, interrompido, retomado e auditado sem depender de memória informal, comportamento implícito ou confiança no modelo.
+
+## Explicação em três camadas
+
+### Camada 1 — explicação simples
+
+Um loop é uma sequência controlada de passos. Ele precisa saber:
+
+- onde está;
+- o que já fez;
+- quanto ainda pode gastar;
+- se está progredindo;
+- quando deve parar.
+
+### Camada 2 — explicação operacional
+
+Um loop seguro possui estados, transições, budgets, critérios de progresso, stop conditions, política de retry, checkpoint e relatório terminal.
+
+### Camada 3 — explicação de engenharia
+
+Loop Engineering transforma execução iterativa em uma máquina de estados finita, observável e recuperável. O objetivo não é maximizar autonomia, mas controlar variância, custo, efeitos, falhas e terminação.
+
+## Glossário essencial
+
+| Termo | Definição operacional |
+|---|---|
+| estado | situação atual da execução |
+| transição | mudança válida entre estados |
+| budget | limite de passos, tempo, falhas, custo ou efeitos |
+| progresso | alteração mensurável em critério relevante |
+| estagnação | repetição sem avanço verificável |
+| stop condition | condição explícita que encerra ou suspende |
+| retry | nova tentativa da mesma operação elegível |
+| retomada | restauração de estado após checkpoint |
+| checkpoint | registro suficiente para continuar com segurança |
+| circuit breaker | bloqueio temporário após padrão de falhas |
+| reconciliação | verificação do estado real antes de repetir efeito |
+
+## Mapa visual
 
 ```mermaid
 stateDiagram-v2
@@ -50,7 +106,7 @@ stateDiagram-v2
     execute --> observe
     observe --> evaluate
     evaluate --> complete: objetivo atingido
-    evaluate --> await_approval: efeito sensível
+    evaluate --> await_approval: aprovação necessária
     evaluate --> plan: progresso mensurável
     evaluate --> stopped: budget, risco ou estagnação
     await_approval --> execute: aprovado e hash válido
@@ -65,7 +121,19 @@ Estados terminais permitidos:
 - `await_approval` — execução suspensa com decisão humana pendente;
 - `stopped` — parada segura e explicada.
 
-Nenhum caminho pode permanecer indefinidamente em `plan`, `execute`, `observe` ou `evaluate`.
+Nenhum caminho pode permanecer indefinidamente em estados intermediários.
+
+## O problema real
+
+Loops implícitos geram riscos recorrentes:
+
+1. não terminação;
+2. efeitos duplicados;
+3. estagnação mascarada;
+4. falha sem diagnóstico;
+5. retomada insegura;
+6. custo crescente sem ganho;
+7. retry de efeito ambíguo.
 
 ## Contrato mínimo de execução
 
@@ -78,7 +146,8 @@ Nenhum caminho pode permanecer indefinidamente em `plan`, `execute`, `observe` o
     "max_steps": 8,
     "max_failures": 2,
     "max_no_progress": 2,
-    "max_tool_calls": 6
+    "max_tool_calls": 6,
+    "max_external_effects": 1
   },
   "progress_fingerprint": "sha256:...",
   "effects": [],
@@ -86,46 +155,42 @@ Nenhum caminho pode permanecer indefinidamente em `plan`, `execute`, `observe` o
 }
 ```
 
-O contrato precisa ser serializável e suficiente para retomar o loop sem reconstruir decisões críticas a partir de memória informal.
+O contrato deve ser serializável, versionado e suficiente para retomar sem reconstruir decisões críticas a partir de texto livre.
 
 ## Budgets multidimensionais
-
-Um único `max_steps` é insuficiente. O loop deve controlar pelo menos:
 
 | Budget | Protege contra |
 |---|---|
 | `max_steps` | execução longa ou não terminação |
-| `max_tool_calls` | custo e ampliação de superfície de ataque |
-| `max_failures` | repetição de falhas sem diagnóstico |
-| `max_no_progress` | estagnação com saídas cosmeticamente diferentes |
+| `max_tool_calls` | custo e ampliação da superfície de ataque |
+| `max_failures` | repetição sem diagnóstico |
+| `max_no_progress` | estagnação |
 | `max_elapsed_ms` | bloqueio temporal |
-| `max_external_effects` | excesso de mutações |
+| `max_external_effects` | mutações excessivas |
 
 Budgets são limites de segurança, não metas de consumo.
 
-## Detecção de progresso
+## Progresso mensurável
 
-Progresso deve ser definido por mudança mensurável no estado relevante. Exemplos:
+Conta como progresso:
 
-- redução do número de requisitos não satisfeitos;
-- aumento de cobertura de evidência;
+- requisito antes pendente passa a atendido;
+- cobertura de evidência aumenta;
 - teste anteriormente falho passa;
-- novo artefato válido é produzido;
-- bloqueio é removido.
+- bloqueio é removido;
+- artefato novo e válido é produzido.
 
-Não contam como progresso:
+Não conta como progresso:
 
 - reformular a mesma resposta;
 - repetir busca sem novas fontes;
-- gerar arquivos equivalentes;
-- alternar ferramentas sem alterar resultado;
-- aumentar texto sem aumentar evidência.
+- alternar tools sem mudar resultado;
+- aumentar texto sem aumentar evidência;
+- gerar arquivos equivalentes.
 
-Uma implementação prática usa um `progress_fingerprint` derivado apenas dos campos relevantes. Se o fingerprint permanecer igual por `max_no_progress` avaliações, o loop deve parar.
+Use um `progress_fingerprint` derivado apenas dos campos relevantes. Se permanecer igual pelo limite configurado, o loop deve parar.
 
-## Stop conditions
-
-Condições mínimas:
+## Stop conditions obrigatórias
 
 ```text
 objective_complete
@@ -140,37 +205,41 @@ circuit_open
 operator_stop
 ```
 
-Cada parada deve produzir:
+Toda parada deve registrar:
 
 - razão tipada;
 - último estado válido;
 - budget consumido e restante;
-- efeitos já realizados;
+- efeitos concluídos;
 - erros observados;
 - próximo passo seguro.
 
-## Retry seguro
+## Retry, replay e retomada
+
+- **retry:** repete uma operação elegível sob a mesma intenção;
+- **replay:** reproduz uma sequência anterior e pode duplicar efeitos;
+- **retomada:** restaura estado, reconcilia efeitos e continua do ponto seguro.
 
 Retry só é permitido quando:
 
-1. a falha é classificada como transitória;
+1. a falha é transitória;
 2. a operação é idempotente ou possui chave de idempotência;
 3. não há efeito ambíguo pendente;
 4. existe limite de tentativas;
-5. backoff e jitter são aplicados quando apropriado;
-6. o resultado é reconciliado antes de nova mutação.
+5. há backoff quando necessário;
+6. a reconciliação precede nova mutação.
 
-Falhas de autorização, schema, política e conteúdo inseguro não devem ser tratadas com retry automático.
+Falhas de autorização, schema, política e conteúdo inseguro não recebem retry automático.
 
 ## Circuit breaker
 
 Estados:
 
 - `closed` — chamadas permitidas;
-- `open` — chamadas bloqueadas após limiar de falhas;
+- `open` — chamadas bloqueadas;
 - `half_open` — uma probe controlada testa recuperação.
 
-O contrato deve declarar:
+Contrato mínimo:
 
 ```yaml
 failure_threshold: 3
@@ -179,7 +248,7 @@ half_open_probes: 1
 successes_to_close: 1
 ```
 
-Abrir o circuito deve ser observável e não pode apagar a causa das falhas.
+Abrir o circuito deve ser observável e preservar a causa das falhas.
 
 ## Checkpoint e retomada
 
@@ -195,25 +264,22 @@ Um checkpoint seguro registra:
 - erros e métricas;
 - versão dos artefatos usados.
 
-Ao retomar, o sistema deve reconciliar efeitos externos antes de executar novamente. Retomada não é sinônimo de replay.
+Ao retomar, reconcilie efeitos externos antes de executar novamente. Retomada não é replay.
 
-## Relatório de término
+## Exemplo mínimo
 
-```json
-{
-  "run_id": "run-001",
-  "terminal_state": "stopped",
-  "reason": "no_progress",
-  "steps": 5,
-  "tool_calls": 3,
-  "external_effects": 0,
-  "last_progress_step": 2,
-  "recoverable": true,
-  "recommended_next_action": "revisar critério de recuperação"
-}
-```
+Um loop local recebe três requisitos simulados e tenta satisfazê-los. A cada ciclo:
 
-## Implementação de referência
+1. seleciona um requisito pendente;
+2. executa uma ação determinística;
+3. verifica resultado;
+4. atualiza o fingerprint;
+5. consome budget;
+6. conclui ou para.
+
+O exemplo deve conter pelo menos um cenário de sucesso e um de estagnação.
+
+## Demonstração executável
 
 Execute:
 
@@ -221,21 +287,58 @@ Execute:
 python examples/deterministic_loop.py --self-test
 ```
 
-O exemplo deve provar:
+A demonstração deve provar:
 
 - sucesso antes do limite;
 - parada por estagnação;
-- parada por falha não recuperável;
+- falha não recuperável;
 - abertura de circuit breaker;
 - checkpoint e retomada sem efeito duplicado.
 
-## Laboratórios
+> [!WARNING]
+> Se o exemplo não existir ou não executar no ambiente documentado, registre o bloqueio. Não substitua evidência de execução por descrição.
 
-- [LAB-401](../../../labs/LAB-401-stop-conditions.md) — provar stop conditions com falhas injetadas.
+## Prática guiada
 
-## Projeto
+1. desenhe cinco estados e suas transições;
+2. defina três budgets;
+3. escolha um critério de progresso;
+4. defina duas stop conditions;
+5. modele uma falha transitória e uma não recuperável;
+6. registre o relatório terminal esperado.
 
-Construir um loop retomável que:
+## Prática independente
+
+Projete um loop para processar uma fila simulada de tarefas read-only. Inclua:
+
+- budget de passos;
+- budget de falhas;
+- detecção de no-progress;
+- circuit breaker;
+- checkpoint;
+- relatório terminal;
+- teste de retomada.
+
+## Testes negativos obrigatórios
+
+- budget zero;
+- estado desconhecido;
+- transição inválida;
+- fingerprint invariável;
+- timeout com efeito desconhecido;
+- checkpoint incompatível;
+- retry sem idempotência;
+- circuit breaker aberto;
+- aprovação expirada;
+- operador solicita parada.
+
+## Laboratório
+
+Execute o [LAB-401](../../../labs/LAB-401-stop-conditions.md).
+
+## Projeto obrigatório
+
+Construa um loop retomável que:
 
 1. use máquina de estados explícita;
 2. declare budgets multidimensionais;
@@ -244,64 +347,107 @@ Construir um loop retomável que:
 5. serialize checkpoint versionado;
 6. reconcilie efeitos antes de retry;
 7. produza relatório terminal tipado;
-8. execute uma suíte adversarial reproduzível.
+8. execute suíte adversarial reproduzível.
 
-## Quiz
+## Rubrica específica
 
-1. Por que `max_steps` sozinho não controla um loop adequadamente?
-2. Qual é a diferença entre retry e retomada?
-3. Quando uma saída diferente não representa progresso?
-4. Por que um checkpoint precisa registrar efeitos já concluídos?
-5. O que deve acontecer quando o circuit breaker está `open`?
-
-<details>
-<summary>Gabarito comentado</summary>
-
-1. Porque não limita separadamente falhas, tempo, chamadas, efeitos e estagnação.
-2. Retry repete uma operação elegível; retomada restaura estado e reconcilia efeitos antes de continuar.
-3. Quando não altera nenhum critério relevante, evidência, teste, bloqueio ou artefato válido.
-4. Para impedir replay e duplicidade após reinício.
-5. Novas chamadas devem ser bloqueadas até o cooldown e uma probe controlada em `half_open`.
-
-</details>
-
-## Checklist
-
-- [ ] Todo caminho alcança `complete`, `await_approval` ou `stopped`.
-- [ ] Budgets são multidimensionais e persistidos.
-- [ ] Estagnação é detectada por critério mensurável.
-- [ ] Checkpoint não duplica efeitos.
-- [ ] Retry exige idempotência e classificação de falha.
-- [ ] Circuit breaker possui limiar, cooldown e probe.
-- [ ] Toda parada gera relatório tipado.
-- [ ] Testes cobrem sucesso, falha, estagnação e retomada.
-
-## Critérios de excelência
-
-| Dimensão | Padrão Premium Elite |
+| Nível | Evidência |
 |---|---|
-| Terminação | 100% dos cenários terminam em estado permitido |
-| Segurança | nenhum retry de efeito ambíguo ou não idempotente |
-| Retomada | zero efeitos duplicados após checkpoint |
-| Observabilidade | razão, budgets, transições e efeitos são auditáveis |
-| Resiliência | circuit breaker e reconciliação testados |
-| Reprodutibilidade | suíte local executa sem API, rede ou segredo |
+| insuficiente | loop pode não terminar, não possui budgets ou duplica efeitos |
+| funcional | termina em cenários básicos e registra razão de parada |
+| robusta | cobre falhas, estagnação, checkpoint e retry seguro |
+| excelente | prova terminação, retomada sem duplicidade, auditabilidade e acessibilidade |
 
-## Bibliografia
+Segurança, terminação e rastreabilidade são critérios de bloqueio.
 
-NYGARD, Michael T. *Release It!*. 2. ed. Raleigh: Pragmatic Bookshelf, 2018.
+## Erros comuns
 
-KLEPPMANN, Martin. *Designing Data-Intensive Applications*. Sebastopol: O'Reilly Media, 2017.
+- usar apenas `max_steps`;
+- considerar texto diferente como progresso;
+- misturar retry com retomada;
+- retomar sem reconciliar efeitos;
+- esconder falha em exceção genérica;
+- permitir transição não declarada;
+- apagar causa ao abrir circuit breaker;
+- registrar segredo no checkpoint.
 
-## Referências
+## Stop conditions para o estudante
 
-- AWS Builders’ Library — Timeouts, retries and backoff with jitter: https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
-- Microsoft Azure Architecture Center — Circuit Breaker pattern: https://learn.microsoft.com/azure/architecture/patterns/circuit-breaker
-- Martin Fowler — Circuit Breaker: https://martinfowler.com/bliki/CircuitBreaker.html
+Pare o exercício e peça revisão quando:
+
+- houver efeito externo não simulado;
+- o checkpoint contiver credencial;
+- não for possível provar terminação;
+- um retry puder duplicar ação;
+- o código exigir desabilitar teste;
+- o ambiente não corresponder à documentação.
+
+## Acessibilidade
+
+- diagramas devem ter descrição textual equivalente;
+- estados não devem depender apenas de cor;
+- comandos devem ser copiáveis;
+- tabelas devem possuir cabeçalhos claros;
+- exemplos devem funcionar sem interface gráfica;
+- vídeos futuros devem possuir legenda e transcrição.
+
+## Autoavaliação
+
+- [ ] Consigo explicar todos os estados e transições.
+- [ ] Defini progresso mensurável.
+- [ ] Meus budgets são persistidos.
+- [ ] Todo cenário termina.
+- [ ] Retry exige elegibilidade explícita.
+- [ ] Retomada reconcilia efeitos.
+- [ ] O checkpoint não contém segredo.
+- [ ] O relatório terminal é auditável.
+
+## Quiz comentado
+
+1. Por que `max_steps` sozinho é insuficiente?  
+   Porque não limita separadamente falhas, tempo, chamadas, efeitos e estagnação.
+
+2. Qual a diferença entre retry e retomada?  
+   Retry repete uma operação elegível; retomada restaura estado e reconcilia efeitos.
+
+3. Quando uma saída diferente não representa progresso?  
+   Quando não altera critério relevante, evidência, teste, bloqueio ou artefato válido.
+
+4. Por que checkpoint registra efeitos concluídos?  
+   Para impedir replay e duplicidade após reinício.
+
+5. O que ocorre com circuit breaker aberto?  
+   Novas chamadas são bloqueadas até cooldown e probe controlada.
+
+## Critérios Premium Elite
+
+| Dimensão | Padrão exigido |
+|---|---|
+| terminação | 100% dos cenários chegam a estado permitido |
+| segurança | nenhum retry de efeito ambíguo ou não idempotente |
+| retomada | zero efeitos duplicados após checkpoint |
+| observabilidade | razão, budgets, transições e efeitos auditáveis |
+| resiliência | circuit breaker e reconciliação testados |
+| reprodutibilidade | suíte local sem API, rede ou segredo |
+| acessibilidade | conteúdo utilizável sem depender apenas de elementos visuais |
+
+## Referências essenciais
+
+- NYGARD, Michael T. *Release It!*. 2. ed. Pragmatic Bookshelf, 2018.
+- KLEPPMANN, Martin. *Designing Data-Intensive Applications*. O'Reilly Media, 2017.
+- AWS Builders’ Library — Timeouts, retries and backoff with jitter.
+- Microsoft Azure Architecture Center — Circuit Breaker pattern.
+- Martin Fowler — Circuit Breaker.
 
 > [!WARNING]
-> Exemplos locais demonstram invariantes arquiteturais. Parâmetros reais dependem do impacto, latência, consistência e modelo de falha do sistema externo.
+> Parâmetros reais dependem do impacto, latência, consistência e modelo de falha do sistema externo. Registre versão e data de consulta das fontes.
 
-## Próximo passo
+## Gate de progressão
 
-Conclua o LAB-401 e obtenha nível funcional ou superior na rubrica antes de avançar para protocolos e MCP.
+Avance para [05 — Memory Engineering](../05-memory-engineering/README.md) somente após:
+
+- concluir o LAB-401;
+- obter nível funcional ou superior;
+- não apresentar bloqueio de segurança;
+- demonstrar terminação e retomada segura;
+- registrar limitações e risco residual.
