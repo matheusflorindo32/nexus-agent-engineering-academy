@@ -34,7 +34,7 @@ afirmação à qual está ligada. Versões marcadas são fixadas deliberadamente
 
 ## Modelos de citação
 
-### ABNT (NBR 6023:2018, modelo institucional online)
+### ABNT (modelo institucional online; edição da NBR 6023 a confirmar)
 
 ```text
 INSTITUIÇÃO. Título. Versão ou data. Disponível em: <URL>. Acesso em: DD mmm. AAAA.

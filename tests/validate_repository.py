@@ -30,11 +30,12 @@ REQUIRED_EXECUTABLES = {
     "examples/security_guardrails.py",
     "examples/production_runtime.py",
     "examples/observability_pipeline.py",
+    "tests/run_quality_gates.py",
     "datasets/lab-201-context-fixtures.json",
     ".github/workflows/quality.yml",
 }
-EXPECTED_MODULES = {f"{number:02d}" for number in range(11)}
-EXPECTED_LABS = {"000", "101", "201", "301", "401", "501", "601", "701", "801", "901", "1001"}
+EXPECTED_MODULES = {f"{number:02d}" for number in range(13)}
+EXPECTED_LABS = {"000", "101", "201", "301", "401", "501", "601", "701", "801", "901", "1001", "1101"}
 REQUIRED_FRONTMATTER = {"id", "title", "lang", "status"}
 ALLOWED_LANGS = {"pt-BR", "en", "es"}
 ALLOWED_STATUS = {"foundation", "draft", "review", "accepted", "active", "stable", "deprecated"}
@@ -50,9 +51,11 @@ REQUIRED_AGENT_FIELDS = {
 }
 LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9.-]*$")
+SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SECRET_PATTERNS = {
     "OpenAI-style key": re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b"),
     "GitHub token": re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"),
+    "AWS access key ID": re.compile(r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"),
     "Private key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
 }
 
@@ -71,6 +74,32 @@ def parse_frontmatter(text: str) -> dict[str, str] | None:
     return result
 
 
+def document_slug(path: Path, data: dict[str, str]) -> str:
+    """Return an explicit slug or a stable repository-relative derived slug."""
+    explicit = data.get("slug", "").strip()
+    if explicit:
+        return explicit
+    relative = path.relative_to(ROOT).with_suffix("")
+    parts = list(relative.parts)
+    if len(parts) == 1 and parts[0].lower() == "readme":
+        return "repository"
+    if parts and parts[-1].lower() == "readme":
+        parts[-1] = "index"
+    raw_slug = "-".join(part.lower() for part in parts)
+    return re.sub(r"[^a-z0-9]+", "-", raw_slug).strip("-")
+
+
+def parse_inline_list(value: str) -> list[str] | None:
+    """Parse the flat YAML list syntax used by curriculum prerequisites."""
+    value = value.strip()
+    if not (value.startswith("[") and value.endswith("]")):
+        return None
+    body = value[1:-1].strip()
+    if not body:
+        return []
+    return [item.strip().strip("\"'") for item in body.split(",") if item.strip()]
+
+
 def markdown_files() -> list[Path]:
     roots = [ROOT / name for name in CONTENT_ROOTS]
     files = [ROOT / name for name in (
@@ -84,7 +113,9 @@ def markdown_files() -> list[Path]:
 
 
 def check_frontmatter(files: list[Path], errors: list[str]) -> None:
-    seen: dict[str, Path] = {}
+    seen_ids: dict[str, Path] = {}
+    seen_slugs: dict[str, Path] = {}
+    records: list[tuple[Path, dict[str, str]]] = []
     for path in files:
         text = path.read_text(encoding="utf-8")
         data = parse_frontmatter(text)
@@ -98,16 +129,43 @@ def check_frontmatter(files: list[Path], errors: list[str]) -> None:
         doc_id = data.get("id", "")
         if doc_id and not ID_RE.fullmatch(doc_id):
             errors.append(f"{relative}: id inválido: {doc_id}")
-        if doc_id in seen:
-            errors.append(f"{relative}: id duplicado com {seen[doc_id].relative_to(ROOT)}: {doc_id}")
+        if doc_id in seen_ids:
+            errors.append(f"{relative}: id duplicado com {seen_ids[doc_id].relative_to(ROOT)}: {doc_id}")
         elif doc_id:
-            seen[doc_id] = path
+            seen_ids[doc_id] = path
+        slug = document_slug(path, data)
+        if not slug or not SLUG_RE.fullmatch(slug):
+            errors.append(f"{relative}: slug inválido: {slug}")
+        elif slug in seen_slugs:
+            errors.append(
+                f"{relative}: slug duplicado com "
+                f"{seen_slugs[slug].relative_to(ROOT)}: {slug}"
+            )
+        else:
+            seen_slugs[slug] = path
         lang = data.get("lang")
         if lang and lang not in ALLOWED_LANGS:
             errors.append(f"{relative}: lang não suportado: {lang}")
         status = data.get("status")
         if status and status not in ALLOWED_STATUS:
             errors.append(f"{relative}: status não suportado: {status}")
+        records.append((path, data))
+
+    known_ids = set(seen_ids)
+    for path, data in records:
+        raw_prerequisites = data.get("prerequisites")
+        if raw_prerequisites is None:
+            continue
+        prerequisites = parse_inline_list(raw_prerequisites)
+        relative = path.relative_to(ROOT)
+        if prerequisites is None:
+            errors.append(f"{relative}: prerequisites deve usar lista YAML inline")
+            continue
+        for prerequisite in prerequisites:
+            if prerequisite not in known_ids:
+                errors.append(
+                    f"{relative}: pré-requisito inexistente: {prerequisite}"
+                )
 
 
 def normalized_link_target(raw: str) -> str:
@@ -137,8 +195,16 @@ def check_links(files: list[Path], errors: list[str]) -> None:
 def check_modules(errors: list[str]) -> None:
     modules_root = ROOT / "course" / "modules"
     present: set[str] = set()
+    owners: dict[str, Path] = {}
     for path in sorted(modules_root.glob("*/README.md")):
         prefix = path.parent.name.split("-", 1)[0]
+        if prefix in owners:
+            errors.append(
+                f"número de módulo duplicado {prefix}: "
+                f"{owners[prefix].relative_to(ROOT)} e {path.relative_to(ROOT)}"
+            )
+        else:
+            owners[prefix] = path
         present.add(prefix)
         text = path.read_text(encoding="utf-8")
         missing = [heading for heading in REQUIRED_MODULE_SECTIONS if heading not in text]
@@ -155,10 +221,19 @@ def check_modules(errors: list[str]) -> None:
 
 def check_labs(errors: list[str]) -> None:
     present: set[str] = set()
+    owners: dict[str, Path] = {}
     for path in sorted((ROOT / "labs").glob("LAB-*.md")):
         match = re.match(r"LAB-(\d{3,4})-", path.name)
         if match:
-            present.add(match.group(1))
+            lab_number = match.group(1)
+            if lab_number in owners:
+                errors.append(
+                    f"número de laboratório duplicado {lab_number}: "
+                    f"{owners[lab_number].relative_to(ROOT)} e {path.relative_to(ROOT)}"
+                )
+            else:
+                owners[lab_number] = path
+            present.add(lab_number)
         text = path.read_text(encoding="utf-8")
         missing = [heading for heading in REQUIRED_LAB_SECTIONS if heading not in text]
         if missing:
@@ -208,10 +283,14 @@ def check_executables(errors: list[str]) -> None:
 
 
 def check_secrets(errors: list[str]) -> None:
-    text_extensions = {".md", ".py", ".ts", ".yml", ".yaml", ".json", ".toml", ".txt"}
+    text_extensions = {
+        ".cfg", ".ini", ".json", ".md", ".py", ".toml", ".ts",
+        ".txt", ".yaml", ".yml",
+    }
     ignored = {".git", ".venv", "node_modules"}
     for path in ROOT.rglob("*"):
-        if not path.is_file() or path.suffix.lower() not in text_extensions:
+        is_env_file = path.name == ".env" or path.name.startswith(".env.")
+        if not path.is_file() or (path.suffix.lower() not in text_extensions and not is_env_file):
             continue
         if any(part in ignored for part in path.parts):
             continue
@@ -245,8 +324,8 @@ def main() -> int:
         return 1
     print(
         "NEXUS Premium Elite validation passed: "
-        f"{len(files)} Markdown files; Modules 00-10; LAB-000 through LAB-1001; "
-        "structure, metadata, IDs, links, contracts, executables and secret scan OK."
+        f"{len(files)} Markdown files; Modules 00-12; LAB-000 through LAB-1101; "
+        "unique numbering, structure, metadata, IDs, links, contracts, executables and secret scan OK."
     )
     return 0
 
