@@ -2,7 +2,7 @@
 id: course.zero-track.z01
 title: Z01 — Terminal sem medo
 lang: pt-BR
-status: pilot
+status: review
 prerequisites: [course.zero-track.z00]
 estimated_hours: 3
 ---
