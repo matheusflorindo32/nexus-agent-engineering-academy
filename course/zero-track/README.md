@@ -28,19 +28,19 @@ explicação simples → demonstração → prática guiada → prática indepen
 
 Não avance apenas porque leu. Avance quando conseguir produzir a evidência solicitada.
 
-## Primeiras unidades implementadas
+## Unidades implementadas
 
 | Unidade | Tema | Evidência mínima |
 |---|---|---|
 | [Z00](Z00-computador-e-ambiente/README.md) | computador, arquivos, programas e ambiente | relatório do verificador de ambiente |
 | [Z01](Z01-terminal-sem-medo/README.md) | navegação e operações seguras no terminal | transcript com criação, leitura e remoção controlada |
 | [Z02](Z02-git-e-github-essenciais/README.md) | Git, commit, branch e GitHub | repositório local com histórico compreensível |
+| [Z03](Z03-python-essencial/README.md) | Python essencial | script, testes e falha explicada |
+| [Z04](Z04-markdown-json-yaml/README.md) | Markdown, JSON e YAML | documentação e configurações validadas |
+| [Z05](Z05-http-apis-chaves/README.md) | HTTP, APIs e proteção de credenciais | contrato de API e simulação local segura |
 
 ## Unidades planejadas
 
-- Z03 — Python essencial;
-- Z04 — Markdown, JSON e YAML;
-- Z05 — HTTP, APIs, chaves e variáveis de ambiente;
 - Z06 — segurança básica e proteção de segredos;
 - Z07 — clonar, executar, testar e corrigir um projeto;
 - Z08 — primeiro workflow;
@@ -55,6 +55,10 @@ A pessoa pode avançar quando consegue:
 - criar, ler, mover e excluir arquivos de teste;
 - explicar a diferença entre Git e GitHub;
 - criar um repositório local, registrar um commit e abrir uma branch;
+- executar um script Python e interpretar um traceback;
+- diferenciar Markdown, JSON e YAML;
+- explicar requisição, resposta, autenticação e autorização;
+- proteger credenciais em código, configuração e logs;
 - mostrar evidências do que executou.
 
 ## Segurança
@@ -63,4 +67,4 @@ A pessoa pode avançar quando consegue:
 - não execute comandos destrutivos que não entende;
 - use somente pastas de laboratório;
 - registre erros e dúvidas em vez de ocultá-los;
-- pare quando houver risco de perda de dados.
+- pare quando houver risco de perda de dados ou exposição de segredo.
