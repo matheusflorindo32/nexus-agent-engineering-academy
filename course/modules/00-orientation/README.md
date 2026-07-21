@@ -3,8 +3,8 @@ id: course.module.00-orientation
 title: 00 — Orientação e método de engenharia
 lang: pt-BR
 status: review
-version: 0.2.0
-estimated_time: 3h
+version: 0.3.0
+estimated_time: 4h
 prerequisites: []
 learning_outcomes:
   - navegar a arquitetura NEXUS
@@ -15,82 +15,111 @@ learning_outcomes:
 
 # 00 — Orientação e método de engenharia
 
-> [!NOTE]
-> Este módulo não começa ensinando uma ferramenta. Ele ensina como pensar, testar, registrar e interromper um sistema de IA com segurança.
+> [!IMPORTANT]
+> Este módulo é o ponto de entrada técnico do currículo. Pessoas sem familiaridade com terminal, Git ou Python devem concluir primeiro a [Trilha Zero](../../zero-track/README.md).
 
-## Missão do módulo
+## Público real
 
-Ao final, você deverá conseguir entrar em qualquer projeto agentic, identificar seus componentes, executar uma verificação mínima e explicar uma decisão de engenharia de forma auditável.
+- iniciantes técnicos que concluíram a Trilha Zero;
+- estudantes com noções básicas de Git, terminal e Python;
+- profissionais que desejam entender o método NEXUS antes de avançar.
+
+## Resultado final
+
+Ao concluir, a pessoa consegue entrar em um projeto agentic, localizar contratos, executar uma verificação mínima, registrar uma decisão e explicar quando interromper uma execução.
 
 ## Objetivos
 
 - Navegar a arquitetura NEXUS e rastrear seus contratos.
 - Executar o validador local e registrar evidências reproduzíveis.
 - Aplicar o ciclo hipótese–experimento–evidência–revisão.
+- Identificar riscos, stop conditions e pontos de aprovação humana.
 
 ## Pré-requisitos
 
-Nenhum; este é o ponto de entrada do currículo.
+- Trilha Zero concluída ou diagnóstico equivalente;
+- Git, terminal e Python em nível introdutório;
+- capacidade de criar arquivos Markdown e executar comandos locais.
 
-## Mapa visual de aprendizagem
+## Diagnóstico inicial
 
-![Mapa manuscrito do ecossistema NEXUS com curso, agentes, loops, plataformas, governança, conhecimento e melhoria contínua.](../../../assets/architecture/nexus-system-handwritten.png)
+Antes de começar, confirme que consegue:
 
-> [!TIP]
-> Use este mapa como orientação inicial. O infográfico claro 3D do README é a visão institucional canônica; esta versão manuscrita foi mantida para apoiar aprendizagem, design thinking e explicações em aula.
+1. executar `python --version`;
+2. executar `git --version`;
+3. clonar um repositório;
+4. abrir um arquivo Markdown;
+5. explicar por que segredos não devem entrar no Git.
 
-## O problema real
+Se três ou mais itens falharem, retorne à Trilha Zero.
 
-Um agente pode parecer inteligente em uma demonstração e ainda ser inseguro, impossível de reproduzir ou difícil de manter. A NEXUS adota um princípio simples:
+## Por que este módulo existe
 
-> Toda decisão relevante precisa deixar evidência suficiente para ser explicada, testada e revisada.
+Projetos com agentes falham quando decisões, riscos e critérios de parada ficam implícitos. O método NEXUS exige que toda mudança relevante seja explicável, testável e revisável.
 
-## O ciclo NEXUS
+## Explicação em três camadas
+
+### Camada 1 — simples
+
+Você formula uma hipótese, faz um teste pequeno, observa o resultado e decide se deve continuar.
+
+### Camada 2 — técnica
+
+Cada experimento declara contexto, entrada, procedimento, versão, critério de sucesso, evidência e stop condition.
+
+### Camada 3 — profissional
+
+Mudanças são promovidas somente quando passam por gates técnicos, segurança, rastreabilidade e revisão humana proporcional ao risco.
+
+## Mapa visual
 
 ```mermaid
 flowchart LR
-    H[Hipótese] --> E[Experimento]
+    H[Hipótese] --> E[Experimento controlado]
     E --> V[Evidência]
     V --> R[Revisão]
-    R --> D{Critério atingido?}
-    D -- Não --> H
-    D -- Sim --> P[Publicar ou aprovar]
+    R --> G{Gate atingido?}
+    G -- não --> H
+    G -- sim --> A[Aprovação ou publicação]
+    X[Risco ou ausência de progresso] --> S[Stop condition]
+    S --> R
 ```
 
-### Exemplo rápido
+## Glossário mínimo
 
-**Hipótese:** a estrutura do repositório permite localizar um conceito e sua aplicação em menos de cinco minutos.
-
-**Experimento:** partir do índice de loops e encontrar o módulo, o laboratório e o template correspondente.
-
-**Evidência:** links visitados, diagrama do caminho e tempo gasto.
-
-**Revisão:** registrar ambiguidades e propor melhoria.
+| Termo | Significado operacional |
+|---|---|
+| hipótese | afirmação que pode ser testada |
+| evidência | artefato que sustenta uma conclusão |
+| gate | condição obrigatória para avançar |
+| stop condition | regra que encerra a execução com segurança |
+| ADR | registro de decisão arquitetural |
+| baseline | solução simples usada para comparação |
 
 ## Arquitetura que você precisa reconhecer
 
 | Camada | Pergunta que responde | Exemplo |
 |---|---|---|
-| `docs/` | O que é e por que existe? | arquitetura, segurança, padrões |
-| `course/` | Em qual ordem aprender? | módulos e progressão |
-| `agents/` | Quem executa e com qual responsabilidade? | supervisor, revisor, pesquisador |
-| `loops/` | Como o sistema decide continuar ou parar? | retries, budgets, circuit breaker |
-| `platforms/` | Como o conceito aparece em cada ferramenta? | Codex, Claude Code, Gemini CLI |
-| `labs/` | Como testar na prática? | experimentos guiados |
-| `projects/` | Como provar competência? | entregas de portfólio |
-| `templates/` | Como padronizar? | ADR, threat model, agent spec |
+| `docs/` | o que é e por que existe? | arquitetura, segurança, padrões |
+| `course/` | em qual ordem aprender? | módulos e progressão |
+| `agents/` | quem executa e com qual responsabilidade? | supervisor e revisor |
+| `loops/` | como continuar, recuperar ou parar? | retries e budgets |
+| `platforms/` | como adaptar sem perder o conceito? | Codex e Gemini CLI |
+| `labs/` | como testar na prática? | experimentos guiados |
+| `projects/` | como provar competência? | entregas de portfólio |
+| `templates/` | como padronizar? | ADR e threat model |
 
-## Roteiro de aprendizagem
+## Exemplo mínimo
 
-### Bloco 1 — Reconhecimento
+**Hipótese:** é possível localizar um conceito, seu laboratório e seu template em menos de cinco minutos.
 
-1. Leia o README principal.
-2. Identifique o currículo, a arquitetura, o sistema de agentes e o loop mestre.
-3. Explique em uma frase a função de cada camada.
+**Experimento:** partir do índice do curso e encontrar o módulo, o LAB e o template correspondente.
 
-### Bloco 2 — Ambiente reproduzível
+**Evidência:** links, tempo gasto e diagrama do caminho.
 
-Execute:
+**Stop condition:** interromper se houver link quebrado, instrução contraditória ou risco de executar algo não compreendido.
+
+## Demonstração executável
 
 ```bash
 git clone https://github.com/matheusflorindo32/nexus-agent-engineering-academy.git
@@ -102,100 +131,127 @@ Registre:
 
 - sistema operacional;
 - versão do Python;
-- commit analisado;
-- resultado do validador;
-- qualquer bloqueio encontrado.
+- SHA analisado;
+- resultado;
+- bloqueios encontrados;
+- decisão tomada.
 
-### Bloco 3 — Decisão arquitetural
+## Prática guiada
 
-Use [`templates/adr.md`](../../../templates/adr.md) para registrar uma decisão pequena, por exemplo:
+1. Leia o README principal.
+2. Localize `course/`, `labs/`, `agents/`, `loops/` e `templates/`.
+3. Execute o validador.
+4. Abra [`templates/adr.md`](../../../templates/adr.md).
+5. Registre uma decisão pequena e reversível.
+6. Liste pelo menos uma stop condition.
 
-- ambiente local escolhido;
-- uso de Markdown puro;
-- padrão de links relativos;
-- idioma canônico;
-- ferramenta principal do laboratório.
-
-### Bloco 4 — Laboratório
-
-Execute o [LAB-000](../../../labs/LAB-000-repository-orientation.md).
-
-## Laboratório — desafio de 20 minutos
+## Prática independente
 
 Escolha um conceito entre **loop**, **tool**, **MCP**, **avaliação** ou **segurança**. Encontre:
 
-1. a definição conceitual;
-2. o módulo de curso relacionado;
-3. um laboratório ou exemplo;
-4. um template aplicável;
-5. uma fonte primária.
+1. definição;
+2. módulo;
+3. laboratório ou exemplo;
+4. template;
+5. fonte primária.
 
-Entregue um diagrama Mermaid com esses cinco pontos.
+Entregue um diagrama Mermaid e um parágrafo explicando o caminho.
 
-## Quiz
+## Laboratórios
 
-1. Por que a NEXUS separa conceitos de adapters de plataforma?
-2. Qual é a diferença entre uma demonstração e uma evidência reproduzível?
-3. Em qual situação o loop deve parar mesmo sem atingir a nota desejada?
-4. Por que IDs e links relativos são importantes para Obsidian e internacionalização?
-5. Qual artefato registra uma decisão arquitetural e suas consequências?
+- [LAB-000](../../../labs/LAB-000-repository-orientation.md) — orientação, validação e mapa de rastreabilidade.
 
-<details>
-<summary>Gabarito comentado</summary>
+## Projeto
 
-1. Para preservar conhecimento transferível mesmo quando APIs e interfaces mudam.
-2. Evidência reproduzível contém procedimento, contexto, versão, resultado e critério verificável.
-3. Quando existe risco, segredo, ação destrutiva, ausência de progresso, limite de iterações ou necessidade de aprovação humana.
-4. Porque mantêm rastreabilidade, Graph View e paridade entre idiomas sem depender de nomes traduzidos.
-5. ADR — Architecture Decision Record.
-
-</details>
-
-## Projeto — entrega obrigatória
+Entregar:
 
 - ADR preenchido;
 - saída do validador;
-- diagrama do desafio;
-- checklist concluído;
+- mapa de rastreabilidade;
+- registro de uma stop condition;
 - autoavaliação pela [rubrica transversal](../../rubrics/transversal-rubric.md).
 
-## Checklist de conclusão
+## Erros comuns
 
-- [ ] Sei localizar conceito, adapter, laboratório, projeto e template.
-- [ ] Executei o validador e registrei o contexto da execução.
-- [ ] Meu ADR contém decisão, alternativas, consequências e critério de revisão.
-- [ ] Nenhum segredo entrou no histórico Git.
-- [ ] Produzi evidência verificável, não apenas uma descrição.
-- [ ] Apliquei uma condição explícita de parada.
+- tratar leitura como evidência de aprendizagem;
+- executar comandos sem registrar versão e contexto;
+- escrever ADR como justificativa retroativa;
+- avançar apesar de risco ou ambiguidade;
+- usar “funcionou na minha máquina” como conclusão.
 
-## Critérios de excelência
+## Teste de segurança
 
-| Dimensão | Mínimo esperado |
-|---|---|
-| Clareza | outra pessoa entende o caminho sem ajuda verbal |
-| Reprodutibilidade | comandos, versões e resultados estão registrados |
-| Segurança | nenhum segredo ou instalação privilegiada desnecessária |
-| Evidência | artefatos e links sustentam as afirmações |
-| Reflexão | limitações e próximos passos estão explícitos |
+A entrega é bloqueada se:
 
-## Referências essenciais
+- houver segredo no histórico;
+- a pessoa executar comando destrutivo sem compreender;
+- a evidência não permitir reprodução;
+- a decisão ignorar risco conhecido;
+- a stop condition estiver ausente.
 
-### ABNT
+## Avaliação
 
-CHACON, Scott; STRAUB, Ben. *Pro Git*. 2. ed. [S. l.]: Apress, 2014. Disponível em: https://git-scm.com/book/en/v2. Acesso em: 19 jul. 2026.
+| Dimensão | Insuficiente | Funcional | Robusta | Excelente |
+|---|---|---|---|---|
+| navegação | depende de ajuda constante | localiza artefatos principais | conecta camadas sem ajuda | explica arquitetura e trade-offs |
+| evidência | descrição vaga | registra comando e resultado | inclui contexto, versão e limitações | permite reprodução independente |
+| decisão | sem alternativas | ADR básico | consequências e revisão explícitas | decisão reversível e auditável |
+| segurança | ignora riscos | evita segredos | aplica stop conditions | antecipa riscos e escalonamento |
 
-KLEPPMANN, Martin. *Designing Data-Intensive Applications*. Sebastopol: O'Reilly Media, 2017.
+Segurança e rastreabilidade são critérios de bloqueio.
 
-### Fontes oficiais para consulta
+## Quiz comentado
 
-- Git documentation: https://git-scm.com/docs
-- GitHub Docs — About repositories: https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories
-- Mermaid documentation: https://mermaid.js.org/intro/
-- Python documentation: https://docs.python.org/3/
+1. **Qual a diferença entre demonstração e evidência?**  
+   Demonstração mostra que algo aconteceu; evidência permite verificar como, em qual contexto e com quais limitações.
 
-> [!WARNING]
-> As interfaces e versões mudam. Consulte sempre a documentação oficial atual e registre a data de acesso.
+2. **Quando parar mesmo sem atingir o objetivo?**  
+   Diante de risco, segredo, ação destrutiva, ausência de progresso, budget excedido ou necessidade de aprovação humana.
+
+3. **Por que separar conceito de adapter?**  
+   Para preservar conhecimento transferível quando APIs e interfaces mudarem.
+
+4. **O que um ADR deve registrar?**  
+   Contexto, decisão, alternativas, consequências e critério de revisão.
+
+## Checklist
+
+- [ ] Localizo conceito, laboratório, projeto e template.
+- [ ] Executei o validador e registrei o contexto.
+- [ ] Meu ADR contém alternativas e consequências.
+- [ ] Defini stop condition explícita.
+- [ ] Nenhum segredo entrou no Git.
+- [ ] Minha evidência pode ser reproduzida por outra pessoa.
+
+## Acessibilidade
+
+- diagramas possuem descrição textual;
+- comandos são acompanhados de explicação;
+- evidências podem ser entregues em Markdown, áudio transcrito ou vídeo legendado;
+- não exigir distinção por cor como único sinal;
+- fornecer alternativa textual para qualquer imagem.
+
+## Autoavaliação
+
+Responda:
+
+- consigo explicar o método NEXUS sem repetir slogans?
+- consigo reproduzir a validação em outro ambiente?
+- consigo justificar por que devo parar?
+- consigo mostrar evidência, e não apenas afirmar que concluí?
+
+## Bibliografia
+
+- CHACON, Scott; STRAUB, Ben. *Pro Git*. 2. ed. Apress, 2014.
+- KLEPPMANN, Martin. *Designing Data-Intensive Applications*. O’Reilly, 2017.
+
+## Referências
+
+- [Git documentation](https://git-scm.com/docs)
+- [GitHub Docs — About repositories](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories)
+- [Mermaid documentation](https://mermaid.js.org/intro/)
+- [Python documentation](https://docs.python.org/3/)
 
 ## Próximo passo
 
-Siga para [01 — Fundamentos de agentes](../01-agent-foundations/README.md) somente após concluir o laboratório e obter nível **funcional** ou superior na rubrica.
+Avance para [01 — Fundamentos de Agent Engineering](../01-agent-foundations/README.md) somente após concluir o LAB-000 e atingir nível **funcional** ou superior.
