@@ -2,7 +2,7 @@
 id: course.zero-track.z00
 title: Z00 — Computador e ambiente de desenvolvimento
 lang: pt-BR
-status: pilot
+status: review
 prerequisites: []
 estimated_hours: 2
 ---
