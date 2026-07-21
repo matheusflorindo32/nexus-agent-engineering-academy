@@ -2,7 +2,7 @@
 id: course.zero-track.z02
 title: Z02 — Git e GitHub essenciais
 lang: pt-BR
-status: pilot
+status: review
 prerequisites: [course.zero-track.z01]
 estimated_hours: 4
 ---
