@@ -2,7 +2,7 @@
 id: course.zero-track.index
 title: Trilha Zero — Fundamentos para começar
 lang: pt-BR
-status: pilot
+status: review
 ---
 
 # Trilha Zero — Fundamentos para começar
