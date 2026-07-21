@@ -3,7 +3,7 @@ id: course.module.10-observability-engineering
 title: 10 — Observability Engineering
 lang: pt-BR
 status: review
-version: 0.2.0
+version: 0.2.1
 estimated_time: 14h
 prerequisites: [course.module.09-production-architecture]
 learning_outcomes:
@@ -21,15 +21,7 @@ learning_outcomes:
 
 ## Para quem é este módulo
 
-Este módulo é destinado a estudantes que já conseguem:
-
-- interpretar estados terminais, SLOs, políticas e rollouts;
-- ler JSON, traces e logs estruturados;
-- distinguir efeito externo, evento de auditoria e métrica operacional;
-- executar exemplos locais em Python;
-- reconhecer riscos de segredo, PII, cardinalidade e retenção.
-
-Quem ainda não domina esses pontos deve revisar os módulos 07, 08 e 09 e, quando necessário, retornar à [Trilha Zero](../../zero-track/README.md).
+Este módulo é destinado a estudantes que já conseguem interpretar estados terminais, SLOs, políticas, rollouts, JSON, traces e logs estruturados. Quem ainda não domina esses pontos deve revisar os módulos 07, 08 e 09 e, quando necessário, retornar à [Trilha Zero](../../zero-track/README.md).
 
 ## Resultado final observável
 
@@ -38,8 +30,8 @@ Ao final, você deverá entregar uma camada local de observabilidade que:
 - propague IDs opacos e correlacionados;
 - gere logs, traces, métricas e eventos de auditoria;
 - aplique redaction antes da persistência;
-- controle cardinalidade e retenção;
-- preserve 100% dos eventos críticos;
+- controle cardinalidade, sampling, retenção e acesso;
+- preserve todos os eventos críticos;
 - detecte regressões de qualidade, segurança, custo e latência;
 - produza alertas com owner, impacto e runbook;
 - degrade com segurança quando o collector falhar;
@@ -54,65 +46,53 @@ Antes de estudar, responda sem consultar o material:
 2. Por que `request_id` não deve ser label de métrica?
 3. Como preservar eventos críticos sem armazenar todo o tráfego?
 4. O que deve acontecer quando o collector fica indisponível?
-5. Como provar que uma telemetria é suficiente para reconstruir um efeito externo?
+5. Como provar que a telemetria reconstrói um efeito externo?
 
-Registre as respostas. Repita o diagnóstico ao final e compare evolução, lacunas e incertezas.
+Repita o diagnóstico ao final e registre lacunas remanescentes.
 
 ## Objetivos
 
 - Projetar telemetria end-to-end para agentes, ferramentas, memória e efeitos externos.
 - Correlacionar requisição, execução, handoff, tool call, aprovação e efeito.
 - Definir métricas orientadas a usuário, qualidade, segurança, custo e confiabilidade.
-- Implementar redaction, sampling, retenção, controle de cardinalidade e acesso.
+- Implementar redaction, sampling, retenção, cardinalidade e controle de acesso.
 - Construir alertas acionáveis e runbooks verificáveis.
-- Detectar falhas de cobertura, perda, duplicação e corrupção de telemetria.
-- Produzir evidência operacional sem registrar segredos.
+- Detectar perda, duplicação, corrupção e falhas de cobertura.
 
 ## Pré-requisitos
 
-- Módulos 00–09 concluídos;
-- familiaridade com estados terminais, SLOs, rollout e resposta a incidentes;
-- Python 3.11+ recomendado;
-- nenhuma chave de API necessária;
-- capacidade de executar testes locais e interpretar JSON.
+- Módulos 00–09 concluídos.
+- Familiaridade com estados terminais, SLOs, rollout e incidentes.
+- Python 3.11+ recomendado.
+- Nenhuma chave de API necessária.
 
 ## Explicação em três camadas
 
-### Camada 1 — explicação simples
+### Camada 1 — simples
 
-Observabilidade é a capacidade de entender um sistema pelo que ele mostra enquanto funciona. Você precisa saber:
+Observabilidade permite saber o que ocorreu, onde, em qual ordem, com qual impacto e qual ação deve ser tomada.
 
-- o que ocorreu;
-- onde ocorreu;
-- em qual ordem;
-- quem ou qual política autorizou;
-- qual foi o impacto;
-- o que fazer depois.
+### Camada 2 — operacional
 
-### Camada 2 — explicação operacional
+Logs explicam eventos locais, traces conectam a trajetória, métricas mostram comportamento agregado, eventos de auditoria provam autoridade e efeitos, e avaliações mostram mudança de qualidade.
 
-Logs explicam eventos locais, traces conectam a trajetória, métricas mostram comportamento agregado, eventos de auditoria provam autoridade e efeitos, e evidências de avaliação mostram mudança de qualidade.
+### Camada 3 — engenharia
 
-### Camada 3 — explicação de engenharia
-
-Observability Engineering projeta sinais, correlação, schemas, retenção, integridade e resposta operacional como contratos verificáveis. Telemetria é parte do sistema de controle e não um subproduto opcional.
+Observability Engineering projeta sinais, correlação, schemas, retenção, integridade e resposta operacional como contratos verificáveis. Telemetria é parte do sistema de controle.
 
 ## Glossário essencial
 
 | Termo | Definição operacional |
 |---|---|
-| log estruturado | evento técnico com campos tipados e pesquisáveis |
-| trace | representação causal de uma execução distribuída |
+| log estruturado | evento técnico com campos tipados |
+| trace | representação causal de uma execução |
 | span | unidade temporal dentro de um trace |
-| métrica | série agregada para tendência, SLI e alerta |
+| métrica | série agregada para tendência e SLI |
 | evento de auditoria | evidência de decisão, autoridade ou efeito |
-| correlação | ligação estável entre sinais relacionados |
-| cardinalidade | quantidade de combinações distintas de labels |
-| sampling | política de retenção parcial de telemetria |
-| redaction | remoção ou transformação de dado sensível |
-| SLI | indicador medido do nível de serviço |
-| alerta acionável | notificação com impacto, owner e runbook |
-| telemetry loss | perda parcial ou total de sinais esperados |
+| cardinalidade | combinações distintas de labels |
+| sampling | retenção parcial governada |
+| redaction | remoção de dado sensível |
+| telemetry loss | perda de sinais esperados |
 | clock skew | diferença de relógio entre componentes |
 
 ## Modelo de observabilidade NEXUS
@@ -123,7 +103,7 @@ flowchart LR
     A --> M[Memory]
     A --> T[Tool Boundary]
     T --> E[External Effect]
-    A --> C[Telemetry Collector]
+    A --> C[Collector]
     M --> C
     T --> C
     E --> C
@@ -131,17 +111,15 @@ flowchart LR
     C --> X[Traces]
     C --> Q[Metrics]
     C --> U[Audit Events]
-    L --> D[Dashboards & Alerts]
+    L --> D[Dashboards e Alertas]
     X --> D
     Q --> D
     U --> D
 ```
 
-Descrição textual: todos os componentes emitem sinais para um collector. Os sinais são persistidos conforme política, correlacionados e apresentados em dashboards, alertas e trilhas de auditoria.
+Descrição textual: os componentes emitem sinais ao collector; os sinais são validados, redigidos, persistidos conforme política e correlacionados para diagnóstico, alerta e auditoria.
 
 ## Contrato de correlação
-
-Toda execução deve propagar identificadores estáveis:
 
 ```text
 request_id → run_id → agent_id → handoff_id → tool_call_id → approval_id → effect_id
@@ -149,22 +127,21 @@ request_id → run_id → agent_id → handoff_id → tool_call_id → approval_
 
 Regras:
 
-- IDs devem ser opacos e não conter PII;
-- IDs não podem ser reutilizados entre tenants;
-- cada efeito deve apontar para decisão, política e aprovação;
-- eventos devem registrar versões de artefato, configuração, política, schema e modelo;
-- telemetria não pode alterar o resultado funcional;
-- ausência de um elo causal deve ser detectada como falha de cobertura.
+- IDs são opacos e não contêm PII;
+- IDs não são reutilizados entre tenants;
+- cada efeito aponta para decisão, política e aprovação;
+- eventos registram versões de artefato, configuração, política, schema e modelo;
+- lacunas causais são detectadas como falha de cobertura.
 
-## Os cinco sinais mínimos
+## Cinco sinais mínimos
 
 | Sinal | Pergunta respondida |
 |---|---|
-| Logs estruturados | O que ocorreu em um ponto específico? |
-| Traces distribuídos | Qual foi o caminho causal da execução? |
+| Logs estruturados | O que ocorreu localmente? |
+| Traces | Qual foi o caminho causal? |
 | Métricas | O comportamento agregado está saudável? |
-| Eventos de auditoria | Quem ou qual política autorizou uma ação? |
-| Evidências de avaliação | A qualidade mudou em relação ao baseline? |
+| Auditoria | Quem ou qual política autorizou? |
+| Avaliação | A qualidade mudou frente ao baseline? |
 
 ## Schema mínimo de evento
 
@@ -178,7 +155,6 @@ Regras:
   "tenant_id": "tenant_opaque",
   "request_id": "req_opaque",
   "run_id": "run_opaque",
-  "agent_id": "agent.planner",
   "tool_call_id": "tool_opaque",
   "policy_version": "12",
   "artifact_version": "0.10.0",
@@ -189,193 +165,78 @@ Regras:
 }
 ```
 
-Campos desconhecidos devem ser recusados ou quarentenados conforme política.
+Campos desconhecidos devem ser recusados ou quarentenados.
 
-## Logs estruturados
+## Logs, traces e métricas
 
-- Use campos tipados, não mensagens livres como fonte primária.
-- Separe mensagem humana de atributos pesquisáveis.
-- Nunca registre prompts integrais, segredos, tokens ou payloads sensíveis por padrão.
-- Aplique redaction antes da persistência.
-- Registre stop reasons, erros normalizados e versões.
-- Use event IDs para deduplicação.
-- Preserve timestamps de evento e ingestão.
+Logs usam campos tipados e nunca registram prompts integrais, tokens ou payloads sensíveis por padrão. Cada span possui nome estável, parent, status, duração, versões e atributos de baixa cardinalidade. Métricas precisam declarar unidade, denominador, janela, owner e fonte.
 
-## Traces
-
-Cada span deve possuir:
-
-- nome estável;
-- início, fim e duração;
-- parent span;
-- status tipado;
-- versões relevantes;
-- atributos de baixa cardinalidade;
-- eventos de política e retry;
-- links para efeitos assíncronos;
-- sinalização de sampling.
-
-Não use conteúdo do usuário como nome de span ou label.
-
-## Métricas essenciais
-
-| Dimensão | Exemplos |
-|---|---|
-| Disponibilidade | success rate, terminal reports válidos |
-| Latência | p50, p95, p99 por classe de tarefa |
-| Qualidade | pass rate, regressões, groundedness |
-| Segurança | policy denials, approval failures, exfiltration attempts |
-| Custo | custo por execução e por sucesso |
-| Ferramentas | timeout, retry, circuit breaker, efeitos duplicados |
-| Memória | hit rate, stale reads, rejeições de tenant |
-| Operação | queue depth, saturation, telemetry drop rate |
-| Integridade | missing spans, orphan effects, schema rejection rate |
-
-Toda métrica precisa declarar unidade, denominador, janela, owner e fonte.
+Métricas essenciais incluem disponibilidade, p50/p95/p99, qualidade, violações de política, custo por sucesso, erros de tools, stale reads, queue depth, telemetry drop rate e orphan effect rate.
 
 ## Cardinalidade
 
-Não use como label:
+Nunca use como label:
 
-- `request_id`;
-- `run_id`;
+- `request_id` ou `run_id`;
 - texto do prompt;
 - email, CPF ou identificador de cliente;
 - mensagem de erro livre;
 - URL completa com parâmetros;
 - hash exclusivo por execução.
 
-Esses dados, quando permitidos, pertencem a logs ou traces com acesso e retenção controlados.
-
 ## Sampling
 
 - Preserve 100% dos eventos críticos de segurança e auditoria.
-- Use head sampling para controle simples de volume.
-- Use tail sampling para reter erros, violações e alta latência.
-- Registre versão da política de sampling.
-- Não calcule taxas sem considerar o sampling.
-- Monitore `telemetry_drop_rate` e viés de amostragem.
+- Use head sampling para volume previsível.
+- Use tail sampling para erros, violações e alta latência.
+- Versione a política.
+- Monitore viés e `telemetry_drop_rate`.
 
 ## Redaction e privacidade
-
-Pipeline recomendado:
 
 ```text
 collect → classify → redact → validate → persist → expire
 ```
 
-Princípios:
-
-- deny-by-default para campos desconhecidos;
-- allowlist de atributos persistíveis;
-- hashing não elimina risco de reidentificação;
-- retenção mínima necessária;
-- acesso por função, tenant e finalidade;
-- trilha de consulta a dados sensíveis;
-- exclusão e expiração verificáveis;
-- separação entre dados operacionais e evidência de auditoria.
+Aplique deny-by-default para campos desconhecidos, allowlist de atributos, retenção mínima, segregação por tenant, acesso por função e trilha de consulta. Hashing não elimina risco de reidentificação.
 
 ## Integridade e cobertura
 
-A telemetria deve provar:
+A telemetria deve detectar:
 
-- ausência de efeitos órfãos;
-- ausência de spans órfãos críticos;
-- sequência causal coerente;
-- event IDs únicos;
-- schema válido;
-- assinaturas ou hashes quando aplicável;
-- ausência de lacunas em decisões sensíveis;
-- correspondência entre efeito real e evento auditado.
+- efeitos órfãos;
+- spans críticos ausentes;
+- event IDs duplicados;
+- schema inválido;
+- clock skew;
+- decisões sensíveis sem auditoria;
+- divergência entre efeito real e evento registrado.
 
-Métricas recomendadas:
-
-- `trace_completeness_rate`;
-- `orphan_effect_rate`;
-- `audit_event_missing_rate`;
-- `duplicate_event_rate`;
-- `schema_rejection_rate`;
-- `clock_skew_rate`.
+Métricas mínimas: `trace_completeness_rate`, `orphan_effect_rate`, `audit_event_missing_rate`, `duplicate_event_rate`, `schema_rejection_rate` e `clock_skew_rate`.
 
 ## Alertas acionáveis
 
-Um alerta deve indicar:
+Todo alerta deve conter:
 
-1. qual SLO ou hard gate foi violado;
+1. SLO ou hard gate violado;
 2. impacto estimado;
-3. evidência e janela temporal;
-4. owner responsável;
+3. evidência e janela;
+4. owner;
 5. runbook;
 6. condição de resolução;
-7. risco de falso positivo;
-8. ação automática permitida, se houver.
+7. risco de falso positivo.
 
-Evite alertas sem impacto, salvo segurança crítica.
+## Falhas e degradação segura
 
-## Dashboards
+Quando o collector, fila ou backend falhar:
 
-Ordem recomendada:
-
-1. experiência do usuário;
-2. qualidade e segurança;
-3. fluxo da execução;
-4. dependências;
-5. custo e capacidade;
-6. detalhes diagnósticos.
-
-Dashboard não substitui alerta, trace, runbook ou auditoria.
-
-## Telemetria de agentes
-
-Registre explicitamente:
-
-- objetivo e classe da tarefa, sem conteúdo sensível;
-- agente ativo e handoffs;
-- contexto selecionado e proveniência por ID;
-- decisão de política;
-- chamada e resultado normalizado da ferramenta;
-- retries e budgets restantes;
-- stop condition;
-- terminal state;
-- avaliação e feedback posterior;
-- aprovação e efeito externo.
-
-## Falhas de observabilidade
-
-- collector indisponível: buffer limitado e política de degradação;
-- fila cheia: priorizar eventos críticos;
-- schema incompatível: rejeitar ou quarentenar;
-- clock skew: registrar timestamps de evento e ingestão;
-- duplicação: event IDs e consumidores idempotentes;
-- perda de telemetria crítica: bloquear ou suspender efeitos sensíveis;
-- redaction falha: não persistir payload bruto;
-- backend degradado: manter audit trail mínimo local e reconciliar depois.
-
-## Degradação segura
-
-Quando a observabilidade falhar:
-
-- operações read-only podem continuar sob política explícita;
-- efeitos sensíveis devem ser suspensos se a auditoria não puder ser preservada;
-- eventos críticos devem usar buffer prioritário;
-- o sistema deve emitir estado `telemetry_degraded`;
-- a perda deve ser mensurada;
-- a recuperação deve reconciliar eventos pendentes.
-
-Nunca amplie privilégios para compensar falha de telemetria.
-
-## Exemplo mínimo
-
-O exemplo local simula:
-
-- uma requisição;
-- dois agentes;
-- uma tool read-only;
-- uma aprovação;
-- um efeito externo simulado;
-- um collector com falha parcial;
-- redaction e sampling;
-- um alerta operacional.
+- priorize eventos críticos;
+- use buffer limitado;
+- rejeite ou quarentene schemas incompatíveis;
+- emita estado `telemetry_degraded`;
+- suspenda efeitos sensíveis se a auditoria não puder ser preservada;
+- reconcilie eventos pendentes após recuperação;
+- nunca amplie privilégios.
 
 ## Demonstração executável
 
@@ -383,55 +244,32 @@ O exemplo local simula:
 python examples/observability_pipeline.py --self-test
 ```
 
-A implementação deve provar:
-
-- correlação completa;
-- spans hierárquicos;
-- métricas de baixa cardinalidade;
-- redaction antes da persistência;
-- preservação de eventos críticos;
-- detecção de efeito órfão;
-- schema rejection;
-- alerta com owner e runbook;
-- degradação segura do collector;
-- relatório operacional reproduzível.
+A demonstração deve provar correlação, spans, métricas de baixa cardinalidade, redaction, preservação de eventos críticos, detecção de efeito órfão, schema rejection, alerta acionável e degradação segura.
 
 > [!WARNING]
-> Se o exemplo não existir ou não executar, registre o bloqueio. Não substitua evidência de execução por descrição.
+> Se o exemplo não executar, registre o bloqueio. Não substitua evidência por descrição.
 
 ## Prática guiada
 
-1. desenhe o fluxo causal de uma execução;
-2. defina IDs de correlação;
-3. escreva um schema de evento;
-4. classifique cinco campos por sensibilidade;
-5. defina uma política de sampling;
-6. crie um alerta com owner e runbook;
-7. simule perda do collector;
-8. verifique se efeitos sensíveis são suspensos.
+1. Desenhe o fluxo causal.
+2. Defina IDs de correlação.
+3. Escreva um schema de evento.
+4. Classifique campos por sensibilidade.
+5. Defina sampling e retenção.
+6. Crie um alerta com owner e runbook.
+7. Simule perda do collector.
+8. Verifique a suspensão de efeitos sensíveis.
 
 ## Prática independente
 
-Projete observabilidade para um agente que consulta memória, chama uma tool e produz um efeito simulado. Inclua:
-
-- logs;
-- traces;
-- métricas;
-- eventos de auditoria;
-- redaction;
-- cardinalidade;
-- retenção;
-- alerta;
-- runbook;
-- teste de perda de telemetria.
+Projete observabilidade para um agente que consulta memória, chama uma tool e produz efeito simulado. Inclua logs, traces, métricas, auditoria, redaction, retenção, alertas, runbook e teste de perda de telemetria.
 
 ## Testes negativos obrigatórios
 
-- `request_id` como label de métrica;
+- ID único como label;
 - prompt integral em log;
 - segredo em trace;
 - evento sem tenant;
-- span sem parent crítico;
 - efeito sem approval ID;
 - sampling descartando evento crítico;
 - collector indisponível;
@@ -440,32 +278,22 @@ Projete observabilidade para um agente que consulta memória, chama uma tool e p
 - event ID duplicado;
 - clock skew não detectado;
 - alerta sem owner;
-- runbook inexistente;
 - retenção indefinida;
 - redaction após persistência;
-- efeito sensível executado sem trilha de auditoria.
+- efeito sensível sem audit trail.
 
 ## Stop conditions para o estudante
 
-Pare o exercício e peça revisão quando:
-
-- houver segredo em qualquer sinal persistido;
-- uma métrica usar label de alta cardinalidade;
-- efeito sensível puder ocorrer sem audit trail;
-- o collector falhar sem política de degradação;
-- alertas não possuírem owner ou runbook;
-- não for possível reconstruir o caminho causal;
-- eventos críticos puderem ser amostrados.
+Pare e peça revisão quando houver segredo persistido, label de alta cardinalidade, efeito sem auditoria, collector sem degradação segura, alerta sem owner ou impossibilidade de reconstruir o caminho causal.
 
 ## Acessibilidade
 
-- diagramas devem ter descrição textual;
-- dashboards futuros não podem depender apenas de cor;
-- tabelas devem possuir cabeçalhos claros;
-- alertas devem usar texto e prioridade explícita;
-- exemplos devem ser copiáveis;
-- vídeos futuros devem ter legenda e transcrição;
-- o portal futuro deve permitir navegação por teclado e leitor de tela.
+- Diagramas possuem descrição textual.
+- Dashboards não dependem apenas de cor.
+- Tabelas têm cabeçalhos claros.
+- Alertas usam texto e prioridade explícita.
+- Exemplos são copiáveis.
+- Vídeos futuros terão legenda e transcrição.
 
 ## Laboratório
 
@@ -473,102 +301,84 @@ Execute o [LAB-1001](../../../labs/LAB-1001-agent-observability.md).
 
 ## Projeto obrigatório
 
-Construa uma camada de observabilidade que:
+Construa uma camada que:
 
 1. gere IDs correlacionados;
-2. produza logs, traces, métricas e eventos de auditoria;
+2. produza os cinco sinais mínimos;
 3. remova segredos antes da persistência;
-4. bloqueie labels de alta cardinalidade;
-5. preserve eventos críticos independentemente do sampling;
-6. detecte regressões de latência, qualidade e segurança;
+4. bloqueie alta cardinalidade;
+5. preserve eventos críticos;
+6. detecte regressões e falhas de cobertura;
 7. gere alertas com owner e runbook;
 8. degrade sem ampliar privilégios;
-9. detecte falhas de cobertura e integridade;
+9. reconcilie telemetria pendente;
 10. documente risco residual.
 
 ## Avaliação
 
-A avaliação combina:
+A avaliação combina diagnóstico inicial e final, autoteste, LAB-1001, projeto, suíte negativa, simulação de falha do collector, defesa técnica e [rubrica transversal](../../rubrics/transversal-rubric.md).
 
-- diagnóstico inicial e final;
-- autoteste da implementação de referência;
-- LAB-1001;
-- projeto obrigatório;
-- suíte negativa;
-- simulação de falha do collector;
-- defesa técnica de dez minutos;
-- autoavaliação pela [rubrica transversal](../../rubrics/transversal-rubric.md).
-
-Segredo persistido, efeito sem auditoria e perda silenciosa de evento crítico são critérios de bloqueio.
+Segredo persistido, efeito sem auditoria e perda silenciosa de evento crítico são bloqueadores.
 
 ## Rubrica específica
 
 | Nível | Evidência |
 |---|---|
-| insuficiente | sinais desconectados, segredos persistidos ou efeitos sem auditoria |
-| funcional | correlação e sinais básicos operam com cobertura parcial |
-| robusta | redaction, sampling, integridade, alertas e degradação são testados |
-| excelente | diagnóstico causal, privacidade, acessibilidade e resposta operacional são demonstrados de ponta a ponta |
+| insuficiente | sinais desconectados, segredos ou efeitos sem auditoria |
+| funcional | correlação e sinais básicos com cobertura parcial |
+| robusta | redaction, sampling, integridade, alertas e degradação testados |
+| excelente | diagnóstico causal, privacidade, acessibilidade e resposta operacional ponta a ponta |
 
 ## Quiz
 
-1. Por que `request_id` não deve ser label de métrica?
-2. Qual a diferença entre log e evento de auditoria?
+1. Por que `request_id` não deve ser label?
+2. Qual a diferença entre log e auditoria?
 3. Quando tail sampling é preferível?
-4. Por que prompts integrais não devem ser registrados por padrão?
+4. Por que prompts integrais não devem ser registrados?
 5. O que fazer quando o collector fica indisponível?
 
 <details>
 <summary>Gabarito comentado</summary>
 
-1. Porque cria cardinalidade praticamente ilimitada e custo elevado.
+1. Porque cria cardinalidade praticamente ilimitada.
 2. Log explica comportamento técnico; auditoria comprova decisão, autoridade e efeito.
-3. Quando erros, violações ou alta latência só são conhecidos ao final do trace.
-4. Porque podem conter PII, segredos e dados desnecessários ao diagnóstico.
-5. Aplicar buffer limitado, priorizar eventos críticos e seguir política explícita de degradação.
+3. Quando erros ou violações só são conhecidos ao final.
+4. Porque podem conter PII, segredos e dados desnecessários.
+5. Usar buffer limitado, priorizar eventos críticos e aplicar degradação segura.
 
 </details>
 
 ## Checklist
 
-- [ ] IDs correlacionados, opacos e segregados por tenant.
-- [ ] Schema de eventos versionado.
+- [ ] IDs correlacionados, opacos e segregados.
+- [ ] Schema versionado.
 - [ ] Redaction antes da persistência.
-- [ ] Labels com cardinalidade controlada.
-- [ ] Eventos críticos preservados em 100%.
+- [ ] Cardinalidade controlada.
+- [ ] Eventos críticos preservados.
 - [ ] Métricas orientadas a SLO e usuário.
-- [ ] Alertas possuem owner, impacto e runbook.
-- [ ] Retenção e acesso estão definidos.
-- [ ] Falha do collector possui degradação segura.
-- [ ] Telemetria reconstrói efeitos externos.
-- [ ] Integridade e cobertura são medidas.
-- [ ] Risco residual está documentado.
+- [ ] Alertas com owner e runbook.
+- [ ] Retenção e acesso definidos.
+- [ ] Falha do collector testada.
+- [ ] Efeitos externos reconstruíveis.
+- [ ] Integridade e cobertura medidas.
+- [ ] Risco residual documentado.
 
 ## Autoavaliação
 
-Consigo explicar e demonstrar:
-
-- como os sinais se complementam;
-- como a correlação funciona;
-- onde redaction ocorre;
-- como cardinalidade é controlada;
-- como eventos críticos escapam do sampling;
-- como alertas são acionáveis;
-- como o sistema reage à perda de telemetria;
-- como reconstruir um efeito externo.
+Consigo explicar e demonstrar correlação, redaction, cardinalidade, sampling, alertas, degradação segura, integridade e reconstrução de efeitos externos.
 
 ## Critérios de excelência
 
 | Dimensão | Padrão Premium Elite |
 |---|---|
 | Correlação | caminho causal completo entre requisição e efeito |
-| Segurança | zero segredo persistido e eventos críticos não amostrados |
+| Segurança | zero segredo persistido e eventos críticos preservados |
 | Operabilidade | alertas acionáveis e runbooks testados |
-| Qualidade | regressões detectadas contra baseline versionado |
+| Qualidade | regressões detectadas contra baseline |
 | Custo | cardinalidade, retenção e sampling governados |
 | Integridade | schemas, cobertura e auditoria verificáveis |
-| Privacidade | minimização, segregação por tenant e acesso rastreável |
-| Acessibilidade | dashboards e alertas compreensíveis sem depender de cor |
+| Privacidade | minimização e segregação por tenant |
+| Acessibilidade | sinais compreensíveis sem depender de cor |
 
 ## Referências
 
@@ -579,8 +389,8 @@ Consigo explicar e demonstrar:
 - CNCF — Observability and telemetry patterns.
 
 > [!WARNING]
-> Observabilidade reduz incerteza operacional, mas não prova segurança absoluta. Produção exige revisão humana, políticas de acesso, retenção, resposta a incidentes e validação contínua.
+> Observabilidade reduz incerteza, mas não prova segurança absoluta. Produção exige revisão humana, políticas de acesso, retenção e validação contínua.
 
 ## Próximo passo
 
-Conclua o LAB-1001 e obtenha nível funcional ou superior antes de avançar para [11 — Automação Operacional](../11-operational-automation/README.md).
+Conclua o LAB-1001 e obtenha nível funcional ou superior antes de avançar para [11 — Automação](../11-automation/README.md).
