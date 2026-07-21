@@ -38,12 +38,12 @@ Não avance apenas porque leu. Avance quando conseguir produzir a evidência sol
 | [Z03](Z03-python-essencial/README.md) | Python essencial | script, testes e falha explicada |
 | [Z04](Z04-markdown-json-yaml/README.md) | Markdown, JSON e YAML | documentação e configurações validadas |
 | [Z05](Z05-http-apis-chaves/README.md) | HTTP, APIs e proteção de credenciais | contrato de API e simulação local segura |
+| [Z06](Z06-seguranca-e-segredos/README.md) | segurança básica e proteção de segredos | política curta, `.gitignore` e varredura sintética |
+| [Z07](Z07-clonar-executar-testar-corrigir/README.md) | clonar, executar, testar e corrigir | baseline, diff pequeno e evidência antes/depois |
+| [Z08](Z08-primeiro-workflow/README.md) | primeiro workflow determinístico | execução, falha, retry idempotente e testes |
 
-## Unidades planejadas
+## Unidade planejada
 
-- Z06 — segurança básica e proteção de segredos;
-- Z07 — clonar, executar, testar e corrigir um projeto;
-- Z08 — primeiro workflow;
 - Z09 — primeiro agente simples.
 
 ## Gate de saída desta etapa
@@ -59,6 +59,8 @@ A pessoa pode avançar quando consegue:
 - diferenciar Markdown, JSON e YAML;
 - explicar requisição, resposta, autenticação e autorização;
 - proteger credenciais em código, configuração e logs;
+- clonar, testar e corrigir um projeto sem enfraquecer os testes;
+- modelar um workflow com stop conditions e idempotência;
 - mostrar evidências do que executou.
 
 ## Segurança
