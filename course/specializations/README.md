@@ -9,11 +9,11 @@ status: foundation
 
 Esta área registra conteúdos complementares que não ocupam numeração da trilha principal.
 
-## Conteúdos incorporados
+## Conteúdos incorporados e lacunas
 
-Os materiais históricos de MCP e Skills, fundamentos de avaliação, observabilidade/SRE, segurança e sistemas multiagentes foram consolidados nos módulos Premium Elite correspondentes:
+Os materiais históricos de avaliação, observabilidade/SRE, segurança e sistemas multiagentes foram consolidados nos módulos Premium Elite correspondentes. MCP e Skills tiveram apenas conceitos parciais preservados; não há equivalência integral publicada na árvore atual:
 
-- MCP e Skills: Módulos 03 e 04;
+- MCP e Skills: conceitos de ferramentas no Módulo 03 e controles de segurança MCP na documentação transversal; os objetivos históricos de protocolo, negociação e empacotamento de skills permanecem recuperáveis apenas no histórico Git e aguardam decisão sobre uma especialização futura;
 - avaliação: Módulo 07;
 - observabilidade e SRE: Módulos 09 e 10;
 - segurança: Módulo 08;
@@ -25,4 +25,4 @@ Uma especialização futura deve usar ID sem número curricular, declarar pré-r
 
 ## Referências
 
-Consulte o [currículo oficial](../README.md) e o histórico Git para rastrear a consolidação editorial.
+Consulte o [currículo oficial](../README.md), o [guia de migração](../../docs/quality/MIGRATION_GUIDE.md) e o histórico Git para distinguir consolidação, redução e conteúdo disponível.

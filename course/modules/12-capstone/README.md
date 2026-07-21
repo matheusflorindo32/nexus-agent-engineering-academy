@@ -24,7 +24,7 @@ Conceito: sistema sociotécnico → arquitetura: C4 + threats + SLOs → impleme
 
 ## Laboratórios
 
-- LAB-1201 — game day: dependência falha, injeção aparece e budget é consumido sem perda de rastreabilidade.
+- `LAB-1201` está **planejado e ainda não foi implementado**. Seu escopo previsto é um game day no qual uma dependência falha, uma injeção aparece e o budget é consumido sem perda de rastreabilidade. Até sua publicação, esta descrição não constitui atividade disponível nem requisito de conclusão.
 
 ## Projeto
 
