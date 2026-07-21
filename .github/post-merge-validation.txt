@@ -1,0 +1,2 @@
+Post-merge validation trigger for main SHA 0a4fa01db529c8a54449f457686c4998b3d45aba.
+This file exists only on the validation branch and must not be merged.
