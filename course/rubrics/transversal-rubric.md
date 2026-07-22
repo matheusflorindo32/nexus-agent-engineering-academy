@@ -3,63 +3,106 @@ id: course.rubric.transversal
 title: Rubrica transversal NEXUS
 lang: pt-BR
 status: review
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Rubrica transversal NEXUS
 
-Use esta rubrica em módulos, laboratórios e projetos. Segurança e rastreabilidade são critérios de bloqueio.
+Use esta rubrica em módulos, laboratórios e projetos. A nota resume desempenho; ela nunca substitui hard gates, evidência ou julgamento humano.
 
-## Níveis
+## Escala
 
 | Nível | Significado |
 |---|---|
-| 0 — Insuficiente | não demonstra o resultado ou contém risco crítico |
-| 1 — Funcional | cumpre o mínimo com limitações registradas |
-| 2 — Robusto | é reproduzível, seguro e bem justificado |
-| 3 — Excelente | adiciona validação adversarial, comparação e melhoria mensurável |
+| 0 — Insuficiente | resultado ausente, não verificável ou com bloqueio crítico |
+| 1 — Funcional | cumpre o mínimo, mas possui lacunas relevantes registradas |
+| 2 — Robusto | reproduzível, governado, testado e bem justificado |
+| 3 — Excelente | inclui comparação, validação adversarial, reprodução independente e melhoria mensurável |
 
 ## Dimensões
 
 | Dimensão | 0 — Insuficiente | 1 — Funcional | 2 — Robusto | 3 — Excelente |
 |---|---|---|---|---|
-| Objetivo | vago ou ausente | resultado principal identificado | objetivo observável e critérios claros | objetivo, limites e trade-offs explícitos |
-| Reprodutibilidade | faltam passos ou contexto | procedimento básico registrado | versões, commit, entradas e saídas registrados | outra pessoa reproduz e confirma o resultado |
-| Evidência | opinião sem suporte | artefato mínimo | múltiplas evidências coerentes | evidência independente ou teste adversarial |
-| Engenharia | solução improvisada | contratos básicos | estados, falhas e interfaces explícitos | alternativas comparadas e decisão registrada |
-| Segurança | segredo, privilégio ou ação perigosa | riscos básicos reconhecidos | least privilege e stop conditions aplicados | threat model, rollback e teste adversarial |
-| Qualidade pedagógica | passivo ou confuso | explicação e exercício simples | prática ativa, feedback e progressão | engajamento, transferência e metacognição |
-| Referências | inexistentes ou inventadas | ao menos uma fonte adequada | fontes primárias, links e data de acesso | triangulação, versão e limites da evidência |
-| Comunicação | difícil de entender | compreensível | clara, acessível e estruturada | excelente síntese visual e textual |
-| Internacionalização | texto rígido ou IDs instáveis | estrutura traduzível | IDs estáveis e termos controlados | paridade verificada entre idiomas |
-| Reflexão | não reconhece limites | lista limitações | prioriza melhorias | mede impacto e propõe próximo experimento |
+| Objetivo e escopo | vago ou sem limites | resultado principal identificado | objetivo observável, critérios e non-goals | trade-offs, owner e risco residual explícitos |
+| Reprodutibilidade | faltam passos ou versões | procedimento básico | commit, versões, entradas, outputs e seed | terceiro reproduz e confirma resultados críticos |
+| Evidência e rastreabilidade | opinião ou artefato isolado | evidência mínima | múltiplas evidências correlacionadas | evidence bundle independente e reconstrução causal |
+| Engenharia | solução improvisada | contratos básicos | estados, interfaces, budgets e falhas explícitos | alternativas comparadas com ADR e métricas |
+| Avaliação | sem baseline ou critérios | testes felizes | dataset, graders, thresholds e regressão | holdout, variância, trajetória e hard gates auditáveis |
+| Segurança e privacidade | segredo, privilégio ou vazamento | riscos reconhecidos | least privilege, isolamento, redaction e stop conditions | threat model, red team, resposta e risco residual revisado |
+| Operação e resiliência | sem pause ou recuperação | tratamento básico de erro | rollback, reconciliação, kill switch e runbook | game day, restore e métricas de recuperação |
+| Observabilidade | logs soltos ou sensíveis | eventos básicos | correlação, métricas, traces e auditoria | integridade, cobertura, alertas e modo degradado testados |
+| Qualidade pedagógica | passivo ou confuso | explicação e exercício | prática ativa, feedback, progressão e acessibilidade | transferência, metacognição e piloto com evidências |
+| Referências e proveniência | inexistentes ou inventadas | fonte adequada | fontes primárias, versão e data | triangulação e limites da evidência explícitos |
+| Comunicação e acessibilidade | difícil ou dependente de cor | compreensível | clara, estruturada, navegável e com texto alternativo | síntese visual/textual validada por usuário diverso |
+| Internacionalização | IDs instáveis | estrutura traduzível | IDs e termos controlados | paridade verificada entre idiomas |
+| Reflexão e melhoria | não reconhece limites | lista limitações | prioriza melhorias com owner | mede impacto e define próximo experimento falsificável |
+
+## Hard gates transversais
+
+A entrega é reprovada independentemente da média quando houver:
+
+- nota 0 em segurança, privacidade, evidência/rastreabilidade ou reprodutibilidade;
+- segredo ou dado pessoal real em artefato;
+- vazamento entre tenants, sujeitos ou projetos;
+- efeito proibido, não autorizado ou duplicado;
+- hard gate compensado por média;
+- evidência adulterada ou não versionada;
+- retry cego após efeito desconhecido;
+- risco alto ou crítico sem tratamento, owner e decisão;
+- imagem sem licença/proveniência ou texto alternativo;
+- alegação de segurança, conformidade ou prontidão absoluta.
 
 ## Regras de aprovação
 
-- Média mínima para conclusão de módulo: **1,5**.
-- Média mínima para selo Premium Elite: **2,5**.
-- Nota zero em segurança ou rastreabilidade reprova a entrega, independentemente da média.
-- Alegações sem fonte não podem receber nível 3 em evidência.
-- Imagens sem licença/proveniência e texto alternativo bloqueiam publicação.
+- conclusão de módulo: média mínima **1,5**, sem hard gate falho;
+- laboratório: média mínima **2,0**, critérios específicos e reprodução quando exigida;
+- projeto starter: média mínima **2,0**, segurança e reprodutibilidade ≥ 2;
+- selo Premium Elite: média mínima **2,5**, nenhuma dimensão abaixo de 2 e reprodução independente;
+- capstone: rubrica específica + transversal, game day e defesa humana;
+- nível 3 exige evidência observável, não apenas texto mais detalhado.
+
+## Processo de revisão
+
+1. valide identidade do artefato, commit e versões;
+2. verifique hard gates antes da pontuação;
+3. avalie cada dimensão citando evidências;
+4. registre incertezas e itens não aplicáveis;
+5. peça segunda revisão para entregas de alto risco;
+6. produza decisão e próxima ação concreta;
+7. reavalie apenas após nova evidência versionada.
 
 ## Registro recomendado
 
 ```yaml
 rubric_id: course.rubric.transversal
+rubric_version: 0.2.0
 artifact_id: <id>
-reviewer: <humano-ou-agente>
+artifact_commit: <sha>
+reviewer: <identificador>
+reviewer_role: <papel>
 reviewed_at: YYYY-MM-DD
+scope: <escopo-exato>
+evidence_refs: []
 scores:
-  objective: 0
+  objective_scope: 0
   reproducibility: 0
-  evidence: 0
+  evidence_traceability: 0
   engineering: 0
-  security: 0
+  evaluation: 0
+  security_privacy: 0
+  operations_resilience: 0
+  observability: 0
   pedagogy: 0
-  references: 0
-  communication: 0
+  references_provenance: 0
+  communication_accessibility: 0
   i18n: 0
-  reflection: 0
+  reflection_improvement: 0
 blocking_findings: []
+residual_risks: []
+decision: blocked | revise | approved_with_constraints | approved
 next_action: <ação concreta>
 ```
+
+## Honestidade
+
+Rubricas reduzem ambiguidade, mas não eliminam viés, desacordo ou lacunas de teste. A pontuação deve ser acompanhada por evidências, limitações e revisão humana adequada ao risco.
