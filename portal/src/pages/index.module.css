@@ -1,0 +1,118 @@
+.hero {
+  padding: 6rem 0 5rem;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(109, 93, 252, 0.2), transparent 32rem),
+    linear-gradient(145deg, #07101f 0%, #111b33 55%, #16264a 100%);
+  color: #f8fafc;
+}
+
+.eyebrow {
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #67e8f9;
+}
+
+.heroTitle {
+  max-width: 850px;
+  margin-bottom: 1.25rem;
+  font-size: clamp(2.4rem, 6vw, 5rem);
+  line-height: 1.02;
+  color: #ffffff;
+}
+
+.heroText {
+  max-width: 760px;
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  line-height: 1.7;
+  color: #dbeafe;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.disclaimer {
+  max-width: 760px;
+  padding-left: 1rem;
+  border-left: 4px solid #f59e0b;
+  color: #e2e8f0;
+}
+
+.section,
+.sectionAlt {
+  padding: 4.5rem 0;
+}
+
+.sectionAlt {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.sectionIntro {
+  max-width: 760px;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  display: flex;
+  min-height: 220px;
+  flex-direction: column;
+  padding: 1.6rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 18px;
+  background: var(--ifm-background-surface-color);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+}
+
+.card p {
+  flex: 1;
+}
+
+.cardLink {
+  font-weight: 750;
+}
+
+.principles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.principles div {
+  padding: 1.25rem;
+  border-left: 4px solid var(--ifm-color-primary);
+  background: var(--ifm-background-surface-color);
+}
+
+@media (max-width: 760px) {
+  .hero {
+    padding: 4rem 0 3.5rem;
+  }
+
+  .grid,
+  .principles {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
