@@ -32,7 +32,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.course.js'),
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
-          remarkPlugins: [remarkCrossDocLinks],
+          beforeDefaultRemarkPlugins: [remarkCrossDocLinks],
         },
         blog: false,
         theme: {
@@ -51,7 +51,7 @@ const config = {
         sidebarPath: require.resolve('./sidebars.labs.js'),
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
-        remarkPlugins: [remarkCrossDocLinks],
+        beforeDefaultRemarkPlugins: [remarkCrossDocLinks],
       },
     ],
     [
@@ -63,7 +63,7 @@ const config = {
         sidebarPath: require.resolve('./sidebars.projects.js'),
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
-        remarkPlugins: [remarkCrossDocLinks],
+        beforeDefaultRemarkPlugins: [remarkCrossDocLinks],
       },
     ],
   ],
