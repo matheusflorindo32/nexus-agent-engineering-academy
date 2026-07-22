@@ -27,6 +27,7 @@ jobs:
       - name: Checkout candidate SHA
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: candidate
 
       - name: Checkout rollback target SHA
@@ -60,9 +61,10 @@ jobs:
           VERCEL_GIT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           NEXUS_BUILD_PROVIDER: github-actions-rollback-rehearsal
         run: |
-          npm ci --no-audit --no-fund --ignore-scripts --loglevel=error
-          npm run typecheck
-          npm run build
+          set -o pipefail
+          npm ci --no-audit --no-fund --ignore-scripts --loglevel=error 2>&1 | tee ../../candidate-install.log
+          npm run typecheck 2>&1 | tee ../../candidate-typecheck.log
+          npm run build 2>&1 | tee ../../candidate-build.log
 
       - name: Build rollback target exactly
         working-directory: rollback-target/portal
@@ -71,9 +73,10 @@ jobs:
           VERCEL_GIT_COMMIT_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
           NEXUS_BUILD_PROVIDER: github-actions-rollback-rehearsal
         run: |
-          npm ci --no-audit --no-fund --ignore-scripts --loglevel=error
-          npm run typecheck
-          npm run build
+          set -o pipefail
+          npm ci --no-audit --no-fund --ignore-scripts --loglevel=error 2>&1 | tee ../../rollback-install.log
+          npm run typecheck 2>&1 | tee ../../rollback-typecheck.log
+          npm run build 2>&1 | tee ../../rollback-build.log
 
       - name: Create immutable manifests
         run: |
@@ -123,6 +126,12 @@ jobs:
           name: portal-rollback-rehearsal-${{ github.sha }}
           path: |
             rollback-identity.txt
+            candidate-install.log
+            candidate-typecheck.log
+            candidate-build.log
+            rollback-install.log
+            rollback-typecheck.log
+            rollback-build.log
             candidate-manifest.sha256
             candidate-manifest.digest
             rollback-manifest.sha256
@@ -133,5 +142,5 @@ jobs:
             rollback-build-identity.json
             candidate-server.log
             rollback-server.log
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 7
