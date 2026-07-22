@@ -38,9 +38,15 @@ jobs:
           node --version
           npm --version
 
-      - name: Install declared dependencies
+      - name: Resolve dependencies and generate candidate lockfile
         working-directory: portal
         run: npm install --no-audit --no-fund --ignore-scripts --loglevel=error
+
+      - name: Assert candidate lockfile
+        run: |
+          test -f portal/package-lock.json
+          node -e "const p=require('./portal/package-lock.json'); if(p.lockfileVersion !== 3) process.exit(1);"
+          sha256sum portal/package-lock.json > portal-package-lock.sha256
 
       - name: Typecheck
         working-directory: portal
@@ -67,12 +73,14 @@ jobs:
           find portal/build -type f | sort > portal-build-manifest.txt
           sha256sum portal-build-manifest.txt
 
-      - name: Upload evidence and diagnostics
+      - name: Upload evidence and candidate lockfile
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: portal-build-evidence-${{ github.sha }}
+          name: portal-lockfile-candidate-${{ github.sha }}
           path: |
+            portal/package-lock.json
+            portal-package-lock.sha256
             portal-build.log
             portal-build-manifest.txt
             portal/build/
