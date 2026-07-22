@@ -1,0 +1,80 @@
+name: Portal Quality
+
+on:
+  pull_request:
+    paths:
+      - 'portal/**'
+      - 'course/**'
+      - 'labs/**'
+      - 'projects/**'
+      - '.github/workflows/portal-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Typecheck and build portal
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.4'
+
+      - name: Record build identity
+        run: |
+          echo "sha=${GITHUB_SHA}"
+          node --version
+          npm --version
+
+      - name: Install declared dependencies
+        working-directory: portal
+        run: npm install --no-audit --no-fund --ignore-scripts --loglevel=error
+
+      - name: Typecheck
+        working-directory: portal
+        run: npm run typecheck
+
+      - name: Build static portal
+        working-directory: portal
+        env:
+          NODE_ENV: production
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee ../portal-build.log
+
+      - name: Assert critical output
+        run: |
+          test -f portal/build/index.html
+          test -f portal/build/curso.html
+          test -f portal/build/laboratorios.html
+          test -f portal/build/projetos.html
+          test -f portal/build/curso/modules/orientation.html
+          test -f portal/build/curso/modules/tool-engineering.html
+          test -f portal/build/curso/modules/evaluation-engineering.html
+          test -f portal/build/projetos/capstone.html
+          find portal/build -type f | sort > portal-build-manifest.txt
+          sha256sum portal-build-manifest.txt
+
+      - name: Upload evidence and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-build-evidence-${{ github.sha }}
+          path: |
+            portal-build.log
+            portal-build-manifest.txt
+            portal/build/
+          if-no-files-found: warn
+          retention-days: 7

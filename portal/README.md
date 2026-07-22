@@ -3,7 +3,7 @@ id: portal.readme
 title: Portal NEXUS
 lang: pt-BR
 status: review
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Portal NEXUS
@@ -21,22 +21,55 @@ Portal estático para publicar o conteúdo canônico do repositório sem duplica
 
 A versão foi fixada para reduzir deriva entre preview e produção. Todos os pacotes `@docusaurus/*` usam a mesma versão.
 
-## Executar localmente
+## Estado atual da instalação
+
+O repositório ainda não contém `portal/package-lock.json`. Enquanto esse artefato não for gerado, revisado e versionado:
+
+- o workflow usa `npm install` apenas para provar que o scaffold pode ser resolvido, tipado e compilado;
+- a execução não é considerada totalmente reproduzível;
+- cache de dependências permanece desabilitado;
+- publicação e release continuam bloqueadas;
+- o próximo gate é substituir `npm install` por `npm ci` no mesmo SHA que contiver o lockfile aprovado.
+
+Esse modo transitório não deve ser interpretado como exceção permanente ao requisito de lockfile.
+
+## Executar localmente antes do lockfile
 
 ```bash
 cd portal
-npm ci
-npm run start
+npm install --no-audit --no-fund --ignore-scripts
+npm run typecheck
+npm run build
+npm run serve
 ```
 
-Para validar o build estático:
+Após a aprovação do lockfile, o procedimento obrigatório será:
 
 ```bash
+cd portal
+npm ci --ignore-scripts
+npm run typecheck
 npm run build
 npm run serve
 ```
 
 O build deve falhar diante de links quebrados.
+
+## Quality gate automatizado
+
+O workflow `.github/workflows/portal-quality.yml` executa no SHA exato do pull request:
+
+1. checkout do commit;
+2. Node.js fixado;
+3. registro das versões de Node e npm;
+4. instalação transitória das dependências declaradas;
+5. typecheck;
+6. build estático;
+7. verificação das rotas críticas;
+8. manifesto ordenado dos arquivos gerados;
+9. evidence bundle retido por sete dias.
+
+Um workflow verde prova somente que esse SHA foi resolvido e compilado naquele ambiente. Ele não prova reprodutibilidade completa, acessibilidade, segurança, eficácia pedagógica, aprovação para merge ou prontidão para deploy.
 
 ## Rotas
 
@@ -50,7 +83,9 @@ O build deve falhar diante de links quebrados.
 
 - `python tests/validate_repository.py` no repositório;
 - `npm ci` com lockfile aprovado;
+- `npm run typecheck` sem erro;
 - `npm run build` sem erro;
+- evidence bundle vinculado ao SHA;
 - navegação por teclado;
 - foco visível;
 - zoom a 200%;
@@ -63,6 +98,7 @@ O build deve falhar diante de links quebrados.
 
 A publicação permanece bloqueada se houver:
 
+- ausência de lockfile aprovado;
 - rota crítica indisponível;
 - link interno quebrado;
 - segredo no bundle;
@@ -75,4 +111,4 @@ A publicação permanece bloqueada se houver:
 
 ## Limitações
 
-Este scaffold ainda não prova acessibilidade, segurança ou eficácia pedagógica. Ele precisa ser instalado, compilado, inspecionado por pessoa revisora, publicado em preview e submetido aos protocolos do repositório antes de qualquer promoção de status.
+Este scaffold e seu build automatizado ainda não provam acessibilidade, segurança ou eficácia pedagógica. O portal precisa de lockfile aprovado, revisão humana, preview imutável, validação prática de acessibilidade, smoke test e ensaio de rollback antes de qualquer promoção de status ou publicação.
