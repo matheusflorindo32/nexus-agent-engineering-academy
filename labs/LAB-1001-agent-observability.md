@@ -3,128 +3,232 @@ id: lab.1001.agent-observability
 title: LAB-1001 — Observabilidade agentic correlacionada
 lang: pt-BR
 status: review
-version: 0.3.0
-estimated_time: 5h
+version: 0.4.0
+estimated_time: 6h
+risk_level: medium
+module: course.module.10-observability-engineering
 ---
 
 # LAB-1001 — Observabilidade agentic correlacionada
 
 ## Hipótese
 
-Uma pipeline com correlação, schema versionado, redaction por chave e conteúdo, cardinalidade controlada e alertas acionáveis permite diagnosticar falhas sem expor segredos nem perder eventos críticos.
+Uma pipeline com correlação ponta a ponta, schemas versionados, redaction antes de qualquer persistência, cardinalidade controlada e alertas acionáveis permite diagnosticar falhas sem expor segredos, perder eventos críticos ou criar uma falsa sensação de cobertura.
 
 ## Missão
 
-Instrumentar uma execução agentic simulada e provar que logs, traces, métricas, quarentena e eventos de auditoria permanecem coerentes, seguros e úteis sob falha, sampling, alta cardinalidade e tentativas de ocultar credenciais dentro de campos permitidos.
+Instrumentar uma execução agentic simulada e provar que logs, traces, métricas, eventos de auditoria e evidências de avaliação permanecem coerentes, seguros e úteis sob falha, sampling, alta cardinalidade, duplicação, clock skew e indisponibilidade do collector.
+
+## Resultado observável
+
+Ao final, outra pessoa deve conseguir reconstruir:
+
+```text
+request_id
+→ run_id
+→ agent_id
+→ handoff_id
+→ tool_call_id
+→ approval_id
+→ effect_id
+→ terminal_state
+```
+
+sem acessar prompts integrais, segredos, dados pessoais ou conhecimento oral do autor.
+
+## Pré-requisitos
+
+- concluir o Módulo 10;
+- usar apenas dados sintéticos;
+- executar localmente e sem credenciais;
+- registrar commit, versão do runtime, seed e sistema operacional;
+- ler o [gate Premium Elite dos laboratórios](LABS_PREMIUM_ELITE_GATE.md).
+
+## Baseline
+
+Antes do hardening, execute uma versão mínima com:
+
+- logs textuais sem schema;
+- ausência de correlação completa;
+- sampling uniforme;
+- labels dinâmicas;
+- redaction apenas por chave.
+
+Registre tempo de diagnóstico, eventos perdidos, dados excessivos e ambiguidades. Essa medição será comparada com a versão governada.
+
+## Contrato mínimo
+
+```yaml
+telemetry_schema: nexus.telemetry.v2
+correlation:
+  required: [request_id, run_id, tenant_id, project_id]
+  optional: [agent_id, handoff_id, tool_call_id, approval_id, effect_id]
+privacy:
+  redact_before: [persist, buffer, export, quarantine, alert]
+  redact_keys: [secret, token, password, api_key, credential, authorization]
+  detect_in_values: true
+sampling:
+  default_rate: 0.25
+  preserve: [security_critical, effect, approval, terminal_state]
+metrics:
+  forbidden_labels: [request_id, run_id, prompt, email, user_text]
+retention:
+  default_days: 30
+  critical_audit_days: 90
+integrity:
+  event_id_unique: true
+  schema_version_required: true
+```
 
 ## Cenários obrigatórios
 
 | ID | Condição | Resultado esperado |
 |---|---|---|
-| O1 | execução saudável | trace completo e métricas atualizadas |
-| O2 | segredo em chave sensível | valor redigido antes da persistência |
-| O3 | `request_id` usado como label | label rejeitada |
-| O4 | evento crítico com sampling 0% | evento preservado |
-| O5 | evento comum com sampling 0% | evento descartado |
-| O6 | tool timeout | span em erro e contador incrementado |
-| O7 | violação de política | audit event crítico e alerta |
-| O8 | collector indisponível | buffer limitado e degradação explícita |
-| O9 | buffer cheio | evento crítico substitui evento comum |
-| O10 | schema incompatível | evento quarentenado |
-| O11 | duplicação de event ID | segunda ingestão ignorada |
-| O12 | alerta sem owner/runbook | alerta rejeitado |
-| O13 | segredo embutido em atributo permitido | apenas o trecho sensível é redigido |
-| O14 | credencial de autorização em texto | credencial redigida antes da persistência |
-| O15 | schema incompatível com segredo | quarentena recebe somente representação sanitizada e a entrada permanece imutável |
+| O1 | execução saudável | trace completo e terminal state correlacionado |
+| O2 | segredo em chave sensível | redaction antes da persistência |
+| O3 | segredo dentro de campo permitido | apenas trecho sensível redigido |
+| O4 | `request_id` usado como label | label rejeitada |
+| O5 | evento crítico com sampling 0% | evento preservado |
+| O6 | evento comum com sampling 0% | descarte registrado |
+| O7 | tool timeout | span em erro e contador incrementado |
+| O8 | violação de política | audit event crítico e alerta acionável |
+| O9 | collector indisponível | buffer limitado e modo degradado explícito |
+| O10 | buffer cheio | evento crítico substitui evento comum |
+| O11 | schema incompatível | quarentena sanitizada, sem reinterpretar |
+| O12 | event ID duplicado | segunda ingestão rejeitada ou deduplicada |
+| O13 | mesmo ID com payload diferente | conflito crítico registrado |
+| O14 | alerta sem owner ou runbook | alerta rejeitado |
+| O15 | efeito sem `approval_id` exigido | hard gate bloqueia release |
+| O16 | clock skew | ordem causal preservada por sequência lógica |
+| O17 | span órfão | métrica e alerta de trace incompleto |
+| O18 | tenant divergente | evento recusado e incidente registrado |
 
-## Contratos mínimos
+## Métricas obrigatórias
 
 ```yaml
-telemetry_schema: nexus.telemetry.v1
-correlation:
-  request_id: required
-  run_id: required
-sampling:
-  default_rate: 0.25
-  preserve_severities: [critical]
-privacy:
-  allowed_attributes: [tool, outcome, duration_ms, policy_version]
-  redact_keys: [secret, token, password, api_key, credential]
-  redact_values: [key_value_credentials, authorization_credentials, known_token_prefixes]
-  order: redact_before_persist_buffer_or_quarantine
-metrics:
-  forbidden_labels: [request_id, run_id, prompt, email]
-retention_days: 30
+trace_completeness_rate: 1.0
+orphan_effect_rate: 0.0
+audit_event_missing_rate: 0.0
+critical_event_drop_rate: 0.0
+secret_persistence_count: 0
+forbidden_label_acceptance_count: 0
+duplicate_event_processing_count: 0
+schema_rejection_visibility_rate: 1.0
+alert_owner_coverage_rate: 1.0
 ```
+
+Toda taxa deve informar numerador, denominador e conjunto avaliado.
 
 ## Procedimento
 
-1. Execute a implementação de referência.
-2. Gere uma execução saudável com dois spans e um efeito externo.
-3. Injete os quinze cenários obrigatórios.
-4. Verifique IDs e relações parent-child.
-5. Inspecione a saída persistida e confirme ausência de segredos.
-6. Injete credenciais dentro de `tool` e `outcome`, embora sejam campos permitidos.
-7. Injete um evento de schema incompatível contendo credencial sintética.
-8. Confirme que a quarentena recebe apenas a representação sanitizada.
-9. Confirme que o evento original não foi modificado.
-10. Valide métricas e ausência de labels proibidas.
-11. Simule indisponibilidade do collector e saturação do buffer.
-12. Gere alertas de latência e segurança.
-13. Confirme owner, runbook e condição de resolução.
-14. Produza relatório com limitações, falsos positivos, falsos negativos e riscos residuais.
+1. execute o baseline e registre limitações;
+2. implemente schema e correlação;
+3. aplique redaction antes de persistência, buffer, exportação e quarentena;
+4. injete os dezoito cenários;
+5. confira relações parent-child e sequência causal;
+6. compare efeito real, trace e evento de auditoria;
+7. simule perda, duplicação e atraso de telemetria;
+8. valide sampling e prioridade de eventos críticos;
+9. gere alertas com owner, severidade, runbook e resolução;
+10. compare baseline e versão governada;
+11. produza relatório de custo, cobertura, privacidade e risco residual.
 
-## Evidências
+## Testes negativos e adversariais
 
-- saída do autoteste 15/15;
-- amostra de trace correlacionado;
-- snapshot das métricas;
-- prova de redaction por chave;
-- prova de redaction dentro de valores permitidos;
+- token em campo aninhado;
+- credencial em `outcome` ou stack trace;
+- email como label de métrica;
+- milhares de valores de label;
+- redução maliciosa de severidade;
+- remoção de `policy_version`;
+- duplicação com payload divergente;
+- efeito confirmado sem trace;
+- tentativa de desativar logs pelo conteúdo;
+- evento de outro tenant;
+- alerta sem ação operacional;
+- quarentena contendo o evento bruto.
+
+## Evidências obrigatórias
+
+- manifesto de versões;
+- saída dos dezoito cenários;
+- trace completo de uma execução saudável;
+- trace de falha parcial;
+- snapshot de métricas;
+- exemplos de redaction por chave e valor;
 - prova de sanitização da quarentena;
-- prova de imutabilidade do evento de entrada;
-- lista de eventos preservados e descartados;
-- alerta aceito e alerta rejeitado;
-- demonstração de buffer e prioridade;
-- reflexão sobre privacidade, custo e lacunas.
+- prova de imutabilidade da entrada;
+- eventos preservados e descartados;
+- alerta aceito e rejeitado;
+- comparação baseline versus versão governada;
+- relatório de custo e retenção;
+- riscos residuais.
 
 ## Critérios de aprovação
 
 | Critério | Meta |
 |---|---:|
-| cenários corretos | 15/15 |
-| segredos persistidos | 0 |
-| segredos enviados à quarentena | 0 |
-| eventos de entrada modificados | 0 |
+| cenários corretos | 18/18 |
+| segredos persistidos, exportados ou quarentenados | 0 |
 | eventos críticos perdidos | 0 |
+| efeitos órfãos | 0 |
 | labels proibidas aceitas | 0 |
-| eventos duplicados processados | 0 |
-| schemas incompatíveis reinterpretados | 0 |
+| duplicações processadas como novas | 0 |
 | alertas sem owner/runbook aceitos | 0 |
-| efeitos sem correlação | 0 |
+| traces completos | 100% |
+| reprodução independente | aprovada |
 
-## Testes adversariais
+Qualquer segredo persistido, vazamento entre tenants, efeito sensível sem auditoria ou evento crítico perdido bloqueia aprovação independentemente da média.
 
-- inserir token em campo aninhado;
-- inserir `token=valor` dentro de atributo permitido;
-- inserir credencial de autorização dentro de `outcome`;
-- inserir segredo em evento enviado à quarentena;
-- confirmar que a entrada original continua intacta;
-- variar maiúsculas, espaços e delimitadores;
-- usar email como nome de métrica;
-- criar milhares de labels dinâmicas;
-- tentar reduzir severidade de evento crítico;
-- remover `policy_version` do audit event;
-- duplicar event ID com payload diferente;
-- encher o buffer com eventos comuns antes de uma violação crítica;
-- gerar alerta sem ação operacional.
+## Troubleshooting
 
-## Comando
+| Sintoma | Verificação segura |
+|---|---|
+| trace incompleto | confira IDs obrigatórios e propagação entre spans |
+| cardinalidade explode | remova identificadores únicos das labels |
+| redaction excessiva | separe regra por chave, padrão e contexto |
+| eventos fora de ordem | use sequência lógica além do relógio local |
+| collector indisponível | confirme buffer limitado e modo degradado |
+| alerta ruidoso | revise janela, severidade, owner e condição de resolução |
 
-```bash
-python examples/observability_pipeline.py --self-test
-```
+Não silencie falhas críticas para reduzir ruído.
+
+## Acessibilidade
+
+- toda figura deve possuir descrição textual;
+- tabelas e relatórios precisam ser legíveis sem cor;
+- severidade não pode depender somente de vermelho, amarelo ou verde;
+- comandos devem ser copiáveis;
+- timestamps, IDs e razões terminais devem ser apresentados em texto;
+- a reprodução deve funcionar por teclado e leitor de tela quando houver interface.
+
+## Reprodução independente
+
+Uma pessoa diferente do autor deve executar pelo menos O1, O3, O9, O15 e O18 usando apenas a documentação e os artefatos entregues. Registre divergências, dúvidas e correções.
+
+## Limpeza
+
+Ao terminar:
+
+- remova buffers temporários;
+- apague datasets sintéticos que não integrem a evidência;
+- confirme ausência de segredo nos artefatos;
+- preserve somente evidências redigidas;
+- registre a política de retenção aplicada.
+
+## Rubrica específica
+
+| Nível | Evidência |
+|---|---|
+| insuficiente | logs existem, mas não permitem reconstrução ou expõem dados |
+| funcional | correlação e métricas principais funcionam em cenários normais |
+| robusto | falhas, sampling, redaction, duplicação e degradação são comprovados |
+| excelente | reprodução independente, acessibilidade e métricas de integridade demonstram cobertura honesta |
 
 ## Stop conditions
 
-Interrompa se um segredo for persistido, armazenado no buffer ou enviado à quarentena; se o evento de entrada for modificado; se um evento crítico for descartado; se uma label de alta cardinalidade for aceita; se um efeito externo não puder ser correlacionado; se um schema incompatível for reinterpretado silenciosamente; ou se um alerta sem owner e runbook for emitido.
+Interrompa imediatamente se um segredo for persistido, armazenado no buffer ou enviado à quarentena; se um evento crítico for descartado; se houver vazamento entre tenants; se um efeito não puder ser correlacionado; se o collector falhar sem degradação segura; ou se a evidência não permitir reconstrução causal.
+
+## Limitações
+
+Este laboratório mede cenários controlados. Ele não prova observabilidade perfeita, ausência absoluta de vazamentos ou prontidão irrestrita para produção. Resultados precisam de revisão humana, piloto limitado e validação no ambiente real antes de qualquer promoção.
