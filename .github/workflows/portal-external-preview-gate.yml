@@ -1,0 +1,58 @@
+name: Portal External Preview Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      preview_url:
+        description: 'URL HTTPS imutável do preview'
+        required: true
+        type: string
+      expected_sha:
+        description: 'SHA completo esperado no artefato publicado'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-external-preview-${{ inputs.expected_sha }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify external immutable preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact workflow revision
+        uses: actions/checkout@v4
+
+      - name: Validate dispatch contract
+        env:
+          PREVIEW_URL: ${{ inputs.preview_url }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          case "$PREVIEW_URL" in https://*) ;; *) echo 'preview_url deve usar HTTPS'; exit 1;; esac
+          echo "$EXPECTED_SHA" | grep -Eq '^[0-9a-f]{40}$'
+
+      - name: Execute external preview verification
+        env:
+          PREVIEW_URL: ${{ inputs.preview_url }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -o pipefail
+          node portal/scripts/verify-external-preview.mjs "$PREVIEW_URL" "$EXPECTED_SHA" | tee external-preview-evidence.json
+
+      - name: Hash evidence
+        run: sha256sum external-preview-evidence.json > external-preview-evidence.sha256
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-preview-evidence-${{ inputs.expected_sha }}
+          path: |
+            external-preview-evidence.json
+            external-preview-evidence.sha256
+          if-no-files-found: error
+          retention-days: 14
