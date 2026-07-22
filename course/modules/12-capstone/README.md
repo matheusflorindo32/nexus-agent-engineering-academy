@@ -3,7 +3,7 @@ id: course.module.12-capstone
 title: 12 — Capstone production-grade
 lang: pt-BR
 status: review
-version: 0.2.0
+version: 0.2.1
 estimated_time: 30–60h
 prerequisites: [course.module.11-automation]
 learning_outcomes:
@@ -35,7 +35,7 @@ Este módulo é destinado a estudantes que concluíram os módulos 00–11 e já
 Ao final, você deverá entregar um sistema agentic executável que:
 
 - resolve um problema real com escopo limitado;
-- possui requisitos, não objetivos e critérios de sucesso rastreáveis;
+- possui requisitos, non-goals e critérios de sucesso rastreáveis;
 - executa localmente sem segredo obrigatório para a demo principal;
 - separa control, data, state e observability plane;
 - protege tools, memória, handoffs e efeitos externos;
@@ -49,14 +49,14 @@ Ao final, você deverá entregar um sistema agentic executável que:
 
 Antes de iniciar, responda:
 
-1. Qual problema será resolvido e qual problema ficará explicitamente fora do escopo?
+1. Qual problema será resolvido e qual ficará fora do escopo?
 2. Qual é o menor vertical slice que produz valor observável?
-3. Quais efeitos externos são reversíveis, compensáveis ou irreversíveis?
+3. Quais efeitos são reversíveis, compensáveis ou irreversíveis?
 4. Quais falhas bloqueiam release independentemente da média?
 5. Como outra pessoa provará que a demo funciona sem depender de você?
-6. Qual risco residual continuará existindo após os controles?
+6. Qual risco residual continuará existindo?
 
-Registre as respostas e revise-as ao final do projeto.
+Registre as respostas e revise-as ao final.
 
 ## Objetivos
 
@@ -64,7 +64,7 @@ Registre as respostas e revise-as ao final do projeto.
 - Construir um vertical slice antes de ampliar escopo.
 - Transformar requisitos em contratos, testes, métricas e evidências.
 - Demonstrar segurança, avaliação, observabilidade e recuperação.
-- Operar um piloto controlado com rollback e game day.
+- Operar piloto controlado com rollback e game day.
 - Defender decisões arquiteturais com ADRs e trade-offs explícitos.
 - Produzir documentação acessível para usuários, operadores e revisores.
 
@@ -81,7 +81,7 @@ Registre as respostas e revise-as ao final do projeto.
 
 ### Camada 1 — explicação simples
 
-Você construirá um sistema completo, mas pequeno o suficiente para ser testado. Ele deve fazer algo útil, falhar com segurança e deixar evidências do que aconteceu.
+Você construirá um sistema completo, mas pequeno o suficiente para ser testado. Ele deve fazer algo útil, falhar com segurança e deixar evidências.
 
 ### Camada 2 — explicação operacional
 
@@ -89,13 +89,13 @@ O projeto conecta entrada, política, contexto, decisão, tools, memória, avali
 
 ### Camada 3 — explicação de engenharia
 
-O capstone valida um sistema sociotécnico: software, modelos, pessoas, políticas, dados, fornecedores e procedimentos operacionais. A qualidade final depende da coerência entre arquitetura, governança e evidência, não da sofisticação isolada de um componente.
+O capstone valida um sistema sociotécnico: software, modelos, pessoas, políticas, dados, fornecedores e procedimentos. A qualidade depende da coerência entre arquitetura, governança e evidência.
 
 ## Glossário essencial
 
 | Termo | Definição operacional |
 |---|---|
-| vertical slice | fluxo mínimo ponta a ponta que entrega valor e produz evidência |
+| vertical slice | fluxo mínimo ponta a ponta que entrega valor e evidência |
 | non-goal | capacidade explicitamente fora do escopo |
 | acceptance criterion | condição observável para aceitar uma entrega |
 | ADR | registro versionado de decisão arquitetural |
@@ -121,8 +121,6 @@ O problema deve:
 Evite projetos cujo sucesso dependa apenas de uma resposta visualmente impressionante.
 
 ## Critérios de escopo
-
-Declare:
 
 ```yaml
 problem: triagem de solicitações internas simuladas
@@ -164,8 +162,8 @@ Descrição textual: a entrada é validada antes do runtime; políticas limitam 
 
 Durante execução normal, falha e game day:
 
-- tenant e projeto não podem trocar silenciosamente;
-- autoridade não pode ser ampliada pelo modelo;
+- tenant e projeto não trocam silenciosamente;
+- autoridade não é ampliada pelo modelo;
 - conteúdo recuperado permanece não confiável;
 - efeitos externos usam idempotency key;
 - timeout mutável não autoriza retry cego;
@@ -177,125 +175,41 @@ Durante execução normal, falha e game day:
 
 ## Entregáveis obrigatórios
 
-### 1. Documento de requisitos
+### 1. Requisitos
 
-Deve conter:
-
-- problema;
-- usuários;
-- jornadas;
-- requisitos funcionais;
-- requisitos não funcionais;
-- non-goals;
-- critérios de aceitação;
-- restrições;
-- riscos e dependências.
+Inclua problema, usuários, jornadas, requisitos funcionais e não funcionais, non-goals, critérios de aceitação, restrições, riscos e dependências.
 
 ### 2. Arquitetura
 
-Inclua:
-
-- diagrama de contexto e componentes;
-- fronteiras de confiança;
-- fluxo de dados;
-- control, data, state e observability plane;
-- integrações e adapters;
-- estratégia de degradação;
-- decisão de build versus buy.
+Inclua diagramas de contexto e componentes, fronteiras de confiança, fluxo de dados, planes, adapters, degradação e decisão build versus buy.
 
 ### 3. ADRs
 
-No mínimo:
-
-- escolha da arquitetura;
-- escolha de modelo ou adapter;
-- política de memória;
-- política de efeitos e aprovação;
-- estratégia de avaliação;
-- estratégia de rollout e rollback.
+Registre arquitetura, modelo ou adapter, memória, efeitos e aprovação, avaliação, rollout e rollback.
 
 ### 4. Threat model
 
-Mapeie:
-
-- ativos;
-- atores;
-- fronteiras;
-- capabilities;
-- abuse cases;
-- controles;
-- testes;
-- owners;
-- risco residual.
+Mapeie ativos, atores, fronteiras, capabilities, abuse cases, controles, testes, owners e risco residual.
 
 ### 5. Evaluation suite
 
-Inclua:
-
-- dataset versionado;
-- baseline;
-- casos críticos;
-- casos adversariais;
-- graders e limitações;
-- métricas;
-- hard gates;
-- relatório de regressão;
-- decisão de release.
+Inclua dataset versionado, baseline, casos críticos e adversariais, graders, métricas, hard gates, regressão e decisão de release.
 
 ### 6. Observabilidade
 
-Comprove:
-
-- correlação ponta a ponta;
-- logs estruturados;
-- traces;
-- métricas;
-- eventos de auditoria;
-- redaction;
-- cardinalidade controlada;
-- alertas com owner e runbook.
+Comprove correlação, logs estruturados, traces, métricas, auditoria, redaction, cardinalidade e alertas com owner e runbook.
 
 ### 7. Automação
 
-Demonstre:
-
-- reentrega segura;
-- concorrência;
-- idempotência;
-- retry budget;
-- timeout ambíguo;
-- reconciliação;
-- DLQ;
-- compensação;
-- caminho manual.
+Demonstre reentrega segura, concorrência, idempotência, retry budget, timeout ambíguo, reconciliação, DLQ, compensação e caminho manual.
 
 ### 8. Operação
 
-Inclua:
-
-- SLI e SLO;
-- rollout canary;
-- abort criteria;
-- rollback;
-- kill switch;
-- backup e restore quando aplicável;
-- runbook de incidente;
-- plano de comunicação.
+Inclua SLI, SLO, canary, abort criteria, rollback, kill switch, restore quando aplicável, runbook e comunicação.
 
 ### 9. Evidence bundle
 
-O pacote final deve conter:
-
-- versão do código;
-- versões de configuração e política;
-- resultados de CI;
-- relatório de avaliação;
-- relatório de segurança;
-- traces e eventos redigidos;
-- evidência do game day;
-- riscos residuais;
-- limitações conhecidas;
-- instruções de reprodução.
+Inclua versões, CI, relatórios de avaliação e segurança, traces redigidos, game day, riscos, limitações e instruções de reprodução.
 
 ## Plano de execução
 
@@ -308,10 +222,10 @@ O pacote final deve conter:
 
 ### Fase 2 — vertical slice
 
-- construir fluxo ponta a ponta mínimo;
+- construir fluxo mínimo ponta a ponta;
 - usar dados sintéticos;
-- evitar dependências externas desnecessárias;
-- produzir primeiro trace e primeiro caso de avaliação.
+- evitar dependências desnecessárias;
+- produzir primeiro trace e caso de avaliação.
 
 ### Fase 3 — hardening
 
@@ -336,28 +250,18 @@ O pacote final deve conter:
 
 ## Demonstração executável
 
-A execução principal deve ser local e determinística quando possível:
-
 ```bash
 python examples/capstone_reference_system.py --self-test
 ```
 
-A demonstração deve provar:
-
-- entrada válida e inválida;
-- política deny-by-default;
-- contexto com proveniência;
-- tool segura;
-- loop com budgets;
-- memória governada;
-- avaliação baseline versus candidato;
-- observabilidade correlacionada;
-- automação idempotente;
-- kill switch;
-- relatório terminal.
+A demonstração deve provar entrada válida e inválida, deny-by-default, proveniência, tool segura, loop com budgets, memória governada, avaliação, observabilidade, automação idempotente, kill switch e relatório terminal.
 
 > [!WARNING]
-> Caso a implementação de referência ainda não exista, registre o bloqueio. Não trate pseudocódigo ou descrição como evidência executável.
+> Caso a implementação de referência ainda não exista, registre o bloqueio. Pseudocódigo ou descrição não são evidência executável.
+
+## Laboratório
+
+- [LAB-1201 — Game day do capstone](../../../labs/LAB-1201-capstone-game-day.md): simular falhas, ataques, consumo de budget, timeout ambíguo, falha do collector e reentrega concorrente preservando invariantes e evidências.
 
 ## Prática guiada
 
@@ -369,35 +273,42 @@ A demonstração deve provar:
 6. escolha dois hard gates;
 7. defina um SLO;
 8. escreva um rollback;
-9. descreva um game day;
-10. peça revisão antes de implementar o restante.
+9. descreva o game day;
+10. peça revisão antes de ampliar o escopo.
 
 ## Prática independente
 
 Construa um protótipo local com dados sintéticos que processe uma solicitação, produza decisão justificada, exija aprovação para efeito simulado, registre trace e gere relatório de avaliação.
 
+## Projeto
+
+Entregue um sistema agentic completo e limitado que:
+
+1. possua requisitos, non-goals e baseline;
+2. implemente vertical slice executável;
+3. use contratos para contexto, tools, loops e memória;
+4. aplique least privilege e aprovação vinculada;
+5. mantenha idempotência, ledger e reconciliação;
+6. execute avaliação baseline versus candidato;
+7. gere telemetria correlacionada sem segredos;
+8. possua SLO, canary, rollback e kill switch;
+9. conclua o LAB-1201;
+10. produza evidence bundle e defesa técnica;
+11. seja reproduzido por outra pessoa;
+12. documente limitações e riscos residuais.
+
 ## Game day Premium Elite
 
-O game day deve injetar, no mínimo:
+O game day deve injetar:
 
-- indisponibilidade de uma dependência;
+- indisponibilidade de dependência;
 - prompt injection indireta;
 - consumo anormal de budget;
 - timeout com efeito desconhecido;
 - falha do collector;
-- tentativa de reentrega concorrente.
+- reentrega concorrente.
 
-O sistema deve:
-
-- detectar;
-- conter;
-- preservar evidência;
-- evitar duplicação;
-- manter isolamento;
-- permitir ação do operador;
-- recuperar ou encerrar com razão tipada.
-
-`LAB-1201` permanece planejado e ainda não implementado. Até sua publicação, o game day pode ser conduzido como parte do projeto, mas não deve ser apresentado como laboratório formal disponível.
+O sistema deve detectar, conter, preservar evidência, evitar duplicação, manter isolamento, permitir ação do operador e recuperar ou encerrar com razão tipada.
 
 ## Testes negativos obrigatórios
 
@@ -416,7 +327,7 @@ O sistema deve:
 - collector indisponível;
 - rollback incompleto;
 - game day sem evidência;
-- demo não reproduzível por outra pessoa;
+- demo não reproduzível;
 - risco residual omitido.
 
 ## Stop conditions
@@ -425,7 +336,7 @@ Pare o projeto e peça revisão quando:
 
 - o escopo não couber no prazo;
 - não existir alternativa manual;
-- houver dado real sensível sem autorização e governança;
+- houver dado sensível real sem governança;
 - efeito irreversível não possuir aprovação especializada;
 - hard gate estiver sendo contornado;
 - a demo depender de segredo compartilhado;
@@ -437,31 +348,17 @@ Pare o projeto e peça revisão quando:
 - diagramas possuem descrição textual;
 - vídeos futuros possuem legenda e transcrição;
 - demo não depende somente de cor, animação ou áudio;
-- documentação usa estrutura de títulos navegável;
+- documentação usa títulos navegáveis;
 - comandos e exemplos estão disponíveis como texto;
 - interface futura deve funcionar com teclado;
 - erros devem ser comunicados com texto claro;
-- defesa técnica deve aceitar formato equivalente acessível.
+- defesa técnica aceita formato equivalente acessível.
 
 ## Avaliação
 
-A avaliação combina:
+A avaliação combina brief, requisitos, ADRs, arquitetura, threat model, sistema executável, suíte de avaliação, testes adversariais, observabilidade, automação, LAB-1201, evidence bundle, defesa técnica, reprodução independente e rubrica transversal.
 
-- brief aprovado;
-- requisitos e ADRs;
-- arquitetura e threat model;
-- sistema executável;
-- suíte de avaliação;
-- testes adversariais;
-- observabilidade;
-- automação;
-- game day;
-- evidence bundle;
-- defesa técnica de 20 minutos;
-- reprodução independente;
-- autoavaliação pela rubrica transversal.
-
-Critérios de segurança, isolamento, idempotência, rastreabilidade e capacidade de interrupção são bloqueantes.
+Segurança, isolamento, idempotência, rastreabilidade e capacidade de interrupção são critérios bloqueantes.
 
 ## Defesa técnica
 
@@ -485,7 +382,7 @@ A defesa deve responder:
 | insuficiente | demo frágil, escopo vago, sem hard gates ou recuperação |
 | funcional | vertical slice executa e possui controles básicos |
 | robusta | segurança, avaliação, observabilidade, automação e rollback são testados |
-| excelente | reprodução independente, game day, defesa técnica e benefício líquido são demonstrados com acessibilidade e risco residual explícito |
+| excelente | reprodução independente, game day, defesa e benefício líquido são demonstrados com acessibilidade e risco residual explícito |
 
 ## Checklist
 
@@ -500,25 +397,14 @@ A defesa deve responder:
 - [ ] Timeout ambíguo exige reconciliação.
 - [ ] Operador consegue pausar, retomar, reconciliar e encerrar.
 - [ ] Rollout, rollback e kill switch foram testados.
-- [ ] Game day possui evidências.
+- [ ] LAB-1201 possui evidências e postmortem.
 - [ ] Outra pessoa reproduziu a demo.
 - [ ] Limitações e riscos residuais estão explícitos.
 - [ ] Acessibilidade foi revisada.
 
 ## Autoavaliação
 
-Consigo demonstrar:
-
-- por que o agente é necessário;
-- o que o sistema não faz;
-- onde cada decisão é registrada;
-- como autoridade e tenant são protegidos;
-- como qualidade e segurança são medidas;
-- como efeitos são reconciliados;
-- como o sistema é interrompido;
-- como um incidente é reconstruído;
-- como outra pessoa reproduz o projeto;
-- quais riscos permanecem.
+Consigo demonstrar por que o agente é necessário, o que o sistema não faz, onde decisões são registradas, como autoridade e tenant são protegidos, como qualidade e segurança são medidas, como efeitos são reconciliados, como o sistema é interrompido, como um incidente é reconstruído, como outra pessoa reproduz o projeto e quais riscos permanecem.
 
 ## Critérios de excelência
 
