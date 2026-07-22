@@ -8,22 +8,22 @@ const tracks = [
   {
     title: 'NEXUS Start',
     text: 'Do zero ao primeiro agente local, somente leitura e sem chave de API.',
-    href: '/curso/modules/00-orientation/',
+    href: '/curso/modules/orientation',
   },
   {
     title: 'NEXUS Builder',
     text: 'Contexto, tools, loops, memória e coordenação com contratos explícitos.',
-    href: '/curso/modules/03-tool-engineering/',
+    href: '/curso/modules/tool-engineering',
   },
   {
     title: 'NEXUS Engineer',
     text: 'Avaliação, segurança, produção, observabilidade e automação confiável.',
-    href: '/curso/modules/07-evaluation-engineering/',
+    href: '/curso/modules/evaluation-engineering',
   },
   {
     title: 'NEXUS Elite',
     text: 'Capstone auditável com game day, reprodução independente e defesa técnica.',
-    href: '/projetos/capstone/',
+    href: '/projetos/capstone',
   },
 ];
 
