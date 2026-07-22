@@ -1,33 +1,66 @@
-name: Melhoria de conteúdo
-description: Corrigir ou aprofundar material educacional com evidência.
+name: Melhoria de conteúdo ou aprendizagem
+description: Corrigir, aprofundar ou tornar um material mais acessível com evidência verificável.
 title: "docs: "
-labels: [documentation]
+labels: ["documentation", "triage"]
 body:
   - type: input
     id: location
     attributes:
-      label: Arquivo ou ID
+      label: Arquivo, URL interna ou ID canônico
       placeholder: course.module.04-loop-engineering
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Categoria principal
+      options:
+        - Erro técnico ou conceitual
+        - Lacuna pedagógica
+        - Exercício ou avaliação insuficiente
+        - Acessibilidade
+        - Referência ou proveniência
+        - Internacionalização
+        - Navegação ou link
+        - Outra
     validations:
       required: true
   - type: textarea
     id: problem
     attributes:
-      label: Problema
-      description: Explique imprecisão, lacuna pedagógica ou link quebrado.
+      label: Problema observável
+      description: Explique quem é afetado, em qual etapa e qual evidência demonstra a lacuna.
     validations:
       required: true
   - type: textarea
     id: evidence
     attributes:
-      label: Evidência primária
-      description: URL oficial, RFC, artigo ou livro; inclua versão/data.
+      label: Evidência e referências
+      description: Priorize fonte primária; inclua autor institucional, título, versão/data e link. Separe evidência de opinião.
     validations:
       required: true
   - type: textarea
     id: proposal
     attributes:
-      label: Proposta
+      label: Proposta de melhoria
+      description: Inclua objetivo observável, mudança mínima e critério de aceite.
     validations:
       required: true
-
+  - type: textarea
+    id: validation
+    attributes:
+      label: Como validar
+      description: Informe teste, exercício, rubrica, revisão humana ou piloto necessário.
+    validations:
+      required: true
+  - type: checkboxes
+    id: gates
+    attributes:
+      label: Hard gates
+      options:
+        - label: A proposta não remove stop conditions, testes, referências ou controles para simplificar a aprovação.
+          required: true
+        - label: Não há alegação de eficácia pedagógica sem evidência humana.
+          required: true
+        - label: Imagens e diagramas propostos terão licença/proveniência e alternativa textual.
+          required: true

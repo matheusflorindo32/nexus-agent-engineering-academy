@@ -1,0 +1,63 @@
+name: Candidatura a good first issue
+description: Proponha uma tarefa pequena, segura, reproduzível e adequada para primeira contribuição.
+title: "community: "
+labels: ["good first issue", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Uma good first issue não é apenas fácil: ela precisa ter escopo curto, caminho seguro, critério de aceite e documentação suficiente para alguém novo contribuir sem conhecimento tácito.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema delimitado
+      description: Descreva uma única lacuna ou defeito observável.
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: Arquivos ou áreas prováveis
+      description: Liste caminhos conhecidos sem impor uma solução única.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceite
+      description: Use resultados verificáveis e inclua o comando de validação.
+      placeholder: |
+        - [ ] Link corrigido
+        - [ ] Alternativa textual adicionada
+        - [ ] python tests/validate_repository.py passa
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risco
+      options:
+        - Baixo — documentação, navegação ou acessibilidade sem mudança de contrato
+        - Médio — exemplo ou teste isolado, sem efeito externo
+    validations:
+      required: true
+  - type: textarea
+    id: guidance
+    attributes:
+      label: Orientação inicial
+      description: Aponte documentação, módulo, template e exemplo relevantes.
+    validations:
+      required: true
+  - type: checkboxes
+    id: suitability
+    attributes:
+      label: Adequação para iniciante
+      options:
+        - label: A tarefa cabe em um PR pequeno e coeso.
+          required: true
+        - label: Não exige credencial, dado real, infraestrutura externa ou efeito mutável.
+          required: true
+        - label: Não envolve vulnerabilidade, migração crítica ou decisão arquitetural irreversível.
+          required: true
+        - label: Uma pessoa nova consegue validar o resultado sem orientação oral.
+          required: true
