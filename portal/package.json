@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "docusaurus start",
+    "prebuild": "node scripts/write-build-identity.mjs",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear",
