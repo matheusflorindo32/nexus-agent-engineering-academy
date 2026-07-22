@@ -1,0 +1,74 @@
+name: Portal Quality
+
+on:
+  pull_request:
+    paths:
+      - 'portal/**'
+      - 'course/**'
+      - 'labs/**'
+      - 'projects/**'
+      - '.github/workflows/portal-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Typecheck and build portal
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.4'
+          cache: npm
+          cache-dependency-path: portal/package.json
+
+      - name: Record build identity
+        run: |
+          echo "sha=${GITHUB_SHA}"
+          node --version
+          npm --version
+
+      - name: Install declared dependencies
+        working-directory: portal
+        run: npm install --no-audit --no-fund --ignore-scripts
+
+      - name: Typecheck
+        working-directory: portal
+        run: npm run typecheck
+
+      - name: Build static portal
+        working-directory: portal
+        env:
+          NODE_ENV: production
+        run: npm run build
+
+      - name: Assert critical output
+        run: |
+          test -f portal/build/index.html
+          test -d portal/build/curso
+          test -d portal/build/laboratorios
+          test -d portal/build/projetos
+          find portal/build -type f | sort > portal-build-manifest.txt
+          sha256sum portal-build-manifest.txt
+
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-build-evidence-${{ github.sha }}
+          path: |
+            portal-build-manifest.txt
+            portal/build/
+          if-no-files-found: error
+          retention-days: 7
