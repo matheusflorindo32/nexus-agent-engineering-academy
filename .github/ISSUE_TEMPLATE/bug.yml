@@ -1,34 +1,80 @@
-name: Bug reproduzível
-description: Reportar falha em teste, exemplo, automação ou estrutura.
-title: "fix: "
-labels: [bug]
+name: Defeito reproduzível
+description: Relate erro técnico, editorial, pedagógico ou operacional com evidência mínima.
+title: "bug: "
+labels: ["bug", "triage"]
 body:
-  - type: textarea
-    id: reproduction
+  - type: markdown
     attributes:
-      label: Reprodução mínima
-      description: Inclua comandos e entradas sanitizadas.
+      value: |
+        Não inclua segredos, dados pessoais, credenciais ou detalhes de vulnerabilidade explorável. Casos de segurança devem seguir `SECURITY.md`.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área afetada
+      options:
+        - Curso ou módulo
+        - Laboratório
+        - Projeto ou rubrica
+        - Exemplo ou código
+        - Documentação e links
+        - CI ou validação
+        - Acessibilidade
+        - Internacionalização
+        - Outra
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Resultado observado
+      description: Descreva o que ocorreu, sem inserir dados sensíveis.
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Esperado e observado
+      label: Resultado esperado
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reprodução mínima
+      description: Informe caminho, comandos, entrada sintética e passos numerados.
     validations:
       required: true
   - type: input
-    id: environment
+    id: revision
     attributes:
-      label: Ambiente e versões
+      label: Commit, branch ou versão
+      placeholder: SHA completo ou branch
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências sanitizadas
+      description: Logs redigidos, mensagem de erro, captura acessível ou saída do validador.
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impacto estimado
+      options:
+        - Baixo — cosmético ou alternativa simples
+        - Médio — bloqueia parte do fluxo
+        - Alto — compromete avaliação, segurança, privacidade ou operação
     validations:
       required: true
   - type: checkboxes
-    id: safety
+    id: checks
     attributes:
-      label: Segurança
+      label: Confirmações
       options:
-        - label: O relato não contém segredos nem dados pessoais.
+        - label: Removi segredos, credenciais e dados pessoais.
           required: true
-        - label: Não se trata de vulnerabilidade que exige relato privado.
+        - label: Verifiquei que este relato não exige disclosure privado de segurança.
           required: true
-
+        - label: Procurei issues abertas equivalentes.
+          required: true
