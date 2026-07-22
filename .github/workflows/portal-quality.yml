@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: portal-quality-${{ github.ref }}
@@ -19,48 +19,39 @@ concurrency:
 
 jobs:
   build:
-    name: Bootstrap lockfile and validate portal
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feat/portal-lockfile-premium-elite'
+    name: Reproducible typecheck and portal build
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
-      - name: Checkout dedicated head branch
+      - name: Checkout exact commit
         uses: actions/checkout@v4
-        with:
-          ref: feat/portal-lockfile-premium-elite
 
-      - name: Set up Node.js
+      - name: Set up Node.js with lockfile cache
         uses: actions/setup-node@v4
         with:
           node-version: '20.19.4'
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
 
-      - name: Generate lockfile from fixed manifest
-        working-directory: portal
-        run: npm install --package-lock-only --no-audit --no-fund --ignore-scripts --loglevel=error
-
-      - name: Assert lockfile contract
+      - name: Record immutable build identity
         run: |
+          echo "sha=${GITHUB_SHA}"
+          node --version
+          npm --version
           test -f portal/package-lock.json
           node -e "const p=require('./portal/package-lock.json'); if(p.lockfileVersion !== 3) process.exit(1);"
-          git diff --check
-          sha256sum portal/package-lock.json
+          sha256sum portal/package-lock.json | tee portal-lock-before.sha256
 
-      - name: Commit candidate lockfile to dedicated branch
-        run: |
-          if git diff --quiet -- portal/package-lock.json && git ls-files --error-unmatch portal/package-lock.json >/dev/null 2>&1; then
-            echo 'Lockfile already versioned; no bootstrap commit required.'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add portal/package-lock.json
-          git commit -m 'build: versionar lockfile auditado do portal'
-          git push origin HEAD:feat/portal-lockfile-premium-elite
-
-      - name: Install exactly from generated lockfile
+      - name: Install exactly from versioned lockfile
         working-directory: portal
         run: npm ci --no-audit --no-fund --ignore-scripts --loglevel=error
+
+      - name: Prove lockfile remained unchanged
+        run: |
+          sha256sum portal/package-lock.json | tee portal-lock-after.sha256
+          diff -u portal-lock-before.sha256 portal-lock-after.sha256
+          git diff --exit-code -- portal/package-lock.json portal/package.json
 
       - name: Typecheck
         working-directory: portal
@@ -70,4 +61,34 @@ jobs:
         working-directory: portal
         env:
           NODE_ENV: production
-        run: npm run build
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee ../portal-build.log
+
+      - name: Assert critical output
+        run: |
+          test -f portal/build/index.html
+          test -f portal/build/curso.html
+          test -f portal/build/laboratorios.html
+          test -f portal/build/projetos.html
+          test -f portal/build/curso/modules/orientation.html
+          test -f portal/build/curso/modules/tool-engineering.html
+          test -f portal/build/curso/modules/evaluation-engineering.html
+          test -f portal/build/projetos/capstone.html
+          find portal/build -type f | sort > portal-build-manifest.txt
+          sha256sum portal-build-manifest.txt | tee portal-build-manifest.sha256
+
+      - name: Upload reproducibility evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-reproducible-build-${{ github.sha }}
+          path: |
+            portal-lock-before.sha256
+            portal-lock-after.sha256
+            portal-build.log
+            portal-build-manifest.txt
+            portal-build-manifest.sha256
+            portal/build/
+          if-no-files-found: warn
+          retention-days: 7
