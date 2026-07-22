@@ -3,7 +3,7 @@ id: lab.1201.capstone-game-day
 title: LAB-1201 — Game day do capstone
 lang: pt-BR
 status: review
-version: 0.1.0
+version: 0.1.1
 estimated_time: 6h
 ---
 
@@ -26,7 +26,7 @@ Executar um game day local e controlado no capstone, injetando falhas e ataques 
 - telemetria correlacionada;
 - kill switch testável;
 - caminho manual disponível;
-- owner e observador do exercício identificados.
+- owner e observador identificados.
 
 ## Invariantes obrigatórias
 
@@ -60,8 +60,8 @@ Durante todos os cenários:
 
 1. registre versão de artefato, configuração, política e dataset;
 2. defina janela e duração máxima;
-3. atribua comandante do exercício, operador e observador;
-4. confirme que todos os efeitos são simulados ou reversíveis;
+3. atribua comandante, operador e observador;
+4. confirme que efeitos são simulados ou reversíveis;
 5. faça snapshot do estado inicial;
 6. valide rollback e caminho manual;
 7. confirme canais de comunicação.
@@ -91,7 +91,7 @@ Interrompa imediatamente quando:
 - efeito irreversível puder ocorrer;
 - kill switch não responder;
 - evidência crítica deixar de ser coletada;
-- o escopo da falha sair do ambiente controlado.
+- o escopo sair do ambiente controlado.
 
 ## Evidências obrigatórias
 
@@ -132,7 +132,22 @@ Evite culpabilização individual. Analise condições do sistema e decisões ve
 | insuficiente | cenário sem controle, evidência ou recuperação |
 | funcional | falhas principais são detectadas e contidas |
 | robusta | invariantes, reconciliação, rollback e postmortem são comprovados |
-| excelente | todos os cenários são reproduzíveis, acessíveis e geram melhorias verificáveis |
+| excelente | cenários reproduzíveis, acessíveis e gerando melhorias verificáveis |
+
+## Critérios de aprovação
+
+O laboratório é aprovado somente quando:
+
+- todos os cenários G1–G10 forem executados ou houver justificativa formal para caso não aplicável;
+- não ocorrer efeito duplicado nem vazamento entre tenants;
+- nenhuma autoridade for ampliada;
+- eventos críticos forem preservados;
+- kill switch, reconciliação e rollback forem demonstrados;
+- tempos de detecção, contenção e recuperação forem registrados;
+- postmortem e novos casos de regressão forem produzidos;
+- riscos residuais e limitações forem explícitos;
+- uma pessoa diferente do autor conseguir revisar as evidências;
+- nenhum bloqueio crítico permanecer aberto.
 
 ## Checklist
 
