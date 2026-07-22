@@ -1,0 +1,142 @@
+name: Portal Preview Quality
+
+on:
+  pull_request:
+    paths:
+      - 'portal/**'
+      - 'course/**'
+      - 'labs/**'
+      - 'projects/**'
+      - '.github/workflows/portal-preview-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-preview-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Immutable preview, HTTP smoke and bundle audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js with lockfile cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.4'
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Record immutable identity
+        run: |
+          set -eu
+          echo "sha=${GITHUB_SHA}" | tee preview-identity.txt
+          node --version | tee -a preview-identity.txt
+          npm --version | tee -a preview-identity.txt
+          sha256sum portal/package.json portal/package-lock.json portal/vercel.json | tee -a preview-identity.txt
+
+      - name: Validate deployment policy
+        run: |
+          node - <<'NODE'
+          const config = require('./portal/vercel.json');
+          const headers = new Map(config.headers[0].headers.map(({key, value}) => [key, value]));
+          const required = [
+            'X-Content-Type-Options',
+            'Referrer-Policy',
+            'X-Frame-Options',
+            'Permissions-Policy',
+            'Cross-Origin-Opener-Policy',
+            'Content-Security-Policy',
+          ];
+          for (const name of required) {
+            if (!headers.has(name)) throw new Error(`Missing required header: ${name}`);
+          }
+          if (headers.get('X-Content-Type-Options') !== 'nosniff') throw new Error('nosniff required');
+          if (headers.get('X-Frame-Options') !== 'DENY') throw new Error('frame denial required');
+          if (!headers.get('Content-Security-Policy').includes("object-src 'none'")) throw new Error('CSP object-src missing');
+          if (!headers.get('Content-Security-Policy').includes("frame-ancestors 'none'")) throw new Error('CSP frame-ancestors missing');
+          console.log(JSON.stringify({requiredHeaders: required, decision: 'pass'}, null, 2));
+          NODE
+
+      - name: Install exactly from versioned lockfile
+        working-directory: portal
+        run: npm ci --no-audit --no-fund --ignore-scripts --loglevel=error
+
+      - name: Prove manifests remained unchanged
+        run: git diff --exit-code -- portal/package.json portal/package-lock.json
+
+      - name: Typecheck and build
+        working-directory: portal
+        env:
+          NODE_ENV: production
+        run: |
+          set -o pipefail
+          npm run typecheck 2>&1 | tee ../preview-typecheck.log
+          npm run build 2>&1 | tee ../preview-build.log
+
+      - name: Audit static bundle
+        working-directory: portal
+        run: node scripts/audit-bundle.mjs build | tee ../preview-bundle-audit.json
+
+      - name: Start immutable local preview
+        working-directory: portal
+        run: |
+          nohup npm run serve -- --host 127.0.0.1 --port 3000 > ../preview-server.log 2>&1 &
+          echo $! > ../preview-server.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat ../preview-server.log
+          exit 1
+
+      - name: Execute HTTP smoke suite
+        working-directory: portal
+        env:
+          PORTAL_BASE_URL: http://127.0.0.1:3000
+        run: node scripts/smoke-http.mjs | tee ../preview-smoke.json
+
+      - name: Assert preview process and stop cleanly
+        if: always()
+        run: |
+          if test -f preview-server.pid; then
+            PID=$(cat preview-server.pid)
+            kill "$PID" 2>/dev/null || true
+            wait "$PID" 2>/dev/null || true
+          fi
+
+      - name: Create immutable evidence manifest
+        if: success()
+        run: |
+          find portal/build -type f -print0 | sort -z | xargs -0 sha256sum > preview-artifact-manifest.sha256
+          sha256sum preview-artifact-manifest.sha256 > preview-artifact-manifest.digest
+          test -s preview-smoke.json
+          test -s preview-bundle-audit.json
+
+      - name: Upload preview evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-preview-evidence-${{ github.sha }}
+          path: |
+            preview-identity.txt
+            preview-typecheck.log
+            preview-build.log
+            preview-server.log
+            preview-smoke.json
+            preview-bundle-audit.json
+            preview-artifact-manifest.sha256
+            preview-artifact-manifest.digest
+            portal/vercel.json
+            portal/build/
+          if-no-files-found: warn
+          retention-days: 7
