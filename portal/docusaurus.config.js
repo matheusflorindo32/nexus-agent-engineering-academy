@@ -1,4 +1,5 @@
 const {themes: prismThemes} = require('prism-react-renderer');
+const remarkCrossDocLinks = require('./plugins/remark-cross-doc-links');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -11,7 +12,11 @@ const config = {
   projectName: 'nexus-agent-engineering-academy',
   trailingSlash: false,
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'throw',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+    },
+  },
   i18n: {
     defaultLocale: 'pt-BR',
     locales: ['pt-BR'],
@@ -27,6 +32,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.course.js'),
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
+          remarkPlugins: [remarkCrossDocLinks],
         },
         blog: false,
         theme: {
@@ -45,6 +51,7 @@ const config = {
         sidebarPath: require.resolve('./sidebars.labs.js'),
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
+        remarkPlugins: [remarkCrossDocLinks],
       },
     ],
     [
@@ -56,6 +63,7 @@ const config = {
         sidebarPath: require.resolve('./sidebars.projects.js'),
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
+        remarkPlugins: [remarkCrossDocLinks],
       },
     ],
   ],
