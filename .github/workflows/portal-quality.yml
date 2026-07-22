@@ -57,9 +57,13 @@ jobs:
       - name: Assert critical output
         run: |
           test -f portal/build/index.html
-          test -d portal/build/curso
-          test -d portal/build/laboratorios
-          test -d portal/build/projetos
+          test -f portal/build/curso.html
+          test -f portal/build/laboratorios.html
+          test -f portal/build/projetos.html
+          test -f portal/build/curso/modules/orientation.html
+          test -f portal/build/curso/modules/tool-engineering.html
+          test -f portal/build/curso/modules/evaluation-engineering.html
+          test -f portal/build/projetos/capstone.html
           find portal/build -type f | sort > portal-build-manifest.txt
           sha256sum portal-build-manifest.txt
 
