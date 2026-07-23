@@ -1,0 +1,176 @@
+name: Portal Rollback Rehearsal
+
+on:
+  pull_request:
+    paths:
+      - 'portal/**'
+      - 'course/**'
+      - 'labs/**'
+      - 'projects/**'
+      - '.github/workflows/portal-rollback-rehearsal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-rollback-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rehearse:
+    name: Build, switch and verify rollback
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout candidate SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate
+
+      - name: Checkout rollback target SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          path: rollback-target
+
+      - name: Set up Node.js with lockfile cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.4'
+          cache: npm
+          cache-dependency-path: |
+            candidate/portal/package-lock.json
+            rollback-target/portal/package-lock.json
+
+      - name: Record rehearsal identity
+        run: |
+          {
+            echo "candidate_sha=${{ github.event.pull_request.head.sha || github.sha }}"
+            echo "rollback_sha=${{ github.event.pull_request.base.sha || github.sha }}"
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+            echo "typecheck_harness_sha=$(sha256sum candidate/portal/tsconfig.json | cut -d' ' -f1)"
+          } | tee rollback-identity.txt
+
+      - name: Build candidate exactly
+        working-directory: candidate/portal
+        env:
+          NODE_ENV: production
+          VERCEL_GIT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          NEXUS_BUILD_PROVIDER: github-actions-rollback-rehearsal
+        run: |
+          set -o pipefail
+          npm ci --no-audit --no-fund --ignore-scripts --loglevel=error 2>&1 | tee ../../candidate-install.log
+          npm run typecheck 2>&1 | tee ../../candidate-typecheck.log
+          npm run build 2>&1 | tee ../../candidate-build.log
+
+      - name: Build rollback target with normalized validation harness
+        working-directory: rollback-target/portal
+        env:
+          NODE_ENV: production
+          VERCEL_GIT_COMMIT_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+          NEXUS_BUILD_PROVIDER: github-actions-rollback-rehearsal
+        run: |
+          set -o pipefail
+          npm ci --no-audit --no-fund --ignore-scripts --loglevel=error 2>&1 | tee ../../rollback-install.log
+          cp tsconfig.json ../../rollback-original-tsconfig.json
+          cp ../../candidate/portal/tsconfig.json tsconfig.json
+          npm run typecheck 2>&1 | tee ../../rollback-typecheck.log
+          mv ../../rollback-original-tsconfig.json tsconfig.json
+          git diff --exit-code -- tsconfig.json
+          npm run build 2>&1 | tee ../../rollback-build.log
+
+      - name: Create immutable manifests
+        run: |
+          find candidate/portal/build -type f -print0 | sort -z | xargs -0 sha256sum > candidate-manifest.sha256
+          find rollback-target/portal/build -type f -print0 | sort -z | xargs -0 sha256sum > rollback-manifest.sha256
+          sha256sum candidate-manifest.sha256 > candidate-manifest.digest
+          sha256sum rollback-manifest.sha256 > rollback-manifest.digest
+
+      - name: Serve candidate and run smoke tests
+        env:
+          PORTAL_BASE_URL: http://127.0.0.1:4173
+        run: |
+          setsid npm --prefix candidate/portal run serve -- --host 127.0.0.1 --port 4173 > candidate-server.log 2>&1 &
+          PID=$!
+          echo "$PID" > candidate-server.pid
+          trap 'kill -- -"$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            curl --fail --silent --show-error http://127.0.0.1:4173/ >/dev/null && break
+            sleep 1
+          done
+          curl --fail --silent --show-error http://127.0.0.1:4173/ >/dev/null
+          node candidate/portal/scripts/smoke-http.mjs > candidate-smoke.json
+          curl --fail --silent --show-error http://127.0.0.1:4173/.well-known/nexus-build.json > candidate-build-identity.json
+          node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('candidate-build-identity.json')); if(j.sourceSha !== '${{ github.event.pull_request.head.sha || github.sha }}') process.exit(1);"
+          kill -- -"$PID"
+          wait "$PID" 2>/dev/null || true
+          STOPPED=0
+          for i in $(seq 1 20); do
+            if ! curl --silent http://127.0.0.1:4173/ >/dev/null 2>&1; then STOPPED=1; break; fi
+            sleep 1
+          done
+          test "$STOPPED" = 1
+          trap - EXIT
+
+      - name: Switch to rollback target and verify recovery
+        env:
+          PORTAL_BASE_URL: http://127.0.0.1:4173
+        run: |
+          setsid npm --prefix rollback-target/portal run serve -- --host 127.0.0.1 --port 4173 > rollback-server.log 2>&1 &
+          PID=$!
+          echo "$PID" > rollback-server.pid
+          trap 'kill -- -"$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            curl --fail --silent --show-error http://127.0.0.1:4173/ >/dev/null && break
+            sleep 1
+          done
+          curl --fail --silent --show-error http://127.0.0.1:4173/ >/dev/null
+          node rollback-target/portal/scripts/smoke-http.mjs > rollback-smoke.json
+          curl --fail --silent --show-error http://127.0.0.1:4173/.well-known/nexus-build.json > rollback-build-identity.json
+          node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('rollback-build-identity.json')); if(j.sourceSha !== '${{ github.event.pull_request.base.sha || github.sha }}') process.exit(1);"
+          kill -- -"$PID"
+          wait "$PID" 2>/dev/null || true
+          trap - EXIT
+
+      - name: Assert rollback evidence contract
+        run: |
+          test -s rollback-identity.txt
+          test -s candidate-manifest.sha256
+          test -s rollback-manifest.sha256
+          test -s candidate-smoke.json
+          test -s rollback-smoke.json
+          test -s candidate-build-identity.json
+          test -s rollback-build-identity.json
+          grep -F '"status": "review"' candidate-build-identity.json
+          grep -F '"status": "review"' rollback-build-identity.json
+          git -C rollback-target diff --exit-code
+
+      - name: Upload rollback rehearsal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-rollback-rehearsal-${{ github.sha }}
+          path: |
+            rollback-identity.txt
+            candidate-install.log
+            candidate-typecheck.log
+            candidate-build.log
+            rollback-install.log
+            rollback-typecheck.log
+            rollback-build.log
+            candidate-manifest.sha256
+            candidate-manifest.digest
+            rollback-manifest.sha256
+            rollback-manifest.digest
+            candidate-smoke.json
+            rollback-smoke.json
+            candidate-build-identity.json
+            rollback-build-identity.json
+            candidate-server.log
+            rollback-server.log
+          if-no-files-found: warn
+          retention-days: 7
