@@ -94,10 +94,10 @@ jobs:
         env:
           PORTAL_BASE_URL: http://127.0.0.1:4173
         run: |
-          nohup npm --prefix candidate/portal run serve -- --host 127.0.0.1 --port 4173 > candidate-server.log 2>&1 &
+          setsid npm --prefix candidate/portal run serve -- --host 127.0.0.1 --port 4173 > candidate-server.log 2>&1 &
           PID=$!
           echo "$PID" > candidate-server.pid
-          trap 'kill "$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
+          trap 'kill -- -"$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
           for i in $(seq 1 30); do
             curl --fail --silent --show-error http://127.0.0.1:4173/ >/dev/null && break
             sleep 1
@@ -106,18 +106,24 @@ jobs:
           node candidate/portal/scripts/smoke-http.mjs > candidate-smoke.json
           curl --fail --silent --show-error http://127.0.0.1:4173/.well-known/nexus-build.json > candidate-build-identity.json
           node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('candidate-build-identity.json')); if(j.sourceSha !== '${{ github.event.pull_request.head.sha || github.sha }}') process.exit(1);"
-          kill "$PID"
+          kill -- -"$PID"
           wait "$PID" 2>/dev/null || true
+          STOPPED=0
+          for i in $(seq 1 20); do
+            if ! curl --silent http://127.0.0.1:4173/ >/dev/null 2>&1; then STOPPED=1; break; fi
+            sleep 1
+          done
+          test "$STOPPED" = 1
           trap - EXIT
 
       - name: Switch to rollback target and verify recovery
         env:
           PORTAL_BASE_URL: http://127.0.0.1:4173
         run: |
-          nohup npm --prefix rollback-target/portal run serve -- --host 127.0.0.1 --port 4173 > rollback-server.log 2>&1 &
+          setsid npm --prefix rollback-target/portal run serve -- --host 127.0.0.1 --port 4173 > rollback-server.log 2>&1 &
           PID=$!
           echo "$PID" > rollback-server.pid
-          trap 'kill "$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
+          trap 'kill -- -"$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
           for i in $(seq 1 30); do
             curl --fail --silent --show-error http://127.0.0.1:4173/ >/dev/null && break
             sleep 1
@@ -126,7 +132,7 @@ jobs:
           node rollback-target/portal/scripts/smoke-http.mjs > rollback-smoke.json
           curl --fail --silent --show-error http://127.0.0.1:4173/.well-known/nexus-build.json > rollback-build-identity.json
           node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('rollback-build-identity.json')); if(j.sourceSha !== '${{ github.event.pull_request.base.sha || github.sha }}') process.exit(1);"
-          kill "$PID"
+          kill -- -"$PID"
           wait "$PID" 2>/dev/null || true
           trap - EXIT
 
