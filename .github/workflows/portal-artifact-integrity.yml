@@ -1,0 +1,124 @@
+name: Portal Artifact Integrity
+
+on:
+  pull_request:
+    paths:
+      - 'portal/**'
+      - 'course/**'
+      - 'labs/**'
+      - 'projects/**'
+      - '.github/workflows/portal-artifact-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-artifact-integrity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integrity:
+    name: Build, seal, mutate and verify artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout exact candidate SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Node.js with lockfile cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.4'
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Record integrity identity
+        run: |
+          {
+            echo "source_sha=${{ github.event.pull_request.head.sha || github.sha }}"
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+            sha256sum portal/package.json portal/package-lock.json portal/tsconfig.json portal/scripts/verify-artifact-integrity.mjs
+          } | tee artifact-integrity-identity.txt
+
+      - name: Install and build exactly
+        working-directory: portal
+        env:
+          NODE_ENV: production
+          VERCEL_GIT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -o pipefail
+          npm ci --no-audit --no-fund --ignore-scripts --loglevel=error 2>&1 | tee ../artifact-install.log
+          npm run typecheck 2>&1 | tee ../artifact-typecheck.log
+          npm run build 2>&1 | tee ../artifact-build.log
+
+      - name: Generate cryptographic artifact manifest
+        working-directory: portal
+        run: node scripts/verify-artifact-integrity.mjs generate build ../artifact-integrity.json | tee ../artifact-integrity-generate-report.json
+
+      - name: Verify sealed artifact
+        working-directory: portal
+        run: node scripts/verify-artifact-integrity.mjs verify build ../artifact-integrity.json | tee ../artifact-integrity-verify-report.json
+
+      - name: Prove tampering is rejected
+        working-directory: portal
+        run: |
+          cp build/index.html ../artifact-index-original.html
+          printf '\n<!-- integrity-negative-control -->\n' >> build/index.html
+          set +e
+          node scripts/verify-artifact-integrity.mjs verify build ../artifact-integrity.json > ../artifact-integrity-negative-control.json 2>&1
+          STATUS=$?
+          set -e
+          test "$STATUS" -ne 0
+          mv ../artifact-index-original.html build/index.html
+          node scripts/verify-artifact-integrity.mjs verify build ../artifact-integrity.json > ../artifact-integrity-post-restore.json
+
+      - name: Bind manifest to source identity
+        run: |
+          sha256sum artifact-integrity.json > artifact-integrity.digest
+          node - <<'NODE'
+          const fs = require('fs');
+          const manifest = JSON.parse(fs.readFileSync('artifact-integrity.json', 'utf8'));
+          const identity = fs.readFileSync('artifact-integrity-identity.txt', 'utf8');
+          if (!identity.includes('source_sha=')) throw new Error('source SHA missing');
+          if (!Number.isInteger(manifest.fileCount) || manifest.fileCount < 1) throw new Error('empty manifest');
+          if (!/^[a-f0-9]{64}$/.test(manifest.recordsDigest)) throw new Error('invalid records digest');
+          console.log(JSON.stringify({decision: 'pass', fileCount: manifest.fileCount, totalBytes: manifest.totalBytes, recordsDigest: manifest.recordsDigest}, null, 2));
+          NODE
+
+      - name: Assert evidence contract
+        run: |
+          test -s artifact-integrity-identity.txt
+          test -s artifact-integrity.json
+          test -s artifact-integrity.digest
+          test -s artifact-integrity-generate-report.json
+          test -s artifact-integrity-verify-report.json
+          test -s artifact-integrity-negative-control.json
+          test -s artifact-integrity-post-restore.json
+          grep -F '"decision": "pass"' artifact-integrity-verify-report.json
+          grep -F '"decision": "fail"' artifact-integrity-negative-control.json
+          grep -F '"decision": "pass"' artifact-integrity-post-restore.json
+          git diff --exit-code -- portal/package.json portal/package-lock.json portal/tsconfig.json
+
+      - name: Upload integrity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-artifact-integrity-${{ github.sha }}
+          path: |
+            artifact-integrity-identity.txt
+            artifact-install.log
+            artifact-typecheck.log
+            artifact-build.log
+            artifact-integrity.json
+            artifact-integrity.digest
+            artifact-integrity-generate-report.json
+            artifact-integrity-verify-report.json
+            artifact-integrity-negative-control.json
+            artifact-integrity-post-restore.json
+          if-no-files-found: error
+          retention-days: 7
