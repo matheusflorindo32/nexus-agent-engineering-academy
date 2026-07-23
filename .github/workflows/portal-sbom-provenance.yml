@@ -34,7 +34,10 @@ jobs:
 
       - name: Generate deterministic SBOM
         working-directory: portal
-        run: node scripts/generate-sbom.mjs | tee evidence/sbom/generation-report.json
+        shell: bash
+        run: |
+          mkdir -p evidence/sbom
+          node scripts/generate-sbom.mjs | tee evidence/sbom/generation-report.json
 
       - name: Validate SBOM structure and digest
         working-directory: portal
