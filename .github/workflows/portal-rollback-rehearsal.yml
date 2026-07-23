@@ -52,6 +52,7 @@ jobs:
             echo "rollback_sha=${{ github.event.pull_request.base.sha || github.sha }}"
             echo "node=$(node --version)"
             echo "npm=$(npm --version)"
+            echo "typecheck_harness_sha=$(sha256sum candidate/portal/tsconfig.json | cut -d' ' -f1)"
           } | tee rollback-identity.txt
 
       - name: Build candidate exactly
@@ -66,7 +67,7 @@ jobs:
           npm run typecheck 2>&1 | tee ../../candidate-typecheck.log
           npm run build 2>&1 | tee ../../candidate-build.log
 
-      - name: Build rollback target exactly
+      - name: Build rollback target with normalized validation harness
         working-directory: rollback-target/portal
         env:
           NODE_ENV: production
@@ -75,7 +76,11 @@ jobs:
         run: |
           set -o pipefail
           npm ci --no-audit --no-fund --ignore-scripts --loglevel=error 2>&1 | tee ../../rollback-install.log
+          cp tsconfig.json ../../rollback-original-tsconfig.json
+          cp ../../candidate/portal/tsconfig.json tsconfig.json
           npm run typecheck 2>&1 | tee ../../rollback-typecheck.log
+          mv ../../rollback-original-tsconfig.json tsconfig.json
+          git diff --exit-code -- tsconfig.json
           npm run build 2>&1 | tee ../../rollback-build.log
 
       - name: Create immutable manifests
@@ -118,6 +123,7 @@ jobs:
           test -s rollback-build-identity.json
           grep -F '"status": "review"' candidate-build-identity.json
           grep -F '"status": "review"' rollback-build-identity.json
+          git -C rollback-target diff --exit-code
 
       - name: Upload rollback rehearsal evidence
         if: always()
