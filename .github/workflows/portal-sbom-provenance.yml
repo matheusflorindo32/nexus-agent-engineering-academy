@@ -1,0 +1,106 @@
+name: Portal SBOM Provenance
+
+on:
+  pull_request:
+    paths:
+      - 'portal/**'
+      - '.github/workflows/portal-sbom-provenance.yml'
+      - 'docs/governance/PORTAL_SBOM_PROVENANCE.md'
+
+permissions:
+  contents: read
+
+jobs:
+  sbom-provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Install reproducibly
+        working-directory: portal
+        run: npm ci
+
+      - name: Generate deterministic SBOM
+        working-directory: portal
+        shell: bash
+        run: |
+          mkdir -p evidence/sbom
+          node scripts/generate-sbom.mjs | tee evidence/sbom/generation-report.json
+
+      - name: Validate SBOM structure and digest
+        working-directory: portal
+        shell: bash
+        run: |
+          node --input-type=module <<'EOF'
+          import { createHash } from 'node:crypto';
+          import { readFile } from 'node:fs/promises';
+          const raw = await readFile('evidence/sbom/portal-sbom.cdx.json', 'utf8');
+          const sbom = JSON.parse(raw);
+          if (sbom.bomFormat !== 'CycloneDX' || sbom.specVersion !== '1.5') throw new Error('invalid CycloneDX envelope');
+          if (!Array.isArray(sbom.components) || sbom.components.length === 0) throw new Error('empty components');
+          const actual = createHash('sha256').update(raw).digest('hex');
+          const digest = (await readFile('evidence/sbom/portal-sbom.sha256', 'utf8')).trim().split(/\s+/)[0];
+          if (actual !== digest) throw new Error('SBOM digest mismatch');
+          const duplicate = sbom.components.find((component, index, all) => all.findIndex((x) => x.purl === component.purl) !== index);
+          if (duplicate) throw new Error(`duplicate component: ${duplicate.purl}`);
+          console.log(JSON.stringify({ valid: true, componentCount: sbom.components.length, sha256: actual }));
+          EOF
+
+      - name: Reproducibility control
+        working-directory: portal
+        shell: bash
+        run: |
+          cp evidence/sbom/portal-sbom.cdx.json /tmp/portal-sbom-first.json
+          cp evidence/sbom/portal-sbom.sha256 /tmp/portal-sbom-first.sha256
+          rm -rf evidence/sbom
+          node scripts/generate-sbom.mjs > /tmp/portal-sbom-second-report.json
+          cmp /tmp/portal-sbom-first.json evidence/sbom/portal-sbom.cdx.json
+          cmp /tmp/portal-sbom-first.sha256 evidence/sbom/portal-sbom.sha256
+
+      - name: Record provenance statement
+        working-directory: portal
+        shell: bash
+        run: |
+          cat > evidence/sbom/provenance.json <<EOF
+          {
+            "schemaVersion": 1,
+            "subject": {
+              "name": "portal-sbom.cdx.json",
+              "sha256": "$(cut -d' ' -f1 evidence/sbom/portal-sbom.sha256)"
+            },
+            "source": {
+              "repository": "${GITHUB_REPOSITORY}",
+              "commit": "${GITHUB_SHA}",
+              "pullRequest": "${{ github.event.pull_request.number }}"
+            },
+            "builder": {
+              "workflow": "${GITHUB_WORKFLOW}",
+              "runId": "${GITHUB_RUN_ID}",
+              "runAttempt": "${GITHUB_RUN_ATTEMPT}"
+            },
+            "limitations": [
+              "This is repository-generated evidence, not a cryptographically signed attestation.",
+              "Green CI is not human approval or release authorization."
+            ]
+          }
+          EOF
+
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-sbom-provenance-${{ github.event.pull_request.head.sha }}
+          path: portal/evidence/sbom
+          if-no-files-found: error
+          retention-days: 30
