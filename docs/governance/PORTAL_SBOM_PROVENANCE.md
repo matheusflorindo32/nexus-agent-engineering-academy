@@ -1,8 +1,9 @@
 ---
+id: governance.portal-sbom-provenance
 title: Portal SBOM and Provenance Protocol
+lang: en
 status: review
-owner: NEXUS Academy
-last_reviewed: 2026-07-23
+version: 0.1.0
 ---
 
 # Portal SBOM and Provenance Protocol
