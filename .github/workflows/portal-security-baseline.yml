@@ -1,0 +1,46 @@
+name: Portal Security Baseline
+
+on:
+  pull_request:
+    paths:
+      - 'portal/**'
+      - '.github/workflows/portal-security-baseline.yml'
+      - 'docs/governance/PORTAL_SECURITY_BASELINE.md'
+
+permissions:
+  contents: read
+
+jobs:
+  security-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Install reproducibly
+        working-directory: portal
+        run: npm ci
+
+      - name: Run security baseline
+        working-directory: portal
+        run: node scripts/security-baseline.mjs
+
+      - name: Upload security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-security-baseline-${{ github.event.pull_request.head.sha }}
+          path: portal/evidence/security
+          if-no-files-found: error
+          retention-days: 30
