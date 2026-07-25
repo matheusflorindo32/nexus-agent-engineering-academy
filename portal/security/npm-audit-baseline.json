@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "status": "review",
+  "recordedAt": "2026-07-25",
+  "reviewBy": "2026-08-31",
+  "source": "npm audit --json",
+  "maximumAllowed": {
+    "critical": 0,
+    "high": 19,
+    "moderate": 6
+  },
+  "knownAdvisorySources": [
+    1113686,
+    1119440,
+    1119441,
+    1124334
+  ],
+  "rationale": [
+    "The current Docusaurus 3.10.2 dependency graph reports inherited npm advisories without a complete automated fix.",
+    "This baseline is temporary risk visibility, not acceptance of safety or a vulnerability waiver.",
+    "Any critical vulnerability, count increase, new advisory source or expired review date fails the gate."
+  ],
+  "limitations": [
+    "Counts include transitive propagation across the dependency graph.",
+    "A passing regression gate does not mean the known vulnerabilities were remediated.",
+    "Human review and dependency upgrade investigation remain mandatory."
+  ]
+}
