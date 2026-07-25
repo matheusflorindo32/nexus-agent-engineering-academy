@@ -1,0 +1,52 @@
+name: Portal Accessibility Performance
+
+on:
+  pull_request:
+    paths:
+      - 'portal/**'
+      - '.github/workflows/portal-accessibility-performance.yml'
+      - 'docs/governance/PORTAL_ACCESSIBILITY_PERFORMANCE.md'
+
+permissions:
+  contents: read
+
+jobs:
+  accessibility-performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Install reproducibly
+        working-directory: portal
+        run: npm ci
+
+      - name: Typecheck and build
+        working-directory: portal
+        run: |
+          npm run typecheck
+          npm run build
+
+      - name: Run accessibility and performance baseline
+        working-directory: portal
+        run: node scripts/accessibility-performance-baseline.mjs
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-accessibility-performance-${{ github.event.pull_request.head.sha }}
+          path: portal/evidence/accessibility-performance
+          if-no-files-found: error
+          retention-days: 30
