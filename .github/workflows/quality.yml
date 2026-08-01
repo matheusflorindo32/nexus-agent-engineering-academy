@@ -32,7 +32,7 @@ jobs:
 
       - name: Upload validation evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nexus-python-validation-evidence
           path: validation-evidence/python.json
@@ -97,7 +97,7 @@ jobs:
 
       - name: Upload TypeScript validation evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nexus-typescript-validation-evidence
           path: validation-evidence/typescript.json
