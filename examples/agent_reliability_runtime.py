@@ -142,7 +142,9 @@ class ActionLedger:
         if receipt.tool_name != tool_name:
             raise ValueError("tool does not match requested operation")
         if receipt.status in {"EXECUTED", "VERIFIED"}:
-            return replace(receipt, retry_count=receipt.retry_count + 1)
+            retried = replace(receipt, retry_count=receipt.retry_count + 1)
+            self._receipts[operation_id] = retried
+            return retried
         if require_approval and operation_id not in self._approvals:
             raise PermissionError("operation has no scoped approval")
         if receipt.status == "DENIED":
@@ -267,9 +269,10 @@ def run_self_tests() -> int:
         return "resource-1", {"ok": True}
 
     ledger.execute_once("op-1", "publish", effect)
-    ledger.execute_once("op-1", "publish", effect)
+    retried = ledger.execute_once("op-1", "publish", effect)
     verified = ledger.verify("op-1", "resource-1")
     checks.append(("idempotent side effect", calls["count"] == 1))
+    checks.append(("retry receipt persisted", retried.retry_count == 1 and verified.retry_count == 1))
     checks.append(("verified receipt", verified.status == "VERIFIED"))
 
     with tempfile.TemporaryDirectory() as tmp:
