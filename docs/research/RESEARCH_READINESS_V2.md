@@ -12,7 +12,7 @@ reviewed_at: 2026-08-25
 
 O NEXUS está pronto para produzir comparações defensáveis entre frameworks/arquiteturas de agentes?
 
-**Resposta atual:** parcialmente. A fundação já permite desenhar estudos, mas ainda faltam adapters equivalentes, ambientes versionados e resultados executados para alegar comparações científicas.
+**Resposta atual:** parcialmente. A fundação já permite desenhar estudos e o reference layer possui CI/benchmark smoke reproduzíveis, mas ainda faltam adapters equivalentes, ambientes/versionamento experimental e resultados multi-framework para alegar conclusões científicas comparativas.
 
 ## Hipóteses prioritárias
 
@@ -46,6 +46,12 @@ Taxonomia explícita de confiança e policy gate fora do modelo reduzirão viola
 - Duplicate Side Effect Rate (DSER);
 - Context Trust Violation Rate (CTVR).
 
+## Evidência reproduzível atual
+
+No SHA `92b3458ba13c98800a86106ed4b0a545b8124e63`, o draft PR #53 executou com sucesso `NEXUS Quality`, `Documentation quality` e `Security - Secret Scan`. Os jobs de Python self-tests/contracts e TypeScript boundary contract também concluíram com sucesso. O benchmark `hardening_v2_smoke.py` faz parte do quality gate.
+
+Essa evidência valida o reference layer configurado naquele SHA, não produz comparação entre frameworks.
+
 ## Requisitos de desenho experimental
 
 1. Mesma tarefa e dataset para frameworks comparados.
@@ -64,9 +70,10 @@ Taxonomia explícita de confiança e policy gate fora do modelo reduzirão viola
 | Componente | Readiness |
 |---|---|
 | Contratos conceituais | ALTO |
-| Segurança e threat modeling | MÉDIO-ALTO, V2 em revisão |
-| Runtime determinístico de hardening | MÉDIO |
-| Testes unitários de hardening | MÉDIO, aguardando CI |
+| Segurança e threat modeling | ALTO para desenho; V2 em revisão para adoção final |
+| Runtime determinístico de hardening | MÉDIO-ALTO, CI comprovado |
+| Testes unitários de hardening | ALTO no escopo do reference layer, CI comprovado |
+| Benchmark smoke determinístico | ALTO para validação interna; NÃO é benchmark de frameworks |
 | Adapters reais comparáveis | BAIXO/PARCIAL |
 | Dataset benchmark multi-framework | BAIXO |
 | Protocolo preregistrável | PARCIAL |
@@ -80,4 +87,4 @@ Antes de qualquer claim do tipo “framework A é mais seguro/confiável que B�
 
 ## Classificação
 
-**Research-ready para desenho/piloto; não research-ready para conclusão comparativa pública.**
+**Research-ready para desenho/piloto controlado; não research-ready para conclusão comparativa pública.**
