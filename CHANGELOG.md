@@ -30,6 +30,10 @@ Todas as mudanças relevantes serão registradas aqui. O formato segue
 - Testes de timeout, cancelamento, resume, integridade HITL, efeitos duplicados, Skill integrity e conteúdo MCP não confiável.
 - Benchmark smoke determinístico para VAR, RSR, DSER e CTVR.
 - Technology Radar e Framework Upgrade Gate para adoção controlada de SDKs/frameworks agentic.
+- Provider Adapters V3 com baseline oficial verificado para OpenAI Agents SDK 0.22.0, Google ADK Python 2.7.1 e MCP 2026-07-28.
+- Contract Trial comum para os três adapters prioritários, com VAR, RSR, DSER e CTVR e escopo de claim explícito.
+- Threat Model V3 para fronteiras de providers/protocolo e ADR de paridade de contrato antes de Runtime Trial.
+- Research Readiness V3 e revisão independente/scorecard específicos para comparação futura de providers.
 
 ### Changed
 
@@ -38,7 +42,8 @@ Todas as mudanças relevantes serão registradas aqui. O formato segue
 - Pipeline de observabilidade passa a sanitizar antes de persistir, bufferizar ou quarentenar.
 - Readiness, registro de controles, auditoria e referências passam a distinguir evidência histórica do estado da branch final.
 - Pré-requisito do Módulo 09 corrigido para o ID canônico do Módulo 08.
-- Quality gates passam a executar o reference runtime e benchmark smoke do Hardening V2.
+- Quality gates passam a executar o reference runtime, benchmark smoke do Hardening V2 e Contract Trial dos adapters V3.
+- Technology Radar distingue `TRIAL — contract only` de execução de runtime real.
 
 ### Security
 
@@ -47,6 +52,7 @@ Todas as mudanças relevantes serão registradas aqui. O formato segue
 - Skills externas passam a ser tratadas como supply-chain não confiável até auditoria e aprovação.
 - Aprovação, execução e verificação de ações são modeladas como estados independentes.
 - Conteúdo externo/MCP não pode elevar seu próprio nível de confiança por instrução textual.
+- Findings upstream de OpenAI/Google/MCP passam por classificação explícita antes de qualquer claim local.
 
 ### Fixed
 
@@ -54,3 +60,5 @@ Todas as mudanças relevantes serão registradas aqui. O formato segue
 - Falso negativo do validador diante de prefixos duplicados.
 - Possível exposição de segredo em atributo permitido ou evento incompatível.
 - Reference runtime passa a persistir o `retry_count` de tentativas idempotentes sem repetir o side effect.
+- Teste dos Provider Adapters V3 deixa de usar import dinâmico incompatível com `dataclass`.
+- Recovery Success Rate do Contract Trial deixa de ser assumida e passa a exigir uma falha terminal sintética observável e bounded.
