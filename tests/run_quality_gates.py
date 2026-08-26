@@ -29,6 +29,7 @@ COMMANDS = (
     ("observability-pipeline", (sys.executable, "examples/observability_pipeline.py", "--self-test")),
     ("agent-hardening-v2", (sys.executable, "examples/agent_reliability_runtime.py")),
     ("hardening-v2-benchmark-smoke", (sys.executable, "benchmarks/hardening_v2_smoke.py", "--iterations", "5")),
+    ("provider-adapter-contracts-v3", (sys.executable, "examples/provider_adapter_contracts.py")),
 )
 
 
@@ -81,6 +82,7 @@ def main() -> int:
             "Secret scanning is pattern-based and cannot prove universal secret detection.",
             "Hardening V2 reliability tests are deterministic reference tests; provider/framework integration requires separate adapters.",
             "Hardening V2 benchmark smoke validates the NEXUS reference control plane only and is not a framework comparison.",
+            "Provider Adapters V3 benchmark validates equal NEXUS contract semantics only; no provider SDK/model/API is invoked and no provider performance claim is valid.",
         ],
     }
     output_path = args.output if args.output.is_absolute() else ROOT / args.output
