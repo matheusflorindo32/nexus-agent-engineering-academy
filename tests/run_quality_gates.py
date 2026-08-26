@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = (
     ("repository-validator", (sys.executable, "tests/validate_repository.py")),
     ("unit-tests", (sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v")),
-    ("compileall", (sys.executable, "-m", "compileall", "-q", "examples", "tests")),
+    ("compileall", (sys.executable, "-m", "compileall", "-q", "examples", "tests", "benchmarks")),
     ("minimal-readonly-agent", (sys.executable, "examples/minimal_readonly_agent.py", "--demo")),
     ("context-retriever", (sys.executable, "examples/context_retriever.py")),
     ("safe-tool-boundary", (sys.executable, "examples/safe_tool_boundary.py", "--self-test")),
@@ -28,6 +28,7 @@ COMMANDS = (
     ("production-runtime", (sys.executable, "examples/production_runtime.py", "--self-test")),
     ("observability-pipeline", (sys.executable, "examples/observability_pipeline.py", "--self-test")),
     ("agent-hardening-v2", (sys.executable, "examples/agent_reliability_runtime.py")),
+    ("hardening-v2-benchmark-smoke", (sys.executable, "benchmarks/hardening_v2_smoke.py", "--iterations", "5")),
 )
 
 
@@ -79,6 +80,7 @@ def main() -> int:
             "External-link availability and formal ABNT conformance are outside this automated suite.",
             "Secret scanning is pattern-based and cannot prove universal secret detection.",
             "Hardening V2 reliability tests are deterministic reference tests; provider/framework integration requires separate adapters.",
+            "Hardening V2 benchmark smoke validates the NEXUS reference control plane only and is not a framework comparison.",
         ],
     }
     output_path = args.output if args.output.is_absolute() else ROOT / args.output
