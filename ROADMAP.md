@@ -27,9 +27,31 @@ Impacto educacional, evidência, segurança e manutenção vêm antes da quantid
 - [x] Adicionar primeira Skill compatível com o formato Agent Skills (`skill-supply-chain-auditor`).
 - [x] Adicionar testes unitários de hardening e benchmark smoke determinístico.
 - [x] Criar technology radar e framework upgrade policy.
-- [ ] Obter CI verde no SHA final da branch `feat/agent-hardening-v2`.
-- [ ] Executar auditoria independente e fechar achados críticos/altos.
-- [ ] Abrir PR sem auto-merge.
+- [x] Obter CI verde no SHA final do PR #53.
+- [x] Executar auditoria independente no reference layer.
+- [x] Abrir PR #53 sem auto-merge.
+
+### Provider Adapters V3 — contract parity
+
+- [x] Verificar fontes oficiais atuais de OpenAI Agents SDK, Google ADK e MCP.
+- [x] Registrar versões verificadas: OpenAI Agents SDK 0.22.0, Google ADK Python 2.7.1, MCP 2026-07-28.
+- [x] Classificar achados upstream antes de qualquer claim local.
+- [x] Criar adapters experimentais de contrato com o mesmo oracle NEXUS.
+- [x] Adicionar testes de paridade VAR/RSR/DSER/CTVR sem chamadas de provider.
+- [x] Atualizar Technology Radar, Threat Model e Research Readiness.
+- [x] Obter CI verde após correções do Contract Trial; o SHA final deste milestone ainda deve ser revalidado após mudanças documentais finais.
+- [x] Executar revisão independente V3 e corrigir achados metodológicos encontrados.
+- [x] Abrir PR #54 como stacked PR, sem auto-merge.
+
+### Provider Runtime Trial — próximo gate
+
+- [ ] Criar protocolo versionado antes de chamadas pagas/model-dependent.
+- [ ] Fixar dependências/lockfiles e ambientes reproduzíveis por adapter.
+- [ ] Executar OpenAI Agents SDK real com tarefas/falhas comuns.
+- [ ] Executar Google ADK real, incluindo A2A/HITL pause-resume e state integrity.
+- [ ] Executar MCP 2026-07-28 real com version negotiation, MRTR e casos adversariais.
+- [ ] Medir task success, correctness, latency, tokens/custo, retries e métricas de segurança.
+- [ ] Publicar apenas resultados realmente executados e vinculados a SHA/versões.
 
 ### Core Curriculum — v0.2
 
