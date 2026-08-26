@@ -1,7 +1,6 @@
 """Contract tests for Provider Adapters V3."""
 from __future__ import annotations
 
-import importlib.util
 from pathlib import Path
 import sys
 import unittest
@@ -11,10 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "examples"
 if str(EXAMPLES) not in sys.path:
     sys.path.insert(0, str(EXAMPLES))
-SPEC = importlib.util.spec_from_file_location("provider_adapter_contracts", EXAMPLES / "provider_adapter_contracts.py")
-assert SPEC and SPEC.loader
-adapters = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(adapters)
+
+import provider_adapter_contracts as adapters
 
 
 class ProviderAdapterContractTests(unittest.TestCase):
