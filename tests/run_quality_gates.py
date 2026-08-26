@@ -27,6 +27,7 @@ COMMANDS = (
     ("security-guardrails", (sys.executable, "examples/security_guardrails.py", "--self-test")),
     ("production-runtime", (sys.executable, "examples/production_runtime.py", "--self-test")),
     ("observability-pipeline", (sys.executable, "examples/observability_pipeline.py", "--self-test")),
+    ("agent-hardening-v2", (sys.executable, "examples/agent_reliability_runtime.py")),
 )
 
 
@@ -77,6 +78,7 @@ def main() -> int:
             "TypeScript strict is executed and evidenced by the independent CI job.",
             "External-link availability and formal ABNT conformance are outside this automated suite.",
             "Secret scanning is pattern-based and cannot prove universal secret detection.",
+            "Hardening V2 reliability tests are deterministic reference tests; provider/framework integration requires separate adapters.",
         ],
     }
     output_path = args.output if args.output.is_absolute() else ROOT / args.output
