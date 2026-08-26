@@ -39,9 +39,9 @@ Impacto educacional, evidência, segurança e manutenção vêm antes da quantid
 - [x] Criar adapters experimentais de contrato com o mesmo oracle NEXUS.
 - [x] Adicionar testes de paridade VAR/RSR/DSER/CTVR sem chamadas de provider.
 - [x] Atualizar Technology Radar, Threat Model e Research Readiness.
-- [ ] Obter CI verde no SHA final da branch `feat/provider-adapters-v3`.
-- [ ] Executar revisão independente V3.
-- [ ] Abrir PR sem auto-merge.
+- [x] Obter CI verde após correções do Contract Trial; o SHA final deste milestone ainda deve ser revalidado após mudanças documentais finais.
+- [x] Executar revisão independente V3 e corrigir achados metodológicos encontrados.
+- [x] Abrir PR #54 como stacked PR, sem auto-merge.
 
 ### Provider Runtime Trial — próximo gate
 
