@@ -64,17 +64,21 @@ compara trade-offs e termina em um artefato demonstrável.
 flowchart TB
     D[docs/\nconceitos e arquitetura] --> C[course/\nsequência pedagógica]
     D --> A[agents/\npadrões de agentes]
+    D --> S[skills/\nprocessos auditáveis]
     D --> L[loops/\ncontrole e confiabilidade]
     P[platforms/\nadapters] --> C
     A --> B[labs/\nexperimentos]
+    S --> B
     L --> B
     C --> B
     B --> R[projects/\nportfólio real]
+    B --> K[benchmarks/\nevidência comparável]
     T[templates/] --> B
     T --> R
     E[examples/] --> B
     Q[tests/ + CI] -. qualidade .-> D
     Q -. qualidade .-> B
+    Q -. qualidade .-> K
     Q -. qualidade .-> R
 ```
 
@@ -82,6 +86,27 @@ Leia a [decisão arquitetural completa](docs/architecture/overview.md), as
 [regras editoriais](docs/standards/content-standard.md), o [contrato dos agentes](AGENTS.md), o
 [loop mestre de qualidade](loops/master-quality-loop.md) e a
 [auditoria Premium Elite](docs/governance/PREMIUM_ELITE_AUDIT.md).
+
+## Hardening V2
+
+A camada de hardening adiciona contratos explícitos para confiabilidade e integridade de ação sem declarar que bugs
+upstream são automaticamente vulnerabilidades locais. O ciclo defensivo é **Discover → Verify → Reproduce → Measure
+→ Mitigate → Test → Document → Automate**.
+
+Controles em revisão incluem:
+
+- Context Trust Model T0–T7;
+- `REQUESTED → APPROVED → EXECUTED → VERIFIED` para ações externas;
+- `operation_id`, Execution Receipts e idempotência para side effects;
+- timeout, cancelamento e propagação de falha terminal;
+- supply-chain de Agent Skills com staging, hash, promoção atômica e rollback;
+- Technology Radar e Framework Upgrade Gate;
+- benchmark smoke determinístico para VAR, RSR, DSER e CTVR.
+
+Veja o [Threat Model V2](docs/security/THREAT_MODEL_V2.md), o
+[Agent Reliability Model](docs/reliability/AGENT_RELIABILITY_MODEL.md), a
+[política de supply-chain de Skills](docs/security/SKILL_SUPPLY_CHAIN_SECURITY.md) e o
+[Technology Radar](docs/radar/AGENT_TECH_RADAR.md).
 
 ## Diferenciais
 
@@ -120,6 +145,7 @@ Consulte a [matriz e o contrato de adapter](platforms/README.md).
 ```text
 .
 ├── agents/       # padrões, papéis, memória, handoffs e coordenação
+├── benchmarks/   # métricas e experimentos comparáveis/machine-readable
 ├── course/       # sequência pedagógica e módulos
 ├── docs/         # conceitos, arquitetura, segurança, padrões e referências
 ├── examples/     # implementações mínimas comparáveis
@@ -127,8 +153,9 @@ Consulte a [matriz e o contrato de adapter](platforms/README.md).
 ├── loops/        # máquinas de estado, budgets e stop conditions
 ├── platforms/    # adapters e matriz de capacidades
 ├── projects/     # projetos integradores e capstone
+├── skills/       # Agent Skills pequenas, versionáveis e auditáveis
 ├── templates/    # contratos, ADRs, ameaças e avaliações reutilizáveis
-├── tests/        # validação estrutural e editorial
+├── tests/        # validação estrutural, segurança e regressão
 └── .github/      # CI, templates, ownership e dependências
 ```
 
@@ -136,9 +163,10 @@ Consulte a [matriz e o contrato de adapter](platforms/README.md).
 
 - Markdown + YAML frontmatter, compatíveis com Obsidian.
 - Mermaid para diagramas versionáveis.
-- Python padrão para validadores sem dependências de runtime.
+- Python padrão para validadores e reference controls de baixo bootstrap.
 - GitHub Actions, Dependabot, CODEOWNERS e Conventional Commits.
-- Adapters podem usar Python, TypeScript ou automação visual quando o módulo exigir.
+- Agent Skills em diretórios com `SKILL.md` e metadados mínimos compatíveis com o formato adotado.
+- Adapters podem usar Python, Go, TypeScript ou automação visual quando o experimento exigir.
 
 ## Começar
 
@@ -146,6 +174,7 @@ Consulte a [matriz e o contrato de adapter](platforms/README.md).
 git clone https://github.com/matheusflorindo32/nexus-agent-engineering-academy.git
 cd nexus-agent-engineering-academy
 python tests/validate_repository.py
+python tests/run_quality_gates.py
 ```
 
 Depois, siga o [Módulo 00](course/modules/00-orientation/README.md) e registre decisões relevantes com o
@@ -153,8 +182,8 @@ Depois, siga o [Módulo 00](course/modules/00-orientation/README.md) e registre 
 
 ## Roadmap
 
-Foundation → Core Curriculum → Production Engineering → Ecosystem → Stable. Veja marcos, critérios e entregas no
-[ROADMAP](ROADMAP.md).
+Foundation → Hardening V2 → Core Curriculum → Production Engineering → Ecosystem → Stable. Veja marcos, critérios e
+entregas no [ROADMAP](ROADMAP.md).
 
 ## Contribuir
 
