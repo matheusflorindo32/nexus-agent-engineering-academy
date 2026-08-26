@@ -12,7 +12,13 @@ from dataclasses import asdict, dataclass
 import json
 from typing import Iterable
 
-from agent_reliability_runtime import ActionLedger, Approval, may_override
+from agent_reliability_runtime import (
+    ActionLedger,
+    Approval,
+    BoundedChannel,
+    TransportClosed,
+    may_override,
+)
 
 
 @dataclass(frozen=True)
@@ -96,9 +102,16 @@ def _verified_action_scenario() -> float:
 
 
 def _recovery_scenario() -> float:
-    # The provider-neutral contract requires a bounded failure outcome rather than
-    # an indefinite wait. The transport primitive itself is tested separately.
-    return 1.0
+    """Verify that a terminal transport failure becomes a bounded observable error."""
+    channel: BoundedChannel[str] = BoundedChannel()
+    channel.fail(ConnectionError("synthetic transport failure"))
+    try:
+        channel.get(0.05)
+    except TransportClosed:
+        return 1.0
+    except TimeoutError:
+        return 0.0
+    return 0.0
 
 
 def _duplicate_side_effect_scenario() -> float:
@@ -133,11 +146,12 @@ def run_contract(adapter: AdapterSpec) -> ScenarioResult:
 
 
 def benchmark(specs: Iterable[AdapterSpec] = SPECS) -> dict[str, object]:
-    results = [run_contract(spec) for spec in specs]
+    materialized = tuple(specs)
+    results = [run_contract(spec) for spec in materialized]
     return {
         "schema": "nexus.provider-adapter-contract-benchmark.v1",
         "scope": "deterministic NEXUS contract parity; not real provider performance",
-        "specs": [asdict(spec) for spec in specs],
+        "specs": [asdict(spec) for spec in materialized],
         "results": [asdict(result) for result in results],
         "limitations": [
             "No provider SDK is installed or invoked by this benchmark.",
