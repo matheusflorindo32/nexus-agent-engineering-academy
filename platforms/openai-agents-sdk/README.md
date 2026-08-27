@@ -11,8 +11,8 @@ verified: 2026-08-26
 Fonte primária: documentação e releases oficiais de `openai/openai-agents-python`.
 
 - Versão estável verificada: `0.22.0` (2026-08-19).
-- Status NEXUS: `experimental-contract`.
-- Execução real do SDK neste milestone: **não**.
+- Status NEXUS: `trial-runtime-offline`.
+- Execução real do SDK: **sim**, com `Runner`/tool pipeline reais e `ScriptedModel` oficial, sem API/provider externo.
 
 ## Capacidades verificadas
 
@@ -49,3 +49,7 @@ Antes de chamar este adapter de `verified`, demonstrar com SDK pinado:
 7. MCP/tool outputs tratados pelo Context Trust Model.
 
 O benchmark V3 atual mede apenas o **contrato NEXUS determinístico**, não desempenho ou segurança do runtime OpenAI real.
+
+## Runtime Trial V1
+
+O SDK 0.22.0 foi instalado e executado em CI. O cenário determinístico completou o marcador, propagou falha injetada de forma bounded e atravessou duas tool calls idênticas com uma única execução do side effect NEXUS. VAR=1.0 e DSER=0.0 valem para a combinação **SDK runtime + controles NEXUS**, não como garantia nativa do SDK.
