@@ -31,7 +31,7 @@ class ProviderRuntimeTrialV1StaticTests(unittest.TestCase):
         protocol = (ROOT / "docs" / "research" / "PROTOCOL_PROVIDER_RUNTIME_COMPARISON_V1.md").read_text(
             encoding="utf-8"
         )
-        self.assertIn("real SDK runtime + simulated model/in-process server", protocol)
+        self.assertIn("Runtime Trial com SDK/protocolo real e modelo simulado/in-process", protocol)
         self.assertIn("Provider/Model Trial", protocol)
         self.assertIn("nenhuma credencial real", protocol)
 
