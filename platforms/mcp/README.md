@@ -11,8 +11,8 @@ verified: 2026-08-26
 Fonte primária: especificação e release oficiais de `modelcontextprotocol/modelcontextprotocol`.
 
 - Revisão estável verificada: `2026-07-28`.
-- Status NEXUS: `experimental-contract`.
-- Execução real de SDK/servidor MCP neste milestone: **não**.
+- Status NEXUS: `trial-runtime-in-process`.
+- Execução real de SDK/servidor MCP: **sim**, Python SDK 2.1.1 com `MCPServer` + `Client` in-process.
 
 ## Mudanças arquiteturais verificadas
 
@@ -44,3 +44,7 @@ Conteúdo vindo de servidor MCP, incluindo tool metadata e resultados, entra com
 9. traces e logs sem credenciais.
 
 O benchmark V3 atual não mede latência, disponibilidade ou segurança de implementações MCP reais.
+
+## Runtime Trial V1
+
+O Python SDK 2.1.1 foi instalado e executado em CI. O client negociou `2026-07-28`, chamou uma tool de marcador e observou uma `ToolError` determinística sem hang. HTTP, OAuth, DNS, MRTR e server discovery remoto permanecem NOT_EXECUTED.
