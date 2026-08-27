@@ -35,6 +35,15 @@ class ProviderRuntimeTrialV1StaticTests(unittest.TestCase):
         self.assertIn("Provider/Model Trial", protocol)
         self.assertIn("nenhuma credencial real", protocol)
 
+    def test_runtime_evidence_binds_pr_head_sha(self) -> None:
+        workflow = (ROOT / ".github" / "workflows" / "provider-runtime-trial.yml").read_text(
+            encoding="utf-8"
+        )
+        common = (ROOT / "runtime_trials" / "common.py").read_text(encoding="utf-8")
+        self.assertGreaterEqual(workflow.count("NEXUS_HEAD_SHA"), 3)
+        self.assertIn('github.event.pull_request.head.sha', workflow)
+        self.assertIn('"workflow_sha"', common)
+
 
 if __name__ == "__main__":
     unittest.main()
