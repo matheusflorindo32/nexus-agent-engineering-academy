@@ -66,6 +66,13 @@ As fronteiras de maior interesse de segurança não foram exercitadas neste smok
 
 **Tratamento:** permanecem POTENTIALLY_APPLICABLE/MONITORING e são P0 do próximo laboratório adversarial.
 
+### F8 — runtime source fora do compileall central
+**Severidade:** média/test coverage.
+
+Uma alteração no helper de evidence introduziu sintaxe inválida. O workflow específico de runtime detectou a falha, mas o NEXUS Quality permaneceu verde porque o gate `compileall` não incluía `runtime_trials/`.
+
+**Correção:** incluir `runtime_trials` no compileall central. Isso converteu a falha encontrada em regressão bloqueável por dois caminhos independentes.
+
 ## Divergências dos revisores
 
 - **SRE:** aceita o V1 como runtime smoke porque há timeouts, failure injection e artifacts; não aceita chamar de chaos engineering completo.
