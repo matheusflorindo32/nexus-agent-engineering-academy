@@ -1,0 +1,104 @@
+name: Provider Runtime Trial V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: provider-runtime-v1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  openai-runtime:
+    name: OpenAI Agents SDK 0.22.0 offline runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned runtime
+        run: |
+          python -m pip install --disable-pip-version-check --no-input -r requirements/runtime/openai.txt
+          python -m pip check
+      - name: Execute real SDK runtime trial
+        env:
+          OPENAI_API_KEY: ""
+        run: |
+          mkdir -p validation-evidence
+          python runtime_trials/openai_runtime_trial.py --output validation-evidence/runtime-openai.json
+          python -m pip freeze > validation-evidence/runtime-openai-freeze.txt
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: provider-runtime-openai-v1
+          path: validation-evidence/runtime-openai*
+          if-no-files-found: error
+          retention-days: 30
+
+  google-adk-runtime:
+    name: Google ADK 2.8.0 offline runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned runtime
+        run: |
+          python -m pip install --disable-pip-version-check --no-input -r requirements/runtime/google-adk.txt
+          python -m pip check
+      - name: Execute real ADK runtime trial
+        env:
+          ADK_EXPERIMENTAL_TELEMETRY: "false"
+        run: |
+          mkdir -p validation-evidence
+          python runtime_trials/google_adk_runtime_trial.py --output validation-evidence/runtime-google-adk.json
+          python -m pip freeze > validation-evidence/runtime-google-adk-freeze.txt
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: provider-runtime-google-adk-v1
+          path: validation-evidence/runtime-google-adk*
+          if-no-files-found: error
+          retention-days: 30
+
+  mcp-runtime:
+    name: MCP Python SDK 2.1.1 in-process runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned runtime
+        run: |
+          python -m pip install --disable-pip-version-check --no-input -r requirements/runtime/mcp.txt
+          python -m pip check
+      - name: Execute real MCP runtime trial
+        run: |
+          mkdir -p validation-evidence
+          python runtime_trials/mcp_runtime_trial.py --output validation-evidence/runtime-mcp.json
+          python -m pip freeze > validation-evidence/runtime-mcp-freeze.txt
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: provider-runtime-mcp-v1
+          path: validation-evidence/runtime-mcp*
+          if-no-files-found: error
+          retention-days: 30
