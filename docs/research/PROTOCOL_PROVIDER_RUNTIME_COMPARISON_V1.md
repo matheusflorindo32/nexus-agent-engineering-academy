@@ -2,7 +2,7 @@
 id: research.protocol-provider-runtime-trial-v1
 title: Provider Runtime Trial V1 — protocolo experimental
 lang: pt-BR
-status: preregistered-in-repository
+status: review
 reviewed_at: 2026-08-26
 ---
 
