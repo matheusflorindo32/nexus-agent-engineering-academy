@@ -24,13 +24,13 @@ Registrar tecnologias relevantes sem converter descoberta em dependência autom�
 | Tecnologia | Versão verificada | Estado | Prioridade | Justificativa |
 |---|---|---:|---:|---|
 | Python stdlib validation core | Python 3.12 CI | ADOPT | 10/10 | Base simples, reproduzível e de baixo bootstrap. |
-| OpenAI Agents SDK | 0.22.0 | TRIAL — contract only | 9.6/10 | Adapter de contrato e paridade criado; SDK real ainda não executado. |
-| Google ADK Python | 2.7.1 | TRIAL — contract only | 9.6/10 | Adapter de contrato criado; A2A/HITL real continua gated por testes de integridade. |
-| MCP | 2026-07-28 | TRIAL — contract only | 10/10 | Revisão estável atual mapeada; runtime/SDK real ainda não executado. |
+| OpenAI Agents SDK | 0.22.0 | TRIAL — runtime offline | 9.7/10 | Runner/tool pipeline real executado com ScriptedModel oficial; provider/model externo não testado. |
+| Google ADK Python | 2.8.0 | TRIAL — runtime offline | 9.7/10 | Runner/session real executado com BaseLlm offline; A2A/HITL real continua gated. |
+| MCP | Python SDK 2.1.1 / spec 2026-07-28 | TRIAL — runtime in-process | 10/10 | Client/server real executado in-process com negociação 2026-07-28; HTTP/auth/MRTR remoto pendente. |
 | Google ADK Go | — | ASSESS | 9.3/10 | Relevante para concorrência e serviços; não criar integração só por paridade. |
 | Agent Skills specification/patterns | current upstream | ASSESS/TRIAL parcial | 10/10 | Supply-chain auditor e lifecycle seguro já existem no reference layer. |
 | LangGraph | — | ASSESS | 8.5/10 | Útil para stateful graphs/checkpointing; entra depois dos três adapters prioritários. |
-| Microsoft Agent Framework | — | ASSESS | 8.5/10 | Relevante para enterprise/workflows; acompanhar maturidade. |
+| Microsoft Agent Framework | Python 1.15.0 / .NET 1.19.0 | ASSESS/MONITORING | 8.8/10 | Relevante e atual, mas V1 bloqueia runtime até Contract Trial paritário. |
 | CrewAI | — | ASSESS | 8/10 | Bom para papéis/flows; não priorizar sobre contratos e reliability. |
 | AutoGen | — | HOLD for new core work | 6/10 | Estudar padrões, não usar como default sem evidência atual. |
 | OpenTelemetry | múltiplas integrações | TRIAL/partial | 9.5/10 | Adequado para tracing distribuído; redaction e schema NEXUS são obrigatórios. |
@@ -70,3 +70,7 @@ DISCOVERED → TRIAGED → AUDITED → CONTRACT_TRIAL → RUNTIME_TRIAL → APPR
 ## Regra
 
 Nenhuma tecnologia muda para `RUNTIME_TRIAL` ou `ADOPT` sem dependência/version pin, fonte oficial, threat review, testes equivalentes, rollback e evidência do SHA executado.
+
+## Provider Runtime Trial V1
+
+O V1 promoveu OpenAI Agents SDK, Google ADK e MCP do estágio de contrato para runtime controlado/offline. Isso **não** promove nenhum deles a ADOPT e não cria ranking de providers. O próximo gate exige fechar A2A/HITL, MCP remoto/auth/MRTR, observabilidade runtime e supply-chain locking.
