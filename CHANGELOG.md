@@ -15,6 +15,13 @@ Todas as mudanças relevantes serão registradas aqui. O formato segue
 
 ### Added
 
+- Provider Runtime Trial V1 com protocolo prévio e boundaries explícitos entre Contract Trial, SDK Runtime Trial e Provider/Model Trial.
+- Execução real offline do OpenAI Agents SDK 0.22.0 com ScriptedModel oficial, tool pipeline e evidence JSON.
+- Execução real offline do Google ADK 2.8.0 com Runner, session service e BaseLlm customizado.
+- Execução real in-process do MCP Python SDK 2.1.1 com negociação da revisão 2026-07-28.
+- Jobs CI isolados por SDK, pins top-level exatos, pip check, pip freeze e artifacts de evidência.
+- Threat Model V4, Research Readiness V4 e revisão adversarial do Runtime Trial V1.
+
 - Fundação editorial, curricular, arquitetural, multilíngue e de segurança.
 - Automação de qualidade e governança do GitHub.
 - ADRs para taxonomia curricular e redaction defensiva.
