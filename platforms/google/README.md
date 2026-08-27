@@ -10,9 +10,9 @@ verified: 2026-08-26
 
 Fonte primária: documentação e releases oficiais de `google/adk-python`.
 
-- Linha 2.x estável verificada: `2.7.1` (2026-08-17).
-- Status NEXUS: `experimental-contract`.
-- Execução real do SDK neste milestone: **não**.
+- Linha 2.x estável verificada: `2.8.0` (2026-08-26).
+- Status NEXUS: `trial-runtime-offline`.
+- Execução real do SDK: **sim**, com `Runner` e `InMemorySessionService` reais e `BaseLlm` offline.
 
 ## Capacidades verificadas
 
@@ -43,3 +43,7 @@ O adapter real deverá provar:
 A ativação de side effects reais fica bloqueada até existir teste com versão pinada do ADK que cubra approval scoped, resume, receipt externo e reconciliação após retry.
 
 O benchmark V3 atual mede apenas o contrato NEXUS determinístico, não o runtime ADK real.
+
+## Runtime Trial V1
+
+O ADK 2.8.0 foi instalado e executado em CI. O marker task e uma falha determinística do BaseLlm passaram pelo runtime real. A2A/HITL, VAR e DSER permanecem NOT_EXECUTED; portanto nenhum issue upstream de resume/state é classificado como REPRODUCED.

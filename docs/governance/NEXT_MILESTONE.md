@@ -1,86 +1,90 @@
 ---
-id: governance.next-milestone-v2
-title: Próximo Milestone — Hardening V2
+id: governance.next-milestone
+title: Próximo Milestone — Runtime Security Convergence V1.1
 lang: pt-BR
 status: review
-reviewed_at: 2026-08-25
+reviewed_at: 2026-08-26
 ---
 
-# Próximo Milestone — Hardening V2
+# Próximo Milestone — Runtime Security Convergence V1.1
 
 ## Objetivo
 
-Converter os controles de referência em evidência executável e preparar adapters reais sem introduzir lock-in ou claims não comprovados.
+Fechar as assimetrias que o Provider Runtime Trial V1 expôs antes de qualquer Provider/Model Trial externo ou expansão para novos frameworks.
 
-## Ordem
+## Prioridade P0
 
-### Gate 1 — CI e regressão
+### Google ADK — A2A/HITL integrity
+- executar pause/resume real;
+- approval scoped;
+- parallel tool calls;
+- state/session restore;
+- side effect sintético com receipt;
+- retry sem duplicação;
+- classificar issues upstream somente após reprodução.
 
-- executar validator;
-- executar `unittest discover`;
-- executar `compileall`;
-- executar todos os self-tests;
-- corrigir qualquer falha da branch.
+### MCP — remote adversarial lab
+- Streamable HTTP/transport atual;
+- version negotiation;
+- MRTR;
+- cancellation;
+- tool metadata poisoning;
+- hostile tool output;
+- OAuth issuer/audience/resource;
+- DNS/host validation;
+- credential passthrough;
+- network interruption/recovery.
 
-### Gate 2 — ADRs
+### Supply chain
+- gerar lock/constraints transitivos;
+- hashes quando suportados;
+- SBOM/provenance quando tecnicamente viável;
+- comparar ambiente resolvido com baseline;
+- bloquear major/minor agentic upgrades sem gate.
 
-Registrar decisões sobre:
+### Observability
+- esquema NEXUS para spans/events;
+- OpenTelemetry por runtime quando disponível;
+- redaction antes de export;
+- provar ausência de secrets em artifacts/logs de teste.
 
-- Context Trust Model;
-- Execution Receipts + idempotency;
-- Atomic Skill Updates;
-- Framework Upgrade Gate.
+## Prioridade P1
 
-### Gate 3 — benchmark schema
+- criar cenário side-effect equivalente para ADK e host MCP;
+- completar VAR/DSER de forma comparável;
+- adicionar cancellation explícito onde o SDK oferecer contrato;
+- testar state/memory integrity;
+- ampliar failure injection de smoke para chaos matrix.
 
-Criar schema machine-readable para:
+## Microsoft Agent Framework
 
-- VAR;
-- RSR;
-- DSER;
-- CTVR;
-- latency/errors/retries.
+Antes de Runtime Trial:
+1. criar Contract Trial paritário;
+2. registrar versão/risco/capabilities;
+3. executar supply-chain review;
+4. somente então decidir promoção a runtime.
 
-### Gate 4 — Skills lifecycle MVP
+Não adicionar MAF apenas para aumentar cobertura de frameworks.
 
-Criar apenas o mínimo:
+## Provider/Model Trial
 
-- manifest/registry simples;
-- staging;
-- validation;
-- hash;
-- status;
-- atomic promotion;
-- rollback.
-
-Não criar serviço/DB se arquivo estruturado atender ao experimento.
-
-### Gate 5 — adapters controlados
-
-Ordem recomendada:
-
-1. OpenAI Agents SDK — tool lifecycle/tracing;
-2. Google ADK Python — HITL/A2A state integrity;
-3. MCP — untrusted metadata/tool output;
-4. Go/TypeScript apenas quando o experimento exigir.
-
-### Gate 6 — chaos lab
-
-Simular timeout, disconnect, partial result, duplicate result, state corruption, MCP unavailable e credential expiry.
-
-### Gate 7 — auditoria independente
-
-Arquitetura, AppSec, Agent Security, MCP Security, Supply Chain, Reliability, Test Engineering e Reproducibility.
+Continua bloqueado. Exige:
+- autorização explícita;
+- credenciais em secret store;
+- orçamento;
+- modelo/configuração fixos;
+- dataset e prompts versionados;
+- repetições pré-definidas;
+- análise estatística;
+- política de retenção de traces;
+- critérios de exclusão antes dos dados.
 
 ## Definition of Done
 
-O milestone termina quando:
-
-- CI está verde;
-- testes novos possuem evidência;
-- nenhuma descoberta upstream é apresentada como vulnerabilidade local sem reprodução;
-- actions críticas usam `operation_id` e receipt no reference layer;
-- trust model e Skill lifecycle têm ADR;
-- benchmark schema está versionado;
-- riscos residuais estão explícitos;
-- PR está aberto, sem auto-merge.
+- CI completa verde;
+- A2A/HITL e MCP remoto possuem testes executados ou status NOT_EXECUTED justificado;
+- supply chain mais forte que top-level pins;
+- observability/redaction verificadas;
+- claims atualizados com limites;
+- revisão adversarial independente;
+- novo PR aberto sem auto-merge.

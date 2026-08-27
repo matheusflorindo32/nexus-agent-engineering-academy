@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = (
     ("repository-validator", (sys.executable, "tests/validate_repository.py")),
     ("unit-tests", (sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v")),
-    ("compileall", (sys.executable, "-m", "compileall", "-q", "examples", "tests", "benchmarks")),
+    ("compileall", (sys.executable, "-m", "compileall", "-q", "examples", "tests", "benchmarks", "runtime_trials")),
     ("minimal-readonly-agent", (sys.executable, "examples/minimal_readonly_agent.py", "--demo")),
     ("context-retriever", (sys.executable, "examples/context_retriever.py")),
     ("safe-tool-boundary", (sys.executable, "examples/safe_tool_boundary.py", "--self-test")),

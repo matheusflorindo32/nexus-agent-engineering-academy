@@ -43,15 +43,20 @@ Impacto educacional, evidência, segurança e manutenção vêm antes da quantid
 - [x] Executar revisão independente V3 e corrigir achados metodológicos encontrados.
 - [x] Abrir PR #54 como stacked PR, sem auto-merge.
 
-### Provider Runtime Trial — próximo gate
+### Provider Runtime Trial V1 — offline controlled runtimes
 
-- [ ] Criar protocolo versionado antes de chamadas pagas/model-dependent.
-- [ ] Fixar dependências/lockfiles e ambientes reproduzíveis por adapter.
-- [ ] Executar OpenAI Agents SDK real com tarefas/falhas comuns.
-- [ ] Executar Google ADK real, incluindo A2A/HITL pause-resume e state integrity.
-- [ ] Executar MCP 2026-07-28 real com version negotiation, MRTR e casos adversariais.
-- [ ] Medir task success, correctness, latency, tokens/custo, retries e métricas de segurança.
-- [ ] Publicar apenas resultados realmente executados e vinculados a SHA/versões.
+- [x] Criar protocolo versionado antes da execução do Runtime Trial.
+- [x] Isolar jobs e fixar versões top-level por adapter; registrar pip freeze.
+- [x] Executar OpenAI Agents SDK 0.22.0 real com ScriptedModel oficial, tool pipeline e falha determinística.
+- [x] Executar Google ADK 2.8.0 real com Runner/session e BaseLlm offline.
+- [x] Executar MCP Python SDK 2.1.1 real in-process com negotiation 2026-07-28.
+- [x] Registrar task success, bounded failure/RSR e métricas aplicáveis sem inventar valores ausentes.
+- [x] Registrar Microsoft Agent Framework como MONITORING até Contract Trial paritário.
+- [ ] Adicionar lock/constraints transitivos com hashes/provenance.
+- [ ] Executar ADK A2A/HITL pause-resume, parallel side effects e state integrity.
+- [ ] Executar MCP remoto com HTTP/auth/MRTR/cancellation e casos adversariais.
+- [ ] Executar tracing/OpenTelemetry/redaction por runtime.
+- [ ] Criar Provider/Model Trial somente com autorização explícita, orçamento e protocolo estatístico.
 
 ### Core Curriculum — v0.2
 
