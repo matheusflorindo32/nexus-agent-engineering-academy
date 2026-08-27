@@ -160,3 +160,9 @@ Issues públicas não equivalem a advisories.
 ## Gate para Provider/Model Trial futuro
 
 Exige autorização explícita para chamadas externas/pagas, credenciais em secret store, orçamento, modelo fixado, número de repetições, dataset versionado, tracing/redaction revisado e protocolo estatístico adicional.
+
+
+## Registro de emendas
+
+- 2026-08-26: ajuste apenas de metadado do frontmatter para um status aceito pelo validador; o desenho experimental permaneceu inalterado.
+- 2026-08-26: evidência passou a distinguir o SHA da branch do SHA usado pelo workflow; o desenho experimental permaneceu inalterado.
