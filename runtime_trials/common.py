@@ -24,7 +24,7 @@ def evidence_base(adapter: str, package: str, package_version: str, boundary: st
         "package": package,
         "package_version": package_version,
         "test_boundary": boundary,
-        "commit_sha": os.environ.get("GITHUB_SHA", "local-unverified"),
+        "commit_sha": os.environ.get("NEXUS_HEAD_SHA") or os.environ.get("GITHUB_SHA", "local-unverified"),\n        "workflow_sha": os.environ.get("GITHUB_SHA", "local-unverified"),
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "environment": {
             "python": sys.version,
