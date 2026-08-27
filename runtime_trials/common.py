@@ -24,7 +24,10 @@ def evidence_base(adapter: str, package: str, package_version: str, boundary: st
         "package": package,
         "package_version": package_version,
         "test_boundary": boundary,
-        "commit_sha": os.environ.get("NEXUS_HEAD_SHA") or os.environ.get("GITHUB_SHA", "local-unverified"),\n        "workflow_sha": os.environ.get("GITHUB_SHA", "local-unverified"),
+        "commit_sha": os.environ.get("NEXUS_HEAD_SHA") or os.environ.get(
+            "GITHUB_SHA", "local-unverified"
+        ),
+        "workflow_sha": os.environ.get("GITHUB_SHA", "local-unverified"),
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "environment": {
             "python": sys.version,
@@ -57,5 +60,8 @@ def write_evidence(payload: dict[str, Any], output: str) -> None:
     if not path.is_absolute():
         path = ROOT / path
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     print(json.dumps(payload, ensure_ascii=False, indent=2))
