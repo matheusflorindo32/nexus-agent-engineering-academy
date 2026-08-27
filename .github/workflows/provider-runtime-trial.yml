@@ -29,6 +29,7 @@ jobs:
           python -m pip check
       - name: Execute real SDK runtime trial
         env:
+          NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           OPENAI_API_KEY: ""
         run: |
           mkdir -p validation-evidence
@@ -60,6 +61,7 @@ jobs:
           python -m pip check
       - name: Execute real ADK runtime trial
         env:
+          NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           ADK_EXPERIMENTAL_TELEMETRY: "false"
         run: |
           mkdir -p validation-evidence
@@ -90,6 +92,8 @@ jobs:
           python -m pip install --disable-pip-version-check --no-input -r requirements/runtime/mcp.txt
           python -m pip check
       - name: Execute real MCP runtime trial
+        env:
+          NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           mkdir -p validation-evidence
           python runtime_trials/mcp_runtime_trial.py --output validation-evidence/runtime-mcp.json
