@@ -1,8 +1,10 @@
 """Contract tests for SpecD Isolated Runtime Trial V1."""
 from __future__ import annotations
 
+import importlib.util
 import json
 from pathlib import Path
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +24,14 @@ ALLOWED_EVIDENCE = {
 
 def load_json(name: str):
     return json.loads((EXP / name).read_text(encoding="utf-8"))
+
+
+def load_trial_module():
+    spec = importlib.util.spec_from_file_location("specd_trial", EXP / "trial.py")
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
 
 
 class SpecDIsolatedRuntimeTrialV1Tests(unittest.TestCase):
@@ -78,6 +88,54 @@ class SpecDIsolatedRuntimeTrialV1Tests(unittest.TestCase):
         self.assertIn("graph index", text)
         self.assertIn("graph impact", text)
         self.assertNotIn("@specd/cli@latest", text)
+
+    def test_unexpected_affected_file_counts_against_precision(self):
+        module = load_trial_module()
+        oracle = {
+            "target_file": "src/core.ts",
+            "expected_affected_files": ["src/service.ts", "src/controller.ts"],
+            "expected_unaffected_files": ["src/unrelated.ts"],
+        }
+        payload = {
+            "affectedFiles": [
+                "src/core.ts",
+                "src/service.ts",
+                "src/controller.ts",
+                "src/extra.ts",
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            raw = root / "raw"
+            raw.mkdir()
+            oracle_path = root / "oracle.json"
+            oracle_path.write_text(json.dumps(oracle), encoding="utf-8")
+            for index in range(1, 6):
+                (raw / f"impact-{index}.json").write_text(json.dumps(payload), encoding="utf-8")
+            result = module.evaluate(raw, oracle_path, 5)
+        self.assertEqual(0.666667, result["metrics"]["affected_file_precision"])
+        self.assertEqual(0.0, result["metrics"]["false_positive_rate"])
+        self.assertEqual(1, result["metrics"]["unexpected_affected_files"])
+
+    def test_workflow_preserves_failure_phase_and_graph_blockers(self):
+        text = WORKFLOW.read_text(encoding="utf-8")
+        for marker in [
+            "UPSTREAM_PACKAGE_MANAGER_SETUP_FAILED",
+            "UPSTREAM_FROZEN_LOCKFILE_MISMATCH",
+            "UPSTREAM_DEPENDENCY_INSTALL_FAILED",
+            "UPSTREAM_BUILD_FAILED",
+            "UPSTREAM_CLI_SMOKE_FAILED",
+            "UPSTREAM_GRAPH_INDEX_FAILED",
+            "UPSTREAM_GRAPH_IMPACT_FAILED",
+            "failure_phase",
+        ]:
+            self.assertIn(marker, text)
+
+    def test_workflow_does_not_rerun_known_blocked_pin_without_recheck_candidate(self):
+        text = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("SPECD_RECHECK_ENABLED", text)
+        self.assertIn("MONITOR", text)
+        self.assertIn("known_blocked_commit", text)
 
 
 if __name__ == "__main__":
