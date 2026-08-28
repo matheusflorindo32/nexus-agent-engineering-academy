@@ -1,0 +1,50 @@
+{
+  "base_sha": "f997419541c6611293087a4a840865c7a0e100c0",
+  "edge_types": [
+    "REFINED_BY",
+    "PLANNED_BY",
+    "TOUCHES_FILE",
+    "TOUCHES_SYMBOL",
+    "CONTAINS_SYMBOL",
+    "DEPENDS_ON",
+    "VERIFIED_BY",
+    "PRODUCES_EVIDENCE"
+  ],
+  "evidence_class": "DETERMINISTIC_CONTROL_EVIDENCE",
+  "limits": {
+    "max_depth": 16,
+    "max_edges": 8000,
+    "max_fanout": 256,
+    "max_metadata_string": 2048,
+    "max_nodes": 2000
+  },
+  "node_types": [
+    "requirement",
+    "spec",
+    "task",
+    "file",
+    "symbol",
+    "test",
+    "evidence"
+  ],
+  "not_applicable": [
+    "llm_tokens",
+    "llm_context_tokens"
+  ],
+  "not_tested": [
+    "human_maintenance_hours",
+    "production_rss_memory"
+  ],
+  "repetitions": 5,
+  "runtime_dependencies_added": 0,
+  "schema": "nexus.traceability-graph-v2.protocol.v1",
+  "score_weights": {
+    "determinism": 0.1,
+    "diagnostic_f1": 0.35,
+    "orphan_detection_rate": 0.15,
+    "regression_detection_rate": 0.1,
+    "security_detection_rate": 0.2,
+    "stale_link_detection_rate": 0.1
+  },
+  "specd_runtime_comparison": "NOT_TESTED"
+}
