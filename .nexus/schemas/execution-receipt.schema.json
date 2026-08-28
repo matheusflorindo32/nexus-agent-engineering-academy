@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nexus.local/schemas/execution-receipt.v1.json",
+  "title": "NEXUS Execution Receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "commit_sha", "timestamp", "tests", "results", "decision"],
+  "properties": {
+    "schema_version": {"const": "nexus.execution-receipt.v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "commit_sha": {"type": "string", "minLength": 7},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "agent": {"type": "string"},
+    "environment": {"type": "object"},
+    "inputs": {"type": "array"},
+    "tools": {"type": "array"},
+    "tests": {"type": "array"},
+    "results": {"type": "object"},
+    "artifacts": {"type": "array"},
+    "failures": {"type": "array"},
+    "decision": {"enum": ["PASS", "BLOCKED", "GO", "PARTIAL", "NOT_TESTED", "NOT_APPLICABLE"]}
+  }
+}

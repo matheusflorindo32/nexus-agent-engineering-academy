@@ -1,0 +1,11 @@
+{
+  "schema_version": "nexus.traceability.v1",
+  "chain": ["requirement", "spec", "task", "files_or_symbols", "tests", "evidence"],
+  "statuses": ["PLANNED", "IMPLEMENTED", "VERIFIED", "BLOCKED", "NOT_APPLICABLE"],
+  "rules": [
+    "Every implemented task must reference at least one requirement.",
+    "Every VERIFIED item must reference tests or explicit non-test evidence.",
+    "Orphan requirements and orphan implementation tasks block release review at L2 or above.",
+    "Blast radius must be declared for L2-L4 changes."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "nexus.standards-registry.v1",
+  "standards": [
+    {"id": "STD-SDD-LIFECYCLE", "source": "github/spec-kit", "decision": "ADAPT", "applies_when": ["new feature", "architecture change"], "controls": ["constitution", "specify", "clarify", "plan", "tasks", "converge"]},
+    {"id": "STD-INCREMENTAL-SPECS", "source": "Fission-AI/OpenSpec", "decision": "ADAPT", "applies_when": ["brownfield change", "living specification"], "controls": ["change proposal", "incremental spec", "archive"]},
+    {"id": "STD-RECON-ADVERSARIAL", "source": "aws-samples/sample-specship", "decision": "ADAPT", "applies_when": ["brownfield", "high-risk implementation"], "controls": ["recon", "test-before-build", "adversarial validation"]},
+    {"id": "STD-TDD-DEBUG-VERIFY", "source": "obra/superpowers", "decision": "ADOPT", "applies_when": ["behavior change", "bugfix", "implementation"], "controls": ["approval gate", "TDD", "systematic debugging", "verification before completion"]},
+    {"id": "STD-HOOKS-STEERING", "source": "kirodotdev/Kiro", "decision": "ADAPT", "applies_when": ["event-driven checks", "project steering"], "controls": ["hooks", "steering", "context scoping"]},
+    {"id": "STD-MULTIAGENT-ROLES", "source": "bmad-code-org/BMAD-METHOD", "decision": "ADAPT", "applies_when": ["multi-agent review", "independent verification"], "controls": ["role separation", "handoffs"]},
+    {"id": "STD-TRACEABILITY-GRAPH", "source": "specd-sdd/SpecD", "decision": "STUDY", "applies_when": ["large change", "multi-repo", "impact analysis"], "controls": ["compiled context", "deterministic verification", "spec-code graph"]},
+    {"id": "STD-CONTEXT-STANDARDS", "source": "buildermethods/agent-os", "decision": "ADAPT", "applies_when": ["agent context preparation"], "controls": ["discover standards", "inject relevant standards"]},
+    {"id": "STD-FRESH-CONTEXT", "source": "open-gsd/gsd-core", "decision": "STUDY", "applies_when": ["long task", "context saturation", "parallel work"], "controls": ["fresh subagent context", "persistent state", "verify-fix loop"]},
+    {"id": "STD-LOCAL-SPECS", "source": "specdd/specdd", "decision": "STUDY", "applies_when": ["large modular codebase", "source-adjacent authority"], "controls": ["local specs", "ownership boundaries"]}
+  ]
+}

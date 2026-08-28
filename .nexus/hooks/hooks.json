@@ -1,0 +1,11 @@
+{
+  "schema_version": "nexus.hooks.v1",
+  "hooks": [
+    {"id": "HOOK-PRE-COMMIT-QUALITY", "trigger": "pre_commit", "enabled_by_default": true, "actions": ["lint", "unit_tests", "secret_scan"]},
+    {"id": "HOOK-PRE-PUSH-TRACE", "trigger": "pre_push", "enabled_by_default": true, "actions": ["traceability_check", "contract_check"]},
+    {"id": "HOOK-PR-VERIFY", "trigger": "pull_request", "enabled_by_default": true, "actions": ["quality_gates", "security_scan", "adversarial_review_prompt"]},
+    {"id": "HOOK-SPEC-CHANGE", "trigger": "spec_change", "enabled_by_default": true, "actions": ["traceability_check", "impact_review"]}
+  ],
+  "requires_explicit_human_authorization": ["merge", "deploy", "delete", "rotate_credentials"],
+  "rule": "Hooks may fail closed on validation but cannot gain authority to perform destructive external side effects by being triggered."
+}

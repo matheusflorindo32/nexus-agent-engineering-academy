@@ -1,0 +1,11 @@
+{
+  "schema_version": "nexus.rigor-levels.v1",
+  "levels": [
+    {"id": "L0_TRIVIAL", "required_gates": ["scope", "verification"], "examples": ["typo", "small documentation correction"]},
+    {"id": "L1_STANDARD", "required_gates": ["scope", "acceptance", "tests_or_justification", "verification"], "examples": ["small feature", "non-critical refactor"]},
+    {"id": "L2_CRITICAL", "required_gates": ["recon", "spec", "plan", "tests", "independent_verification", "release_gate"], "examples": ["architecture change", "material behavior change"]},
+    {"id": "L3_HIGH_ASSURANCE", "required_gates": ["recon", "spec", "threat_model", "plan", "tdd", "security_review", "adversarial_review", "traceability", "execution_receipt", "release_gate"], "examples": ["agent runtime", "MCP", "production data", "automation"]},
+    {"id": "L4_RESEARCH_SAFETY_CRITICAL", "required_gates": ["recon", "protocol", "preregistration_or_version_freeze", "spec", "threat_model", "plan", "tdd", "independent_verification", "security_review", "adversarial_review", "reproducibility", "traceability", "execution_receipt", "human_release_gate"], "examples": ["scientific benchmark", "health", "public safety", "safety-critical autonomy"]}
+  ],
+  "rule": "A domain policy may raise but never lower the required rigor level."
+}

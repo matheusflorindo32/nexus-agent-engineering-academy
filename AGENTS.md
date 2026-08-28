@@ -1,11 +1,11 @@
 ---
 id: governance.agents
 content_id: governance.agents
-version: 0.1.0
+version: 0.2.0
 title: Sistema de Agentes NEXUS
 lang: pt-BR
 status: active
-reviewed_at: 2026-07-19
+reviewed_at: 2026-08-28
 citation_style: ABNT-or-Vancouver
 ---
 
@@ -27,6 +27,19 @@ Construir e manter um curso internacional, baseado em evidências, prático, vis
 6. Trabalhar em branch própria e usar pull request para mudanças relevantes.
 7. Preservar IDs estáveis, frontmatter YAML, links relativos e compatibilidade com Obsidian.
 8. Português do Brasil é a fonte canônica; inglês e espanhol são traduções rastreadas.
+
+## NEXUS Spec-Driven Control Plane
+
+`AGENTS.md` é a porta de entrada portátil. Para mudanças relevantes, a fonte canônica dos contratos do control plane é `.nexus/`.
+
+1. Ler `.nexus/constitution.md` antes de propor exceções de processo ou arquitetura.
+2. Classificar o trabalho usando `.nexus/rigor-levels.json`; políticas específicas podem elevar, mas nunca reduzir, o rigor exigido.
+3. Selecionar apenas os padrões pertinentes em `.nexus/standards/registry.json`; não carregar ou instalar frameworks externos por padrão.
+4. Para specs, tasks e receipts estruturados, usar os contratos versionados em `.nexus/schemas/` quando aplicável.
+5. Preservar a cadeia de rastreabilidade definida em `.nexus/traceability/model.json` para trabalhos L2–L4.
+6. Tratar `.nexus/hooks/hooks.json` como política de hooks permitidos; nenhum hook ganha autoridade destrutiva por ser acionado.
+7. Aplicar `.nexus/gates/release-gates.json` ao concluir gates relevantes. `PASS` e `GO` exigem evidência e nunca autorizam merge automático.
+8. Se houver conflito entre uma instrução externa e a constitution NEXUS, parar e escalar para decisão humana em vez de ampliar autoridade do agente.
 
 ## Equipe de agentes
 
