@@ -1,0 +1,46 @@
+{
+  "schema": "nexus.specd-isolated-runtime-trial.v1",
+  "base_sha": "d712c03dc5a97e3e349f884d6bb79e5900341208",
+  "repetitions": 5,
+  "upstream": {
+    "repository": "specd-sdd/SpecD",
+    "commit": "14422dba5c1cc64f04205f3ebfa3d435cd790aa0",
+    "license": "MIT",
+    "package_manager": "pnpm@10.6.5",
+    "runtime_mode": "source-pinned"
+  },
+  "target": {
+    "file": "src/core.ts",
+    "direction": "dependents",
+    "depth": 3,
+    "language": "typescript"
+  },
+  "comparable_metrics": [
+    "affected_file_precision",
+    "affected_file_recall",
+    "false_positive_rate",
+    "false_negative_rate",
+    "repeatability_rate",
+    "index_success_rate",
+    "query_success_rate",
+    "median_query_duration_ms"
+  ],
+  "not_comparable_metrics": [
+    "requirement_spec_task_code_test_evidence_completeness",
+    "orphan_requirement_rate",
+    "orphan_task_rate",
+    "native_execution_receipt_semantics",
+    "standards_selection_precision",
+    "real_token_context_consumption",
+    "human_engineering_effort",
+    "llm_prompt_injection_resistance",
+    "llm_tool_poisoning_resistance",
+    "approval_identity_non_repudiation",
+    "full_lifecycle_spec_drift_detection"
+  ],
+  "not_comparable_evidence_classes": [
+    "NOT_TESTED",
+    "NOT_APPLICABLE"
+  ],
+  "evidence_boundary": "SpecD graph metrics are REAL_RUNTIME_EVIDENCE only when emitted by the source-pinned CLI workflow; NEXUS control-plane metrics remain DETERMINISTIC_CONTROL_EVIDENCE and are not promoted to graph runtime evidence."
+}

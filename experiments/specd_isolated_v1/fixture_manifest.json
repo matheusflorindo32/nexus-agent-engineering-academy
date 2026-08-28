@@ -1,0 +1,26 @@
+{
+  "schema": "nexus.specd-isolated-fixture-manifest.v1",
+  "hash_algorithm": "sha256",
+  "files": [
+    {
+      "path": "fixture/src/core.ts",
+      "sha256": "1f2e11ab1a1935007062d97b9032fa2b8d489583f20fcd1d9c97586553356393"
+    },
+    {
+      "path": "fixture/src/service.ts",
+      "sha256": "b1b1311bdb7abbb504821d120470dfba8801ba24f025a28d38849fba9bce3196"
+    },
+    {
+      "path": "fixture/src/controller.ts",
+      "sha256": "a482e543386e585f671b4e5b725bf81fe43a2436b094bcd0219f44fd0a2d1297"
+    },
+    {
+      "path": "fixture/src/unrelated.ts",
+      "sha256": "5c34484584d68dd5b15dcb9f767a8ccd4423c746ff9858b52f4ad9446bea2dca"
+    },
+    {
+      "path": "fixture/oracle.json",
+      "sha256": "59c3a86a6f99761ce9c4b55fc03576bf7193871364264e5daaf73def3374b8db"
+    }
+  ]
+}

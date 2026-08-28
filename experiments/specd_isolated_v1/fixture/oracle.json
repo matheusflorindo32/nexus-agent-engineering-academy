@@ -1,0 +1,13 @@
+{
+  "depth": 3,
+  "direction": "dependents",
+  "expected_affected_files": [
+    "src/service.ts",
+    "src/controller.ts"
+  ],
+  "expected_unaffected_files": [
+    "src/unrelated.ts"
+  ],
+  "schema": "nexus.specd-isolated-oracle.v1",
+  "target_file": "src/core.ts"
+}
