@@ -1,0 +1,8 @@
+{
+  "schema": "nexus.repository-indexer-v1.fixture-manifest.v1",
+  "status": "PENDING_GREEN_CAPTURE",
+  "files": [
+    {"path": "protocol.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    {"path": "fixtures.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"}
+  ]
+}
