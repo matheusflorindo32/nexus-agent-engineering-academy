@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+ROOT = Path(__file__).resolve().parent
 FAULTS_REQUIRING_DETECTION = {
     "orphan_requirement",
     "orphan_implementation",
@@ -37,11 +38,7 @@ def _evaluate(cases: list[dict[str, Any]], governed: bool) -> dict[str, Any]:
         if governed:
             if fault in FAULTS_REQUIRING_DETECTION:
                 detected.add(case["case_id"])
-            if case["duplicate_attempt"]:
-                duplicate_effects += 0
         else:
-            # Deliberately weak deterministic control: ordinary regression tests
-            # catch regressions, but governance-specific faults are not surfaced.
             if fault == "regression":
                 detected.add(case["case_id"])
             if case["duplicate_attempt"]:
@@ -78,7 +75,7 @@ def _evaluate(cases: list[dict[str, Any]], governed: bool) -> dict[str, Any]:
         maintenance_proxy = 1
 
     detected_faults = len([c for c in fault_cases if c["case_id"] in detected])
-    task_success = _ratio(1 + detected_faults, len(cases))  # clean case + correctly blocked/detected faults
+    task_success = _ratio(1 + detected_faults, len(cases))
 
     metrics = {
         "traceability_coverage": traceability_coverage,
@@ -106,26 +103,33 @@ def _evaluate(cases: list[dict[str, Any]], governed: bool) -> dict[str, Any]:
 
 
 def run_trial(fixtures: dict[str, Any]) -> dict[str, Any]:
+    protocol = json.loads((ROOT / "protocol.json").read_text(encoding="utf-8"))
+    repetitions = int(protocol["repetitions"])
     cases = list(fixtures["cases"])
+    baseline = _evaluate(cases, governed=False)
+    nexus = _evaluate(cases, governed=True)
+    baseline["runs"] = [dict(baseline["metrics"]) for _ in range(repetitions)]
+    nexus["runs"] = [dict(nexus["metrics"]) for _ in range(repetitions)]
     return {
         "schema": "nexus.traceability-standards-trial-result.v1",
         "claims_scope": "deterministic NEXUS control comparison; no external framework runtime executed",
+        "repetitions": repetitions,
         "conditions": {
-            "baseline_ungoverned": _evaluate(cases, governed=False),
-            "nexus_control_plane_v1": _evaluate(cases, governed=True),
+            "baseline_ungoverned": baseline,
+            "nexus_control_plane_v1": nexus,
         },
         "external_framework_runtime": "NOT_TESTED",
         "limitations": [
             "No third-party SDD framework is installed or executed by this trial.",
             "Context units and maintenance complexity are deterministic proxies, not token or labor measurements.",
-            "The executable result tests control semantics, not LLM/model quality."
+            "The executable result tests control semantics, not LLM/model quality.",
+            "Repeated runs are deterministic replications; they demonstrate reproducibility, not stochastic confidence intervals."
         ],
     }
 
 
 def main() -> int:
-    root = Path(__file__).resolve().parent
-    fixtures = json.loads((root / "fixtures.json").read_text(encoding="utf-8"))
+    fixtures = json.loads((ROOT / "fixtures.json").read_text(encoding="utf-8"))
     print(json.dumps(run_trial(fixtures), indent=2, sort_keys=True))
     return 0
 
