@@ -1,0 +1,19 @@
+{
+  "schema_version": "nexus.release-gates.v1",
+  "decisions": ["PASS", "BLOCKED", "GO"],
+  "human_merge_authority": true,
+  "auto_merge_allowed": false,
+  "evidence_required_for": {
+    "PASS": ["acceptance_criteria", "tests_or_justification", "security_as_applicable", "traceability_as_applicable"],
+    "GO": ["current_gate_complete", "next_scope_declared"]
+  },
+  "blocked_when": [
+    "critical_or_high_finding_without_treatment_or_explicit_human_acceptance",
+    "required_evidence_missing",
+    "secret_detected",
+    "license_conflict",
+    "unbounded_destructive_action",
+    "claim_exceeds_evidence"
+  ],
+  "rule": "PASS and GO are evidence-bound decisions. Neither authorizes merge automatically."
+}
