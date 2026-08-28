@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "TRACEABILITY-STANDARDS-RUNTIME-TRIAL-V1",
+  "commit_sha": "afb9b669e0f6a2ef77c9e1db8e499f07ffa974bf",
+  "timestamp": "2026-08-28T17:07:50Z",
+  "agent": "NEXUS deterministic trial workflow",
+  "environment": "github-actions/ubuntu-latest/python-3.12",
+  "inputs": [
+    "experiments/traceability_standards_v1/protocol.json",
+    "experiments/traceability_standards_v1/fixtures.json",
+    "experiments/traceability_standards_v1/upstream_capabilities.json"
+  ],
+  "tests": [
+    "python -m unittest tests.test_traceability_standards_trial_v1 -v",
+    "python experiments/traceability_standards_v1/trial.py"
+  ],
+  "results": {
+    "workflow_run_id": 33193233042,
+    "workflow_conclusion": "success",
+    "artifact_id": 9694631257,
+    "artifact_digest": "sha256:7727642ce0c31f807e971bb15e2721c9e2627416e26a56f063f76faf6eaff2a8",
+    "claims_scope": "DETERMINISTIC_CONTROL_EVIDENCE",
+    "external_framework_runtime": "NOT_TESTED"
+  },
+  "failures": [],
+  "decision": "PASS"
+}
