@@ -10,7 +10,7 @@ reviewed_at: 2026-08-28
 
 # NEXUS Spec-Driven Control Plane V1 Implementation Plan
 
-> **For agentic workers:** executar tarefa por tarefa com TDD, revisão independente e evidence before assertion.
+> **For agentic workers:** executar tarefa por tarefa com TDD, revisão separada e evidence before assertion.
 
 **Goal:** adicionar uma camada declarativa, stdlib-only e vendor-neutral para governar rigor, standards, schemas, traceability, hooks e release gates sem substituir os mecanismos runtime existentes.
 
@@ -33,71 +33,43 @@ reviewed_at: 2026-08-28
 
 ### Task 1: RED — contrato mínimo do control plane
 
-**Files:**
-- Create: `tests/test_nexus_control_plane_contracts.py`
-
-**Produces:** testes que exigem constitution, rigor levels, standards registry, schemas, traceability, hooks e release gates.
-
-- [x] Escrever teste antes dos artefatos `.nexus`.
-- [ ] Executar CI e confirmar falha por arquivos ausentes, não por erro sintático.
-- [ ] Registrar o run como evidência RED.
+- [x] Escrever `tests/test_nexus_control_plane_contracts.py` antes dos artefatos `.nexus`.
+- [x] Confirmar CI RED por arquivos ausentes, não por erro sintático.
+- [x] Registrar run `33192038733` e artifact `9694146965` como evidência RED.
 
 ### Task 2: GREEN — constitution e rigor levels
 
-**Files:**
-- Create: `.nexus/constitution.md`
-- Create: `.nexus/rigor-levels.json`
-
-**Produces:** invariantes permanentes e cinco níveis de rigor.
-
-- [ ] Criar conteúdo mínimo que satisfaça os testes.
-- [ ] Reexecutar testes focados e confirmar progresso.
+- [x] Criar `.nexus/constitution.md`.
+- [x] Criar `.nexus/rigor-levels.json` com L0–L4.
+- [x] Confirmar contratos em CI GREEN.
 
 ### Task 3: GREEN — standards registry e traceability
 
-**Files:**
-- Create: `.nexus/standards/registry.json`
-- Create: `.nexus/traceability/model.json`
-
-**Produces:** seleção contextual de padrões e cadeia requirement→evidence.
-
-- [ ] Criar registros com IDs únicos e decisões válidas.
-- [ ] Validar estados e referências estruturais.
+- [x] Criar `.nexus/standards/registry.json` com IDs únicos e decisões válidas.
+- [x] Criar `.nexus/traceability/model.json` com requirement→evidence e estados fechados.
 
 ### Task 4: GREEN — schemas versionados
 
-**Files:**
-- Create: `.nexus/schemas/spec.schema.json`
-- Create: `.nexus/schemas/task.schema.json`
-- Create: `.nexus/schemas/execution-receipt.schema.json`
+- [x] Criar schemas de spec, task e execution receipt.
+- [x] Exigir campos centrais, `$id`, versionamento e `additionalProperties=false`.
 
-**Produces:** contratos estruturados com campos obrigatórios e `additionalProperties` explícito.
+### Task 5: GREEN — hooks, gates e entrypoint
 
-- [ ] Criar schemas JSON válidos.
-- [ ] Confirmar required fields e version identifiers pelos testes.
-
-### Task 5: GREEN — hooks e release gates
-
-**Files:**
-- Create: `.nexus/hooks/hooks.json`
-- Create: `.nexus/gates/release-gates.json`
-
-**Produces:** hooks permitidos sem ações destrutivas default e gates PASS/BLOCKED/GO com human merge authority.
-
-- [ ] Implementar policy declarativa.
-- [ ] Confirmar que nenhum hook padrão contém merge/deploy/delete/credential rotation.
+- [x] Criar hook policy sem ações destrutivas default.
+- [x] Criar release gates PASS/BLOCKED/GO com human merge authority.
+- [x] Executar segundo ciclo RED para exigir roteamento em `AGENTS.md`: run `33192394335`, 63 testes e exatamente 1 failure.
+- [x] Atualizar `AGENTS.md` como entrypoint portátil para `.nexus`.
 
 ### Task 6: Verify / adversarial review
 
-**Files:**
-- Create: `docs/audits/NEXUS_CONTROL_PLANE_V1_REVIEW_SCORECARD.md`
-
-- [ ] Executar `NEXUS Quality`, docs quality e secret scan no head final.
-- [ ] Tentar quebrar enums, IDs, additionalProperties, human authority e forbidden hooks.
-- [ ] Registrar riscos residuais e limites de claim.
+- [x] Registrar `docs/audits/NEXUS_CONTROL_PLANE_V1_REVIEW_SCORECARD.md`.
+- [x] Tentar quebrar enums, IDs, `additionalProperties`, human authority e forbidden hooks por contratos automatizados.
+- [x] Registrar riscos residuais e limites de claim.
+- [ ] Confirmar todos os workflows obrigatórios verdes no **head final**.
 
 ### Task 7: PR gate
 
-- [ ] Confirmar diff somente na nova branch.
-- [ ] Abrir PR com base `feat/provider-runtime-trial-v1`.
-- [ ] Não fazer merge.
+- [x] Branch isolada criada sobre o SHA exato do PR #55.
+- [x] PR #56 aberto com base `feat/provider-runtime-trial-v1`.
+- [x] Nenhum merge executado.
+- [ ] Após CI final verde, promover o draft apenas para revisão humana.
