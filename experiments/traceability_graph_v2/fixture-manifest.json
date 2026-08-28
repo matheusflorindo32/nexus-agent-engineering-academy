@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "d8b035b72411014e0ed76c10a4ca4145703453f9c0be8b45f1092b1b80952720"
+    },
+    {
+      "path": "fixtures.json",
+      "sha256": "0896ce39650fec0c8f40cf12d37460da50c3c4adcaa6eb726a5d76fbd03348ff"
+    }
+  ],
+  "schema": "nexus.traceability-graph-v2.fixture-manifest.v1"
+}
