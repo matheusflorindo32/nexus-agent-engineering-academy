@@ -84,6 +84,16 @@ class TraceabilityStandardsTrialV1Tests(unittest.TestCase):
         self.assertGreater(nexus["hostile_input_rejection_rate"], base["hostile_input_rejection_rate"])
         self.assertEqual(0.0, nexus["duplicate_side_effect_rate"])
 
+    def test_protocol_repetitions_are_executed(self):
+        module = load_trial_module()
+        protocol = load_json("protocol.json")
+        result = module.run_trial(load_json("fixtures.json"))
+        repetitions = protocol["repetitions"]
+        self.assertEqual(repetitions, result["repetitions"])
+        for condition in result["conditions"].values():
+            self.assertEqual(repetitions, len(condition["runs"]))
+            self.assertTrue(all(run == condition["metrics"] for run in condition["runs"]))
+
     def test_trial_is_deterministic(self):
         module = load_trial_module()
         fixtures = load_json("fixtures.json")
