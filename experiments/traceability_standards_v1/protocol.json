@@ -1,0 +1,12 @@
+{
+  "schema": "nexus.traceability-standards-trial-protocol.v1",
+  "frozen_at": "2026-08-28",
+  "base_sha": "11a637291b5f215a3bb66c302b89acc39d9cff94",
+  "conditions": ["baseline_ungoverned", "nexus_control_plane_v1"],
+  "fixture_path": "experiments/traceability_standards_v1/fixtures.json",
+  "evidence_classes": ["REAL_RUNTIME_EVIDENCE", "DETERMINISTIC_CONTROL_EVIDENCE", "DOCUMENTED_UPSTREAM_CAPABILITY", "INFERRED", "NOT_TESTED", "NOT_APPLICABLE"],
+  "metrics": ["traceability_coverage", "orphan_requirement_rate", "orphan_implementation_rate", "spec_drift_detection_rate", "change_impact_detection_rate", "standards_selection_precision", "provenance_completeness", "receipt_completeness", "task_success", "correctness", "regression_detection_rate", "hostile_input_rejection_rate", "duplicate_side_effect_rate", "context_units", "maintenance_complexity_proxy"],
+  "runtime_claim_rule": "External framework runtime results are forbidden unless the actual upstream software is installed and executed under this frozen fixture set.",
+  "repetitions": 5,
+  "seed": 20260828
+}

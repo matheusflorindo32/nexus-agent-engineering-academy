@@ -1,0 +1,36 @@
+name: Traceability Standards Runtime Trial V1
+
+on:
+  pull_request:
+    paths:
+      - 'experiments/traceability_standards_v1/**'
+      - 'tests/test_traceability_standards_trial_v1.py'
+      - 'docs/architecture/TRACEABILITY_STANDARDS_RUNTIME_TRIAL_V1_SPEC.md'
+      - '.github/workflows/traceability-standards-trial.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-trial:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Run focused contract tests
+        run: python -m unittest tests.test_traceability_standards_trial_v1 -v
+      - name: Execute deterministic trial
+        run: |
+          mkdir -p validation-evidence
+          python experiments/traceability_standards_v1/trial.py > validation-evidence/traceability-standards-trial-v1.json
+          python -m json.tool validation-evidence/traceability-standards-trial-v1.json > /dev/null
+      - name: Upload trial evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: traceability-standards-trial-v1
+          path: validation-evidence/traceability-standards-trial-v1.json
+          if-no-files-found: error
+          retention-days: 30

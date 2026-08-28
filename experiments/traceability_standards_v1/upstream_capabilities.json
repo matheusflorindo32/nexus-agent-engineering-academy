@@ -1,0 +1,13 @@
+{
+  "schema": "nexus.traceability-standards-upstreams.v1",
+  "verified_at": "2026-08-28",
+  "projects": [
+    {"project":"GitHub Spec Kit","repository":"github/spec-kit","version":"v1.0.1","license":"MIT","evidence_class":"DOCUMENTED_UPSTREAM_CAPABILITY","runtime_evidence":"NOT_TESTED","capabilities":["spec lifecycle","constitution/governance","workflows","extensions","presets","bundles","existing-project adoption"],"source":"https://github.com/github/spec-kit/releases/tag/v1.0.1"},
+    {"project":"OpenSpec","repository":"Fission-AI/OpenSpec","version":"v1.11.0","license":"MIT","evidence_class":"DOCUMENTED_UPSTREAM_CAPABILITY","runtime_evidence":"NOT_TESTED","capabilities":["incremental specs","spec diffs","batch status","validation","archive","human approval before explore writes"],"source":"https://github.com/Fission-AI/OpenSpec/releases/tag/v1.11.0"},
+    {"project":"SpecD","repository":"specd-sdd/SpecD","version":"main-observed-2026-08-28","license":"MIT","evidence_class":"DOCUMENTED_UPSTREAM_CAPABILITY","runtime_evidence":"NOT_TESTED","capabilities":["compiled context","structural verification","spec/code graph","impact analysis","approval gates","deterministic delta application"],"source":"https://github.com/specd-sdd/SpecD"},
+    {"project":"Agent OS","repository":"buildermethods/agent-os","version":"3.0","license":"MIT","evidence_class":"DOCUMENTED_UPSTREAM_CAPABILITY","runtime_evidence":"NOT_TESTED","capabilities":["standards discovery","standards injection","codebase standards","spec guidance"],"source":"https://github.com/buildermethods/agent-os"},
+    {"project":"Superpowers","repository":"obra/superpowers","version":"v6.1.1-observed","license":"MIT","evidence_class":"DOCUMENTED_UPSTREAM_CAPABILITY","runtime_evidence":"NOT_TESTED","capabilities":["TDD","systematic debugging","planning","verification before completion","subagent workflows","code review"],"source":"https://github.com/obra/superpowers"},
+    {"project":"Open GSD Core","repository":"open-gsd/gsd-core","version":"main-observed-2026-08-28","license":"MIT","evidence_class":"DOCUMENTED_UPSTREAM_CAPABILITY","runtime_evidence":"NOT_TESTED","capabilities":["fresh-context subagents","context engineering","persistent state artifacts","verification loop"],"source":"https://github.com/open-gsd/gsd-core"},
+    {"project":"SpecDD","repository":"specdd/specdd","version":"main-observed-2026-08-28","license":"Apache-2.0","evidence_class":"DOCUMENTED_UPSTREAM_CAPABILITY","runtime_evidence":"NOT_TESTED","capabilities":["colocated local specs","incremental brownfield adoption","intent preservation"],"source":"https://github.com/specdd/specdd"}
+  ]
+}

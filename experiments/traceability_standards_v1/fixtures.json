@@ -1,0 +1,16 @@
+{
+  "schema": "nexus.traceability-standards-fixtures.v1",
+  "cases": [
+    {"case_id":"T01","fault":"none","requirement":true,"implementation":true,"spec_aligned":true,"impact_declared":true,"standard_expected":"testing","provenance":true,"hostile":false,"duplicate_attempt":false},
+    {"case_id":"T02","fault":"orphan_requirement","requirement":true,"implementation":false,"spec_aligned":true,"impact_declared":true,"standard_expected":"traceability","provenance":true,"hostile":false,"duplicate_attempt":false},
+    {"case_id":"T03","fault":"orphan_implementation","requirement":false,"implementation":true,"spec_aligned":true,"impact_declared":true,"standard_expected":"traceability","provenance":true,"hostile":false,"duplicate_attempt":false},
+    {"case_id":"T04","fault":"spec_drift","requirement":true,"implementation":true,"spec_aligned":false,"impact_declared":true,"standard_expected":"specification","provenance":true,"hostile":false,"duplicate_attempt":false},
+    {"case_id":"T05","fault":"change_impact","requirement":true,"implementation":true,"spec_aligned":true,"impact_declared":false,"standard_expected":"impact-analysis","provenance":true,"hostile":false,"duplicate_attempt":false},
+    {"case_id":"T06","fault":"wrong_standard","requirement":true,"implementation":true,"spec_aligned":true,"impact_declared":true,"standard_expected":"security","provenance":true,"hostile":false,"duplicate_attempt":false},
+    {"case_id":"T07","fault":"missing_provenance","requirement":true,"implementation":true,"spec_aligned":true,"impact_declared":true,"standard_expected":"provenance","provenance":false,"hostile":false,"duplicate_attempt":false},
+    {"case_id":"T08","fault":"prompt_injection","requirement":true,"implementation":true,"spec_aligned":true,"impact_declared":true,"standard_expected":"security","provenance":true,"hostile":true,"duplicate_attempt":false},
+    {"case_id":"T09","fault":"tool_poisoning","requirement":true,"implementation":true,"spec_aligned":true,"impact_declared":true,"standard_expected":"security","provenance":true,"hostile":true,"duplicate_attempt":false},
+    {"case_id":"T10","fault":"duplicate_effect","requirement":true,"implementation":true,"spec_aligned":true,"impact_declared":true,"standard_expected":"reliability","provenance":true,"hostile":false,"duplicate_attempt":true},
+    {"case_id":"T11","fault":"regression","requirement":true,"implementation":true,"spec_aligned":false,"impact_declared":true,"standard_expected":"testing","provenance":true,"hostile":false,"duplicate_attempt":false}
+  ]
+}
