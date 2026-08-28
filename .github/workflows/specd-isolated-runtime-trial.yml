@@ -1,0 +1,124 @@
+name: SpecD Isolated Runtime Trial V1
+
+on:
+  pull_request:
+    paths:
+      - 'experiments/specd_isolated_v1/**'
+      - 'tests/test_specd_isolated_runtime_trial_v1.py'
+      - 'docs/architecture/SPECD_ISOLATED_RUNTIME_TRIAL_V1_SPEC.md'
+      - 'docs/audits/SPECD_ISOLATED_RUNTIME_TRIAL_V1_*.md'
+      - 'docs/governance/UPSTREAM_ADOPTION_MATRIX_V3.md'
+      - '.github/workflows/specd-isolated-runtime-trial.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  specd-isolated-trial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SPECD_COMMIT: 14422dba5c1cc64f04205f3ebfa3d435cd790aa0
+      PNPM_VERSION: 10.6.5
+      REPETITIONS: '5'
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Verify frozen fixture hashes
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib
+          root = pathlib.Path('experiments/specd_isolated_v1')
+          manifest = json.loads((root / 'fixture_manifest.json').read_text())
+          for item in manifest['files']:
+              path = root / item['path']
+              actual = hashlib.sha256(path.read_bytes()).hexdigest()
+              if actual != item['sha256']:
+                  raise SystemExit(f'hash mismatch: {item["path"]}: {actual}')
+          print('fixture hashes verified')
+          PY
+
+      - name: Clone and verify exact SpecD upstream commit
+        run: |
+          git clone --filter=blob:none https://github.com/specd-sdd/SpecD.git "$RUNNER_TEMP/specd-upstream"
+          git -C "$RUNNER_TEMP/specd-upstream" checkout --detach "$SPECD_COMMIT"
+          test "$(git -C "$RUNNER_TEMP/specd-upstream" rev-parse HEAD)" = "$SPECD_COMMIT"
+          git -C "$RUNNER_TEMP/specd-upstream" rev-parse HEAD | tee upstream-head.txt
+
+      - name: Install and build source-pinned SpecD CLI
+        working-directory: ${{ runner.temp }}/specd-upstream
+        run: |
+          corepack enable
+          corepack prepare "pnpm@$PNPM_VERSION" --activate
+          pnpm --version
+          pnpm install --frozen-lockfile
+          pnpm --filter @specd/cli... build
+          node packages/cli/dist/index.js --help >/dev/null
+
+      - name: Prepare isolated TypeScript fixture
+        run: |
+          FIXTURE="$RUNNER_TEMP/specd-fixture"
+          mkdir -p "$FIXTURE/src"
+          cp experiments/specd_isolated_v1/fixture/src/*.ts "$FIXTURE/src/"
+          git -C "$FIXTURE" init
+          git -C "$FIXTURE" config user.name 'NEXUS Trial'
+          git -C "$FIXTURE" config user.email 'nexus-trial@example.invalid'
+          git -C "$FIXTURE" add src
+          git -C "$FIXTURE" commit -m 'fixture: frozen graph case'
+
+      - name: Run real SpecD graph index
+        run: |
+          mkdir -p trial-evidence/raw
+          CLI="$RUNNER_TEMP/specd-upstream/packages/cli/dist/index.js"
+          FIXTURE="$RUNNER_TEMP/specd-fixture"
+          node "$CLI" graph index --path "$FIXTURE" --force --format json | tee trial-evidence/raw/index.json
+
+      - name: Run five real SpecD impact queries
+        run: |
+          CLI="$RUNNER_TEMP/specd-upstream/packages/cli/dist/index.js"
+          FIXTURE="$RUNNER_TEMP/specd-fixture"
+          : > trial-evidence/durations.txt
+          for i in 1 2 3 4 5; do
+            start=$(date +%s%N)
+            node "$CLI" graph impact --path "$FIXTURE" --direction dependents --depth 3 --format json --file src/core.ts > "trial-evidence/raw/impact-$i.json"
+            end=$(date +%s%N)
+            python -c "print(round(($end - $start) / 1000000, 3))" >> trial-evidence/durations.txt
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          values = [float(x) for x in Path('trial-evidence/durations.txt').read_text().splitlines() if x.strip()]
+          Path('trial-evidence/raw/durations-ms.json').write_text(json.dumps(values, indent=2) + '\n')
+          PY
+
+      - name: Evaluate bounded comparable subset
+        env:
+          NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python experiments/specd_isolated_v1/trial.py \
+            --raw-dir trial-evidence/raw \
+            --oracle experiments/specd_isolated_v1/fixture/oracle.json \
+            --output trial-evidence/result.json \
+            --receipt trial-evidence/execution-receipt.json \
+            --upstream-commit "$SPECD_COMMIT" \
+            --nexus-head "$NEXUS_HEAD_SHA" \
+            --repetitions "$REPETITIONS"
+          cp upstream-head.txt trial-evidence/upstream-head.txt
+          cp experiments/specd_isolated_v1/protocol.json trial-evidence/protocol.json
+          cp experiments/specd_isolated_v1/fixture_manifest.json trial-evidence/fixture-manifest.json
+
+      - name: Upload real runtime evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: specd-isolated-runtime-trial-v1
+          path: trial-evidence/
+          if-no-files-found: error
+          retention-days: 30
