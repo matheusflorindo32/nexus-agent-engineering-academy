@@ -12,6 +12,16 @@ EDGE_TYPES = {
     "REFINED_BY", "PLANNED_BY", "TOUCHES_FILE", "TOUCHES_SYMBOL",
     "CONTAINS_SYMBOL", "DEPENDS_ON", "VERIFIED_BY", "PRODUCES_EVIDENCE",
 }
+EDGE_ENDPOINT_TYPES = {
+    "REFINED_BY": ({"requirement"}, {"spec"}),
+    "PLANNED_BY": ({"spec"}, {"task"}),
+    "TOUCHES_FILE": ({"spec", "task"}, {"file"}),
+    "TOUCHES_SYMBOL": ({"spec", "task"}, {"symbol"}),
+    "CONTAINS_SYMBOL": ({"file"}, {"symbol"}),
+    "DEPENDS_ON": ({"file", "symbol"}, {"file", "symbol"}),
+    "VERIFIED_BY": ({"task", "file", "symbol"}, {"test"}),
+    "PRODUCES_EVIDENCE": ({"test", "task"}, {"evidence"}),
+}
 MAX_NODES = 2000
 MAX_EDGES = 8000
 MAX_FANOUT = 256
@@ -135,6 +145,9 @@ class TraceabilityGraph:
                 raise GraphValidationError("edge references missing node")
             if edge_type not in EDGE_TYPES:
                 raise GraphValidationError("unknown edge type")
+            allowed_sources, allowed_targets = EDGE_ENDPOINT_TYPES[edge_type]
+            if nodes[source]["type"] not in allowed_sources or nodes[target]["type"] not in allowed_targets:
+                raise GraphValidationError("edge type incompatible with node types")
             key = (source, target, edge_type)
             if key in seen_edges:
                 raise GraphValidationError("duplicate edge")
