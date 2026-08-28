@@ -4,7 +4,7 @@ content_id: architecture.traceability-standards-runtime-trial-v1
 version: 1.0.0
 title: Traceability & Standards Runtime Trial V1
 lang: pt-BR
-status: experiment
+status: review
 reviewed_at: 2026-08-28
 ---
 
