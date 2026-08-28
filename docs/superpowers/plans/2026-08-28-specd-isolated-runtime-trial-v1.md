@@ -1,3 +1,13 @@
+---
+id: plan.specd-isolated-runtime-trial-v1
+content_id: plan.specd-isolated-runtime-trial-v1
+version: 1.0.0
+title: SpecD Isolated Runtime Trial V1 Implementation Plan
+lang: pt-BR
+status: review
+reviewed_at: 2026-08-28
+---
+
 # SpecD Isolated Runtime Trial V1 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -34,9 +44,9 @@
 - Consumes: project root and committed trial paths.
 - Produces: structural tests proving upstream pin, five repetitions, evidence classes, fixture/oracle existence, and no fabricated global runtime score.
 
-- [ ] **Step 1: Write failing structural tests** requiring the frozen protocol, fixture manifest, evaluator and workflow before those implementation files exist.
-- [ ] **Step 2: Open a draft stacked PR on `feat/traceability-standards-runtime-trial-v1` and observe GitHub Actions RED caused by the missing implementation files.**
-- [ ] **Step 3: Preserve run IDs/artifact evidence in the final review document; do not rewrite history.**
+- [x] **Step 1: Write failing structural tests** requiring the frozen protocol, fixture manifest, evaluator and workflow before those implementation files exist.
+- [x] **Step 2: Open a draft stacked PR on `feat/traceability-standards-runtime-trial-v1` and observe GitHub Actions RED caused by the missing implementation files.**
+- [x] **Step 3: Preserve run IDs/artifact evidence in the final review document; do not rewrite history.**
 
 ### Task 2: Build the frozen fixture and NEXUS oracle
 
