@@ -1,11 +1,14 @@
 {
-  "schema_version": "nexus.traceability.v1",
+  "schema_version": "nexus.traceability.v2",
+  "graph_schema": ".nexus/traceability/graph-v2.schema.json",
+  "graph_mode": "deterministic-bounded",
   "chain": ["requirement", "spec", "task", "files_or_symbols", "tests", "evidence"],
   "statuses": ["PLANNED", "IMPLEMENTED", "VERIFIED", "BLOCKED", "NOT_APPLICABLE"],
   "rules": [
     "Every implemented task must reference at least one requirement.",
     "Every VERIFIED item must reference tests or explicit non-test evidence.",
     "Orphan requirements and orphan implementation tasks block release review at L2 or above.",
-    "Blast radius must be declared for L2-L4 changes."
+    "Blast radius must be declared for L2-L4 changes.",
+    "Graph relations must satisfy the endpoint-type constraints in graph-v2.schema.json."
   ]
 }

@@ -52,12 +52,17 @@ def evaluate(raw_dir: Path, oracle_path: Path, repetitions: int) -> dict[str, An
 
     first = set(observed_runs[0])
     tp = len(first & positives)
-    fp = len(first & negatives)
+    # Precision must penalize every unexpected affected file, including paths not
+    # enumerated in the explicit negative universe.  FPR remains bounded to the
+    # explicit negative universe because TN is only defined there.
+    unexpected = first - positives
+    precision_fp = len(unexpected)
+    negative_fp = len(first & negatives)
     fn = len(positives - first)
     tn = len(negatives - first)
-    precision = _ratio(tp, tp + fp)
+    precision = _ratio(tp, tp + precision_fp)
     recall = _ratio(tp, tp + fn)
-    fpr = _ratio(fp, fp + tn)
+    fpr = _ratio(negative_fp, negative_fp + tn)
     fnr = _ratio(fn, fn + tp)
     repeatability = _ratio(sum(run == observed_runs[0] for run in observed_runs), repetitions)
 
@@ -77,6 +82,8 @@ def evaluate(raw_dir: Path, oracle_path: Path, repetitions: int) -> dict[str, An
             "affected_file_recall": recall,
             "false_positive_rate": fpr,
             "false_negative_rate": fnr,
+            "unexpected_affected_files": precision_fp,
+            "negative_universe_false_positives": negative_fp,
             "repeatability_rate": repeatability,
             "index_success_rate": 1.0,
             "query_success_rate": 1.0,

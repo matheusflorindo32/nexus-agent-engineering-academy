@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 25
     env:
       SPECD_COMMIT: 14422dba5c1cc64f04205f3ebfa3d435cd790aa0
+      KNOWN_BLOCKED_COMMIT: 14422dba5c1cc64f04205f3ebfa3d435cd790aa0
+      SPECD_RECHECK_ENABLED: 'false'
       PNPM_VERSION: 10.6.5
       REPETITIONS: '5'
     steps:
@@ -49,37 +51,11 @@ jobs:
           print('fixture hashes verified')
           PY
 
-      - name: Clone and verify exact SpecD upstream commit
-        run: |
-          git clone --filter=blob:none https://github.com/specd-sdd/SpecD.git "$RUNNER_TEMP/specd-upstream"
-          git -C "$RUNNER_TEMP/specd-upstream" checkout --detach "$SPECD_COMMIT"
-          test "$(git -C "$RUNNER_TEMP/specd-upstream" rev-parse HEAD)" = "$SPECD_COMMIT"
-          git -C "$RUNNER_TEMP/specd-upstream" rev-parse HEAD | tee trial-evidence/upstream-head.txt
-
-      - name: Install and build source-pinned SpecD CLI
-        id: upstream_build
-        continue-on-error: true
-        working-directory: ${{ runner.temp }}/specd-upstream
-        run: |
-          corepack enable
-          corepack prepare "pnpm@$PNPM_VERSION" --activate
-          pnpm --version | tee "$GITHUB_WORKSPACE/trial-evidence/pnpm-version.txt"
-          set +e
-          pnpm install --frozen-lockfile 2>&1 | tee "$GITHUB_WORKSPACE/trial-evidence/upstream-install.log"
-          install_code=${PIPESTATUS[0]}
-          set -e
-          echo "install_exit_code=$install_code" >> "$GITHUB_OUTPUT"
-          if [ "$install_code" -ne 0 ]; then
-            exit "$install_code"
-          fi
-          pnpm --filter @specd/cli... build 2>&1 | tee "$GITHUB_WORKSPACE/trial-evidence/upstream-build.log"
-          node packages/cli/dist/index.js --help >/dev/null
-
-      - name: Record reproducibility blockage
-        if: steps.upstream_build.outcome != 'success'
+      - name: Monitor known blocked SpecD pin without rerunning runtime
+        id: monitor_gate
+        if: env.SPECD_RECHECK_ENABLED != 'true'
         env:
           NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          INSTALL_EXIT_CODE: ${{ steps.upstream_build.outputs.install_exit_code }}
         run: |
           python - <<'PY'
           import hashlib, json, os
@@ -87,16 +63,14 @@ jobs:
           evidence = Path('trial-evidence')
           result = {
               'schema': 'nexus.specd-isolated-runtime-result.v1',
-              'decision': 'BLOCKED',
-              'evidence_class': 'REAL_RUNTIME_EVIDENCE',
+              'decision': 'MONITOR',
+              'evidence_class': 'DOCUMENTED_UPSTREAM_CAPABILITY',
               'runtime_comparison': 'NOT_TESTED',
-              'blocker': 'UPSTREAM_FROZEN_LOCKFILE_MISMATCH',
+              'blocker': 'known_blocked_commit',
               'upstream_repository': 'specd-sdd/SpecD',
               'upstream_commit': os.environ['SPECD_COMMIT'],
-              'install_exit_code': int(os.environ.get('INSTALL_EXIT_CODE') or 1),
-              'reason': 'The exact pinned source commit cannot be installed with pnpm install --frozen-lockfile because pnpm-lock.yaml and packages/cli/package.json disagree.',
-              'no_fallback_used': True,
-              'forbidden_fallback': 'pnpm install --no-frozen-lockfile',
+              'known_blocked_commit': os.environ['KNOWN_BLOCKED_COMMIT'],
+              'reason': 'No new reproducible SpecD commit/tag was identified; the previously blocked pin is not rerun.',
               'global_framework_comparison': 'BLOCKED',
               'comparable_subset_score_0_100': 'NOT_TESTED'
           }
@@ -104,13 +78,13 @@ jobs:
           result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
           receipt = {
               'schema': 'nexus.execution-receipt.specd-isolated-v1',
-              'evidence_class': 'REAL_RUNTIME_EVIDENCE',
+              'evidence_class': 'DOCUMENTED_UPSTREAM_CAPABILITY',
               'nexus_head_sha': os.environ['NEXUS_HEAD_SHA'],
-              'upstream_repository': 'specd-sdd/SpecD',
               'upstream_commit': os.environ['SPECD_COMMIT'],
-              'phase_reached': 'dependency_install',
+              'phase_reached': 'monitor_gate',
+              'failure_phase': None,
               'runtime_queries_executed': 0,
-              'decision': 'BLOCKED',
+              'decision': 'MONITOR',
               'result_sha256': hashlib.sha256(result_path.read_bytes()).hexdigest()
           }
           (evidence / 'execution-receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
@@ -118,8 +92,51 @@ jobs:
           cp experiments/specd_isolated_v1/protocol.json trial-evidence/protocol.json
           cp experiments/specd_isolated_v1/fixture_manifest.json trial-evidence/fixture-manifest.json
 
+      - name: Clone and verify exact SpecD upstream commit
+        id: clone
+        if: env.SPECD_RECHECK_ENABLED == 'true'
+        continue-on-error: true
+        run: |
+          git clone --filter=blob:none https://github.com/specd-sdd/SpecD.git "$RUNNER_TEMP/specd-upstream"
+          git -C "$RUNNER_TEMP/specd-upstream" checkout --detach "$SPECD_COMMIT"
+          test "$(git -C "$RUNNER_TEMP/specd-upstream" rev-parse HEAD)" = "$SPECD_COMMIT"
+          git -C "$RUNNER_TEMP/specd-upstream" rev-parse HEAD | tee trial-evidence/upstream-head.txt
+
+      - name: Set up pinned package manager
+        id: package_manager
+        if: env.SPECD_RECHECK_ENABLED == 'true' && steps.clone.outcome == 'success'
+        continue-on-error: true
+        working-directory: ${{ runner.temp }}/specd-upstream
+        run: |
+          corepack enable
+          corepack prepare "pnpm@$PNPM_VERSION" --activate
+          pnpm --version | tee "$GITHUB_WORKSPACE/trial-evidence/pnpm-version.txt"
+
+      - name: Install frozen upstream dependencies
+        id: dependency_install
+        if: env.SPECD_RECHECK_ENABLED == 'true' && steps.package_manager.outcome == 'success'
+        continue-on-error: true
+        working-directory: ${{ runner.temp }}/specd-upstream
+        run: pnpm install --frozen-lockfile 2>&1 | tee "$GITHUB_WORKSPACE/trial-evidence/upstream-install.log"
+
+      - name: Build source-pinned SpecD CLI
+        id: upstream_build
+        if: env.SPECD_RECHECK_ENABLED == 'true' && steps.dependency_install.outcome == 'success'
+        continue-on-error: true
+        working-directory: ${{ runner.temp }}/specd-upstream
+        run: pnpm --filter @specd/cli... build 2>&1 | tee "$GITHUB_WORKSPACE/trial-evidence/upstream-build.log"
+
+      - name: Smoke-test built CLI
+        id: cli_smoke
+        if: env.SPECD_RECHECK_ENABLED == 'true' && steps.upstream_build.outcome == 'success'
+        continue-on-error: true
+        working-directory: ${{ runner.temp }}/specd-upstream
+        run: node packages/cli/dist/index.js --help > "$GITHUB_WORKSPACE/trial-evidence/cli-help.txt"
+
       - name: Prepare isolated TypeScript fixture
-        if: steps.upstream_build.outcome == 'success'
+        id: fixture
+        if: env.SPECD_RECHECK_ENABLED == 'true' && steps.cli_smoke.outcome == 'success'
+        continue-on-error: true
         run: |
           FIXTURE="$RUNNER_TEMP/specd-fixture"
           mkdir -p "$FIXTURE/src"
@@ -131,21 +148,25 @@ jobs:
           git -C "$FIXTURE" commit -m 'fixture: frozen graph case'
 
       - name: Run real SpecD graph index
-        if: steps.upstream_build.outcome == 'success'
+        id: graph_index
+        if: env.SPECD_RECHECK_ENABLED == 'true' && steps.fixture.outcome == 'success'
+        continue-on-error: true
         run: |
           CLI="$RUNNER_TEMP/specd-upstream/packages/cli/dist/index.js"
           FIXTURE="$RUNNER_TEMP/specd-fixture"
-          node "$CLI" graph index --path "$FIXTURE" --force --format json | tee trial-evidence/raw/index.json
+          node "$CLI" graph index --path "$FIXTURE" --force --format json 2>trial-evidence/raw/index.stderr | tee trial-evidence/raw/index.json
 
       - name: Run five real SpecD impact queries
-        if: steps.upstream_build.outcome == 'success'
+        id: graph_impact
+        if: env.SPECD_RECHECK_ENABLED == 'true' && steps.graph_index.outcome == 'success'
+        continue-on-error: true
         run: |
           CLI="$RUNNER_TEMP/specd-upstream/packages/cli/dist/index.js"
           FIXTURE="$RUNNER_TEMP/specd-fixture"
           : > trial-evidence/durations.txt
           for i in 1 2 3 4 5; do
             start=$(date +%s%N)
-            node "$CLI" graph impact --path "$FIXTURE" --direction dependents --depth 3 --format json --file src/core.ts > "trial-evidence/raw/impact-$i.json"
+            node "$CLI" graph impact --path "$FIXTURE" --direction dependents --depth 3 --format json --file src/core.ts > "trial-evidence/raw/impact-$i.json" 2> "trial-evidence/raw/impact-$i.stderr"
             end=$(date +%s%N)
             python -c "print(round(($end - $start) / 1000000, 3))" >> trial-evidence/durations.txt
           done
@@ -157,7 +178,9 @@ jobs:
           PY
 
       - name: Evaluate bounded comparable subset
-        if: steps.upstream_build.outcome == 'success'
+        id: evaluator
+        if: env.SPECD_RECHECK_ENABLED == 'true' && steps.graph_impact.outcome == 'success'
+        continue-on-error: true
         env:
           NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
@@ -169,6 +192,72 @@ jobs:
             --upstream-commit "$SPECD_COMMIT" \
             --nexus-head "$NEXUS_HEAD_SHA" \
             --repetitions "$REPETITIONS"
+          cp experiments/specd_isolated_v1/protocol.json trial-evidence/protocol.json
+          cp experiments/specd_isolated_v1/fixture_manifest.json trial-evidence/fixture-manifest.json
+
+      - name: Record phase-specific runtime blockage
+        if: env.SPECD_RECHECK_ENABLED == 'true' && always() && steps.evaluator.outcome != 'success'
+        env:
+          NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          CLONE_OUTCOME: ${{ steps.clone.outcome }}
+          PM_OUTCOME: ${{ steps.package_manager.outcome }}
+          INSTALL_OUTCOME: ${{ steps.dependency_install.outcome }}
+          BUILD_OUTCOME: ${{ steps.upstream_build.outcome }}
+          CLI_OUTCOME: ${{ steps.cli_smoke.outcome }}
+          FIXTURE_OUTCOME: ${{ steps.fixture.outcome }}
+          INDEX_OUTCOME: ${{ steps.graph_index.outcome }}
+          IMPACT_OUTCOME: ${{ steps.graph_impact.outcome }}
+          EVALUATOR_OUTCOME: ${{ steps.evaluator.outcome }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          evidence = Path('trial-evidence')
+          phases = [
+              ('clone', os.getenv('CLONE_OUTCOME'), 'UPSTREAM_SOURCE_CHECKOUT_FAILED'),
+              ('package_manager_setup', os.getenv('PM_OUTCOME'), 'UPSTREAM_PACKAGE_MANAGER_SETUP_FAILED'),
+              ('dependency_install', os.getenv('INSTALL_OUTCOME'), 'UPSTREAM_DEPENDENCY_INSTALL_FAILED'),
+              ('build', os.getenv('BUILD_OUTCOME'), 'UPSTREAM_BUILD_FAILED'),
+              ('cli_smoke', os.getenv('CLI_OUTCOME'), 'UPSTREAM_CLI_SMOKE_FAILED'),
+              ('fixture', os.getenv('FIXTURE_OUTCOME'), 'FIXTURE_PREPARATION_FAILED'),
+              ('graph_index', os.getenv('INDEX_OUTCOME'), 'UPSTREAM_GRAPH_INDEX_FAILED'),
+              ('graph_impact', os.getenv('IMPACT_OUTCOME'), 'UPSTREAM_GRAPH_IMPACT_FAILED'),
+              ('evaluation', os.getenv('EVALUATOR_OUTCOME'), 'NEXUS_EVALUATOR_FAILED'),
+          ]
+          failure_phase, blocker = 'unknown', 'UNKNOWN_RUNTIME_BLOCKER'
+          for phase, outcome, code in phases:
+              if outcome == 'failure':
+                  failure_phase, blocker = phase, code
+                  break
+          install_log = evidence / 'upstream-install.log'
+          if failure_phase == 'dependency_install' and install_log.exists() and 'ERR_PNPM_OUTDATED_LOCKFILE' in install_log.read_text(errors='replace'):
+              blocker = 'UPSTREAM_FROZEN_LOCKFILE_MISMATCH'
+          result = {
+              'schema': 'nexus.specd-isolated-runtime-result.v1',
+              'decision': 'BLOCKED',
+              'evidence_class': 'REAL_RUNTIME_EVIDENCE',
+              'runtime_comparison': 'NOT_TESTED',
+              'failure_phase': failure_phase,
+              'blocker': blocker,
+              'upstream_commit': os.environ['SPECD_COMMIT'],
+              'global_framework_comparison': 'BLOCKED',
+              'comparable_subset_score_0_100': 'NOT_TESTED'
+          }
+          result_path = evidence / 'result.json'
+          result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          receipt = {
+              'schema': 'nexus.execution-receipt.specd-isolated-v1',
+              'evidence_class': 'REAL_RUNTIME_EVIDENCE',
+              'nexus_head_sha': os.environ['NEXUS_HEAD_SHA'],
+              'upstream_commit': os.environ['SPECD_COMMIT'],
+              'phase_reached': failure_phase,
+              'failure_phase': failure_phase,
+              'runtime_queries_executed': 0 if failure_phase != 'graph_impact' else 'PARTIAL_UNKNOWN',
+              'decision': 'BLOCKED',
+              'result_sha256': hashlib.sha256(result_path.read_bytes()).hexdigest()
+          }
+          (evidence / 'execution-receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          PY
           cp experiments/specd_isolated_v1/protocol.json trial-evidence/protocol.json
           cp experiments/specd_isolated_v1/fixture_manifest.json trial-evidence/fixture-manifest.json
 
@@ -185,15 +274,12 @@ jobs:
         if: always()
         run: |
           test -f trial-evidence/result.json
+          test -f trial-evidence/execution-receipt.json
           python - <<'PY'
           import json
           from pathlib import Path
           result = json.loads(Path('trial-evidence/result.json').read_text())
-          if result.get('decision') == 'BLOCKED':
-              assert result.get('runtime_comparison') == 'NOT_TESTED'
-              assert result.get('global_framework_comparison') == 'BLOCKED'
-              print('methodological gate passed: upstream runtime correctly BLOCKED')
-          else:
-              assert result.get('evidence_class') == 'REAL_RUNTIME_EVIDENCE'
-              print('runtime gate passed: real SpecD result recorded')
+          assert result.get('runtime_comparison') == 'NOT_TESTED' or result.get('evidence_class') == 'REAL_RUNTIME_EVIDENCE'
+          assert result.get('global_framework_comparison') == 'BLOCKED'
+          print('SpecD evidence boundary recorded:', result.get('decision'), result.get('blocker'))
           PY

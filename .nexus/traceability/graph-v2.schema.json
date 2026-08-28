@@ -1,0 +1,57 @@
+{
+  "authority": "human_authority_preserved",
+  "edge_types": [
+    "REFINED_BY",
+    "PLANNED_BY",
+    "TOUCHES_FILE",
+    "TOUCHES_SYMBOL",
+    "CONTAINS_SYMBOL",
+    "DEPENDS_ON",
+    "VERIFIED_BY",
+    "PRODUCES_EVIDENCE"
+  ],
+  "evidence_classes": [
+    "REAL_RUNTIME_EVIDENCE",
+    "DETERMINISTIC_CONTROL_EVIDENCE",
+    "DOCUMENTED_UPSTREAM_CAPABILITY",
+    "INFERRED",
+    "NOT_TESTED",
+    "NOT_APPLICABLE"
+  ],
+  "limits": {
+    "max_depth": 16,
+    "max_edges": 8000,
+    "max_fanout": 256,
+    "max_metadata_string": 2048,
+    "max_nodes": 2000
+  },
+  "node_types": [
+    "requirement",
+    "spec",
+    "task",
+    "file",
+    "symbol",
+    "test",
+    "evidence"
+  ],
+  "relation_constraints": {
+    "CONTAINS_SYMBOL": ["file", "symbol"],
+    "DEPENDS_ON": ["file_or_symbol", "file_or_symbol"],
+    "PLANNED_BY": ["spec", "task"],
+    "PRODUCES_EVIDENCE": ["test_or_task", "evidence"],
+    "REFINED_BY": ["requirement", "spec"],
+    "TOUCHES_FILE": ["spec_or_task", "file"],
+    "TOUCHES_SYMBOL": ["spec_or_task", "symbol"],
+    "VERIFIED_BY": ["task_file_or_symbol", "test"]
+  },
+  "schema_version": "nexus.traceability-graph.v2",
+  "source_of_truth": ".nexus/constitution.md",
+  "traceability_chain": [
+    "requirement",
+    "spec",
+    "task",
+    "file_or_symbol",
+    "test",
+    "evidence"
+  ]
+}

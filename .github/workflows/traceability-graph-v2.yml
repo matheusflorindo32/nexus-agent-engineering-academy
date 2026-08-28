@@ -1,0 +1,83 @@
+name: NEXUS Traceability Graph V2
+
+on:
+  pull_request:
+    paths:
+      - 'examples/traceability_graph_v2.py'
+      - 'experiments/traceability_graph_v2/**'
+      - 'tests/test_traceability_graph_v2.py'
+      - 'docs/architecture/NEXUS_TRACEABILITY_GRAPH_V2_DESIGN_TRIAL.md'
+      - 'docs/audits/NEXUS_TRACEABILITY_GRAPH_V2_*.md'
+      - 'docs/governance/UPSTREAM_ADOPTION_MATRIX_V4.md'
+      - '.github/workflows/traceability-graph-v2.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  graph-v2:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      REPETITIONS: '5'
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Verify frozen protocol and fixture hashes
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path('experiments/traceability_graph_v2')
+          manifest = json.loads((root / 'fixture-manifest.json').read_text())
+          for item in manifest['files']:
+              actual = hashlib.sha256((root / item['path']).read_bytes()).hexdigest()
+              if actual != item['sha256']:
+                  raise SystemExit(f"hash mismatch for {item['path']}: {actual}")
+          print('Graph V2 frozen hashes verified')
+          PY
+
+      - name: Run Graph V2 contract tests
+        run: python -m unittest tests.test_traceability_graph_v2 -v
+
+      - name: Execute five-repetition deterministic benchmark
+        env:
+          NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p graph-v2-evidence
+          python experiments/traceability_graph_v2/benchmark.py \
+            --output graph-v2-evidence/result.json \
+            --receipt graph-v2-evidence/execution-receipt.json \
+            --head-sha "$NEXUS_HEAD_SHA" \
+            --repetitions "$REPETITIONS" \
+            | tee graph-v2-evidence/stdout.json
+          cp experiments/traceability_graph_v2/protocol.json graph-v2-evidence/protocol.json
+          cp experiments/traceability_graph_v2/fixtures.json graph-v2-evidence/fixtures.json
+          cp experiments/traceability_graph_v2/fixture-manifest.json graph-v2-evidence/fixture-manifest.json
+
+      - name: Assert evidence boundary and PASS decision
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('graph-v2-evidence/result.json').read_text())
+          receipt = json.loads(Path('graph-v2-evidence/execution-receipt.json').read_text())
+          assert result['evidence_class'] == 'DETERMINISTIC_CONTROL_EVIDENCE'
+          assert result['specd_runtime_comparison'] == 'NOT_TESTED'
+          assert result['repetitions'] == 5
+          assert receipt['decision'] == 'PASS'
+          assert receipt['specd_runtime_comparison'] == 'NOT_TESTED'
+          print('Graph V2 evidence boundary verified')
+          PY
+
+      - name: Upload Graph V2 execution evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-traceability-graph-v2
+          path: graph-v2-evidence/
+          if-no-files-found: error
+          retention-days: 30

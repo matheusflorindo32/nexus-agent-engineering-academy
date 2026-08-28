@@ -1,0 +1,27 @@
+{
+  "cases": [
+    {"case_id": "valid_chain", "expected_codes": []},
+    {"case_id": "orphan_requirement", "expected_codes": ["ORPHAN_REQUIREMENT"]},
+    {"case_id": "orphan_implementation", "expected_codes": ["ORPHAN_IMPLEMENTATION"]},
+    {"case_id": "orphan_test", "expected_codes": ["ORPHAN_TEST"]},
+    {"case_id": "orphan_evidence", "expected_codes": ["ORPHAN_EVIDENCE"]},
+    {"case_id": "spec_drift", "expected_codes": ["SPEC_DRIFT"]},
+    {"case_id": "stale_file_link", "expected_codes": ["STALE_FILE"]},
+    {"case_id": "stale_symbol_link", "expected_codes": ["STALE_SYMBOL"]},
+    {"case_id": "transitive_dependency", "expected_codes": []},
+    {"case_id": "cycle", "expected_codes": ["CYCLE"]},
+    {"case_id": "missing_symbol", "expected_codes": ["STALE_SYMBOL"]},
+    {"case_id": "renamed_file", "expected_codes": ["STALE_FILE"]},
+    {"case_id": "path_traversal", "expected_codes": ["VALIDATION_REJECTED"]},
+    {"case_id": "malformed_metadata", "expected_codes": ["VALIDATION_REJECTED"]},
+    {"case_id": "metadata_prompt_injection", "expected_codes": ["UNTRUSTED_METADATA"]},
+    {"case_id": "duplicate_edge", "expected_codes": ["VALIDATION_REJECTED"]},
+    {"case_id": "poisoned_dependency_relation", "expected_codes": ["VALIDATION_REJECTED"]},
+    {"case_id": "pathological_fanout", "expected_codes": ["VALIDATION_REJECTED"]}
+  ],
+  "derived_from": [
+    "PR#57 traceability governance fixtures",
+    "PR#58 frozen TypeScript impact-chain semantics"
+  ],
+  "schema": "nexus.traceability-graph-v2.fixtures.v1"
+}
