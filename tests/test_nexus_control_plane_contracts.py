@@ -108,6 +108,16 @@ class NexusControlPlaneContractsTest(unittest.TestCase):
         ):
             self.assertIn(phrase, text)
 
+    def test_agents_entrypoint_routes_to_control_plane(self) -> None:
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for phrase in (
+            "NEXUS Spec-Driven Control Plane",
+            ".nexus/constitution.md",
+            ".nexus/rigor-levels.json",
+            ".nexus/standards/registry.json",
+        ):
+            self.assertIn(phrase, text)
+
 
 if __name__ == "__main__":
     unittest.main()
