@@ -215,30 +215,37 @@ class TraceabilityGraph:
         return False
 
     def _cycle_nodes(self) -> set[str]:
-        visited: set[str] = set()
-        active: set[str] = set()
-        cycle: set[str] = set()
-
-        def visit(node: str) -> None:
-            if node in active:
-                cycle.add(node)
-                return
-            if node in visited:
-                return
-            visited.add(node)
-            active.add(node)
-            for nxt in self.forward.get(node, []):
-                if nxt in active:
-                    cycle.update({node, nxt})
-                else:
-                    visit(nxt)
-                    if nxt in cycle:
-                        cycle.add(node)
-            active.remove(node)
-
-        for node_id in sorted(self.nodes):
-            visit(node_id)
-        return cycle
+        """Return only nodes that participate in directed cycles, without recursion."""
+        color: dict[str, int] = {node: 0 for node in self.nodes}  # 0 unseen, 1 active, 2 done
+        cycle_nodes: set[str] = set()
+        for start in sorted(self.nodes):
+            if color[start] != 0:
+                continue
+            color[start] = 1
+            path = [start]
+            path_index = {start: 0}
+            stack: list[tuple[str, int]] = [(start, 0)]
+            while stack:
+                node, next_idx = stack[-1]
+                neighbors = self.forward.get(node, [])
+                if next_idx >= len(neighbors):
+                    stack.pop()
+                    color[node] = 2
+                    path_index.pop(node, None)
+                    if path and path[-1] == node:
+                        path.pop()
+                    continue
+                neighbor = neighbors[next_idx]
+                stack[-1] = (node, next_idx + 1)
+                state = color.get(neighbor, 0)
+                if state == 0:
+                    color[neighbor] = 1
+                    path_index[neighbor] = len(path)
+                    path.append(neighbor)
+                    stack.append((neighbor, 0))
+                elif state == 1 and neighbor in path_index:
+                    cycle_nodes.update(path[path_index[neighbor]:])
+        return cycle_nodes
 
     def audit(self) -> dict[str, Any]:
         diagnostics: list[dict[str, Any]] = []

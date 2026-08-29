@@ -1,0 +1,39 @@
+{
+  "base_sha": "a9f0701f46a8b7b1f91556e992185bbb941f4c19",
+  "fixture_evidence_class": "DETERMINISTIC_CONTROL_EVIDENCE",
+  "ignored_directories": [
+    ".git",
+    ".venv",
+    "venv",
+    "node_modules",
+    "vendor",
+    "generated",
+    "dist",
+    "build",
+    "__pycache__"
+  ],
+  "limits": {
+    "max_file_bytes": 262144,
+    "max_files": 2000,
+    "max_symbols_per_file": 512
+  },
+  "read_only": true,
+  "repetitions": 5,
+  "repository_evidence_class": "REAL_RUNTIME_EVIDENCE",
+  "runtime_dependencies_added": 0,
+  "schema": "nexus.repository-indexer-v1.protocol.v1",
+  "scope": {
+    "javascript": "NOT_TESTED",
+    "languages": [
+      "python"
+    ],
+    "rename_inference": "NOT_TESTED",
+    "typescript": "NOT_TESTED"
+  },
+  "security": {
+    "execute_repository_content": false,
+    "follow_symlinks": false,
+    "network": false
+  },
+  "specd_runtime": "MONITOR"
+}
