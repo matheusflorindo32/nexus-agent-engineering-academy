@@ -1,7 +1,7 @@
 ---
 id: audit.nexus-repository-indexer-v1-results
 content_id: audit.nexus-repository-indexer-v1-results
-version: 1.0.0
+version: 1.0.1
 title: NEXUS Repository Indexer V1 — Results
 lang: pt-BR
 status: review
@@ -13,7 +13,7 @@ reviewed_at: 2026-08-28
 ## Frozen inputs
 
 - `protocol.json` SHA-256: `ad9384481fbc89f21457dbc500cf90d39840896f1fac3f60fa970939501a3ff3`
-- `fixtures.json` SHA-256: `123946a63f217c667d048a629583ecdb0d4faa18ad4bf84539b1b98594ad0a15`
+- `fixtures.json` SHA-256: `eeb51a4ffa9918ba2147e984871f5dc676d34958dc09552fc886e10aefefd1d7`
 - repetitions: 5
 - runtime dependencies added: 0
 
@@ -21,18 +21,20 @@ reviewed_at: 2026-08-28
 
 Class: `DETERMINISTIC_CONTROL_EVIDENCE`.
 
-The initial GREEN capture produced a 100/100 score inside the frozen fixture corpus with precision, recall, F1, fixture pass rate and deterministic rerun equality equal to 1.0 and zero observed false positives/false negatives. This is a bounded synthetic-corpus result, not a production-quality or multi-language claim.
+Após revisão adversarial, todos os oito fixtures passaram a declarar explicitamente o oracle completo de files, symbols, dependencies, parse errors e limite mínimo de texto não confiável. O fallback que poderia usar o próprio observado como expectativa deixou de influenciar o corpus congelado.
+
+O capture com oracle completo produziu 100/100 dentro do corpus: precision, recall, F1, fixture pass rate e deterministic rerun equality = 1.0, com zero false positives e zero false negatives. Esse resultado é restrito ao corpus sintético congelado e não constitui claim de produção ou multi-language.
 
 ## Real repository evidence
 
-Class: `REAL_RUNTIME_EVIDENCE` for observations made by the workflow while indexing this repository read-only. The final workflow artifact is authoritative for file/symbol counts, fingerprint, elapsed time, memory and incremental reuse because those values depend on the exact PR head.
+Class: `REAL_RUNTIME_EVIDENCE` para observações feitas pelo workflow ao indexar este repositório em modo read-only. O artifact do head final é a fonte autoritativa para contagens de files/symbols, fingerprint, elapsed time, memória e incremental reuse porque esses valores dependem do conteúdo exato do PR.
 
-The real-repository correctness score is deliberately `NOT_APPLICABLE`: no independent full oracle exists for every symbol/dependency in the repository. TypeScript, JavaScript and rename inference remain `NOT_TESTED`.
+O real-repository correctness score é deliberadamente `NOT_APPLICABLE`: não existe oracle completo independente para todos os symbols/dependencies do próprio repositório. TypeScript, JavaScript e rename inference permanecem `NOT_TESTED`.
 
 ## Security evidence
 
-The workflow asserts zero repository writes. The indexer reports zero network calls and zero executed repository instructions. Prompt-injection-like strings are counted as untrusted text only.
+O workflow exige zero repository writes. O indexador registra zero network calls e zero repository instructions executadas. Strings semelhantes a prompt injection são contadas somente como texto não confiável.
 
 ## Score boundary
 
-`100/100` may be reported only for the frozen fixture benchmark when the final FROZEN hash check passes. It must not be presented as NEXUS overall quality, production security, real-repository correctness, or superiority over SpecD.
+`100/100` pode ser reportado apenas para o benchmark de fixtures quando o check final do manifest `FROZEN` passar. Não pode ser apresentado como qualidade geral do NEXUS, segurança de produção, correctness do repositório real ou superioridade sobre SpecD.
