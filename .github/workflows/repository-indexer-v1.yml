@@ -1,0 +1,80 @@
+name: NEXUS Repository Indexer V1
+
+on:
+  pull_request:
+    paths:
+      - 'examples/repository_indexer_v1.py'
+      - 'examples/traceability_graph_v2.py'
+      - 'experiments/repository_indexer_v1/**'
+      - 'tests/test_repository_indexer_v1.py'
+      - 'tests/test_traceability_graph_v2_review_regressions.py'
+      - '.github/workflows/repository-indexer-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REPETITIONS: '5'
+
+jobs:
+  indexer-v1:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Verify or capture frozen hashes
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path('experiments/repository_indexer_v1')
+          manifest = json.loads((root / 'fixture-manifest.json').read_text())
+          actual = {name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in ('protocol.json', 'fixtures.json')}
+          print(json.dumps({'manifest_status': manifest['status'], 'actual_sha256': actual}, sort_keys=True))
+          if manifest['status'] == 'FROZEN':
+              expected = {item['path']: item['sha256'] for item in manifest['files']}
+              if actual != expected:
+                  raise SystemExit(f'frozen hash mismatch: actual={actual} expected={expected}')
+          PY
+      - name: Run indexer and Graph V2 regression contracts
+        run: |
+          python -m unittest tests.test_repository_indexer_v1 tests.test_traceability_graph_v2_review_regressions -v
+      - name: Execute frozen and real-repository read-only trial
+        env:
+          NEXUS_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p indexer-v1-evidence
+          python experiments/repository_indexer_v1/benchmark.py \
+            --output indexer-v1-evidence/result.json \
+            --receipt indexer-v1-evidence/execution-receipt.json \
+            --head-sha "$NEXUS_HEAD_SHA" \
+            --repetitions "$REPETITIONS" \
+            | tee indexer-v1-evidence/stdout.json
+          cp experiments/repository_indexer_v1/protocol.json indexer-v1-evidence/protocol.json
+          cp experiments/repository_indexer_v1/fixtures.json indexer-v1-evidence/fixtures.json
+          cp experiments/repository_indexer_v1/fixture-manifest.json indexer-v1-evidence/fixture-manifest.json
+      - name: Assert evidence boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('indexer-v1-evidence/result.json').read_text())
+          receipt = json.loads(Path('indexer-v1-evidence/execution-receipt.json').read_text())
+          assert result['fixture_trial']['evidence_class'] == 'DETERMINISTIC_CONTROL_EVIDENCE'
+          assert result['repository_trial']['evidence_class'] == 'REAL_RUNTIME_EVIDENCE'
+          assert result['repository_trial']['mode'] == 'read-only-self-repository'
+          assert result['repository_trial']['security']['repository_writes'] == 0
+          assert result['runtime_dependencies_added'] == 0
+          assert receipt['decision'] == 'PASS'
+          print('Repository Indexer V1 evidence boundary verified')
+          PY
+      - name: Upload Repository Indexer V1 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-repository-indexer-v1
+          path: indexer-v1-evidence/
+          if-no-files-found: error
+          retention-days: 30
