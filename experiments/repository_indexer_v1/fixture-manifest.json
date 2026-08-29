@@ -1,8 +1,8 @@
 {
   "schema": "nexus.repository-indexer-v1.fixture-manifest.v1",
-  "status": "FROZEN",
+  "status": "PENDING_GREEN_CAPTURE",
   "files": [
     {"path": "protocol.json", "sha256": "ad9384481fbc89f21457dbc500cf90d39840896f1fac3f60fa970939501a3ff3"},
-    {"path": "fixtures.json", "sha256": "123946a63f217c667d048a629583ecdb0d4faa18ad4bf84539b1b98594ad0a15"}
+    {"path": "fixtures.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"}
   ]
 }
