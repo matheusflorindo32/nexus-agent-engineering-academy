@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nexus.local/schemas/repository-indexer-v1.schema.json",
+  "title": "NEXUS Repository Index V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "root_mode", "language_scope", "graph", "fingerprint", "file_records", "dependencies", "reverse_dependencies", "incremental", "skipped", "security", "stats"],
+  "properties": {
+    "schema": {"const": "nexus.repository-index.v1"},
+    "root_mode": {"const": "read-only"},
+    "language_scope": {"type": "array", "items": {"enum": ["python"]}, "uniqueItems": true},
+    "graph": {"type": "object"},
+    "fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "file_records": {"type": "object"},
+    "dependencies": {"type": "object"},
+    "reverse_dependencies": {"type": "object"},
+    "incremental": {"type": "object", "required": ["changed_files", "reused_files", "removed_files"]},
+    "skipped": {"type": "object", "required": ["oversized_files", "symlinks", "parse_errors", "decode_errors"]},
+    "security": {
+      "type": "object",
+      "required": ["instructions_executed", "untrusted_text_markers", "network_calls", "repository_writes"],
+      "properties": {
+        "instructions_executed": {"const": 0},
+        "untrusted_text_markers": {"type": "integer", "minimum": 0},
+        "network_calls": {"const": 0},
+        "repository_writes": {"const": 0}
+      },
+      "additionalProperties": false
+    },
+    "stats": {"type": "object", "required": ["indexed_files", "symbols", "dependency_edges"]}
+  }
+}
