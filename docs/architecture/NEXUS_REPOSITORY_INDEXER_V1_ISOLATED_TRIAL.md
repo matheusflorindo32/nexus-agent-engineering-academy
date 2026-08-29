@@ -1,7 +1,7 @@
 ---
 id: architecture.nexus-repository-indexer-v1-isolated-trial
 content_id: architecture.nexus-repository-indexer-v1-isolated-trial
-version: 1.0.0
+version: 1.0.1
 title: NEXUS Repository Indexer V1 — Isolated Trial
 lang: pt-BR
 status: review
@@ -33,7 +33,7 @@ O indexador não executa conteúdo do repositório, não segue symlinks, não fa
 
 ## Incremental model
 
-A chave de reutilização é SHA-256 do conteúdo do arquivo. Um segundo passe pode reutilizar registros AST de arquivos cujo hash permaneceu idêntntico; arquivos alterados são reprocessados e arquivos removidos aparecem em `removed_files`.
+A chave de reutilização é SHA-256 do conteúdo do arquivo. Um segundo passe pode reutilizar registros AST de arquivos cujo hash permaneceu idêntico; arquivos alterados são reprocessados e arquivos removidos aparecem em `removed_files`.
 
 ## Evidence taxonomy
 
