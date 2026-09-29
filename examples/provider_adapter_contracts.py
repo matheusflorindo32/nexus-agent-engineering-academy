@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import json
+import time
 from typing import Iterable
 
 from agent_reliability_runtime import (
@@ -91,14 +92,20 @@ class ScenarioResult:
 
 def _verified_action_scenario() -> float:
     ledger = ActionLedger()
-    ledger.request("op-verified", "publish", "human-1")
-    ledger.approve(Approval("approval-1", "op-verified", "human-1", True))
+    ledger.request("op-verified", "publish", "human-1", "resource-1")
+    ledger.approve(Approval(
+        "approval-1", "op-verified", "human-1", True, "publish", "resource-1",
+        time.time() + 60, "nonce-verified",
+        ledger.request_hash("op-verified", "publish", "human-1", "resource-1"),
+        "policy-v1",
+    ))
     receipt = ledger.execute_once(
         "op-verified", "publish", lambda: ("resource-1", {"ok": True})
     )
     if receipt.status != "EXECUTED":
         return 0.0
-    return 1.0 if ledger.verify("op-verified", "resource-1").status == "VERIFIED" else 0.0
+    observed = lambda: ("resource-1", {"exists": True})
+    return 1.0 if ledger.verify("op-verified", observed).status == "VERIFIED" else 0.0
 
 
 def _recovery_scenario() -> float:
@@ -116,8 +123,13 @@ def _recovery_scenario() -> float:
 
 def _duplicate_side_effect_scenario() -> float:
     ledger = ActionLedger()
-    ledger.request("op-once", "delete", "human-1")
-    ledger.approve(Approval("approval-2", "op-once", "human-1", True))
+    ledger.request("op-once", "delete", "human-1", "resource-x")
+    ledger.approve(Approval(
+        "approval-2", "op-once", "human-1", True, "delete", "resource-x",
+        time.time() + 60, "nonce-once",
+        ledger.request_hash("op-once", "delete", "human-1", "resource-x"),
+        "policy-v1",
+    ))
     calls = {"count": 0}
 
     def effect() -> tuple[str, object]:
