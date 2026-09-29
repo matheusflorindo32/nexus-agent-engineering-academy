@@ -54,8 +54,12 @@ class HardeningV2Tests(unittest.TestCase):
 
     def test_duplicate_tool_execution(self) -> None:
         ledger = runtime.ActionLedger()
-        ledger.request("op-1", "publish", "human")
-        ledger.approve(runtime.Approval("ap-1", "op-1", "human", True))
+        ledger.request("op-1", "publish", "human", "resource-1")
+        ledger.approve(runtime.Approval(
+            "ap-1", "op-1", "human", True, "publish", "resource-1",
+            time.time() + 60, "nonce-1",
+            ledger.request_hash("op-1", "publish", "human", "resource-1"), "policy-v1"
+        ))
         calls = {"count": 0}
 
         def effect():
@@ -68,27 +72,36 @@ class HardeningV2Tests(unittest.TestCase):
 
     def test_idempotency(self) -> None:
         ledger = runtime.ActionLedger()
-        first = ledger.request("same-operation", "modify", "human")
-        second = ledger.request("same-operation", "modify", "human")
+        first = ledger.request("same-operation", "modify", "human", "resource")
+        second = ledger.request("same-operation", "modify", "human", "resource")
         self.assertEqual(first, second)
 
     def test_hitl_execution_integrity(self) -> None:
         ledger = runtime.ActionLedger()
-        requested = ledger.request("op-2", "delete", "human-A")
+        requested = ledger.request("op-2", "delete", "human-A", "resource-2")
         self.assertEqual(requested.status, "REQUESTED")
+        request_hash = ledger.request_hash("op-2", "delete", "human-A", "resource-2")
         with self.assertRaises(PermissionError):
-            ledger.approve(runtime.Approval("peer-forged", "op-2", "remote-peer", True))
-        approved = ledger.approve(runtime.Approval("human-approved", "op-2", "human-A", True))
+            ledger.approve(runtime.Approval(
+                "peer-forged", "op-2", "remote-peer", True, "delete", "resource-2",
+                time.time() + 60, "nonce-forged", request_hash, "policy-v1"
+            ))
+        approval = runtime.Approval(
+            "human-approved", "op-2", "human-A", True, "delete", "resource-2",
+            time.time() + 60, "nonce-2", request_hash, "policy-v1"
+        )
+        approved = ledger.approve(approval)
         self.assertEqual(approved.status, "APPROVED")
         executed = ledger.execute_once("op-2", "delete", lambda: ("resource-2", {"deleted": True}))
         self.assertEqual(executed.status, "EXECUTED")
-        verified = ledger.verify("op-2", "resource-2")
+        verified = ledger.verify("op-2", lambda: ("resource-2", {"deleted": True}))
         self.assertEqual(verified.status, "VERIFIED")
+        self.assertEqual(verified.verification_status, "independent_observation")
 
     def test_parallel_tool_state(self) -> None:
         ledger = runtime.ActionLedger()
-        ledger.request("read-1", "read", "human")
-        ledger.request("delete-1", "delete", "human")
+        ledger.request("read-1", "read", "human", "r")
+        ledger.request("delete-1", "delete", "human", "d")
         read = ledger.execute_once(
             "read-1", "read", lambda: ("r", {"value": 1}), require_approval=False
         )
@@ -97,6 +110,51 @@ class HardeningV2Tests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             ledger.execute_once("delete-1", "delete", lambda: ("d", {"deleted": True}))
         self.assertEqual(ledger.receipt("delete-1").status, "REQUESTED")
+
+    def test_approval_binding_and_replay_protection(self) -> None:
+        ledger = runtime.ActionLedger()
+        ledger.request("op-bind", "delete", "human", "resource-A")
+        request_hash = ledger.request_hash("op-bind", "delete", "human", "resource-A")
+        approval = runtime.Approval(
+            "approval-bind", "op-bind", "human", True, "delete", "resource-A",
+            time.time() + 60, "nonce-bind", request_hash, "policy-v1"
+        )
+        ledger.approve(approval)
+        with self.assertRaises(PermissionError):
+            ledger.approve(approval)
+
+    def test_expired_approval_denied(self) -> None:
+        ledger = runtime.ActionLedger()
+        ledger.request("op-expired", "delete", "human", "resource-A")
+        with self.assertRaises(PermissionError):
+            ledger.approve(runtime.Approval(
+                "approval-expired", "op-expired", "human", True, "delete", "resource-A",
+                time.time() - 1, "nonce-expired",
+                ledger.request_hash("op-expired", "delete", "human", "resource-A"), "policy-v1"
+            ))
+
+    def test_wrong_resource_approval_denied(self) -> None:
+        ledger = runtime.ActionLedger()
+        ledger.request("op-resource", "delete", "human", "resource-A")
+        with self.assertRaises(PermissionError):
+            ledger.approve(runtime.Approval(
+                "approval-resource", "op-resource", "human", True, "delete", "resource-B",
+                time.time() + 60, "nonce-resource",
+                ledger.request_hash("op-resource", "delete", "human", "resource-A"), "policy-v1"
+            ))
+
+    def test_executor_claim_alone_cannot_verify(self) -> None:
+        ledger = runtime.ActionLedger()
+        ledger.request("op-verify", "create", "human", "resource-A")
+        ledger.approve(runtime.Approval(
+            "approval-verify", "op-verify", "human", True, "create", "resource-A",
+            time.time() + 60, "nonce-verify",
+            ledger.request_hash("op-verify", "create", "human", "resource-A"), "policy-v1"
+        ))
+        ledger.execute_once("op-verify", "create", lambda: ("resource-A", {"created": True}))
+        failed = ledger.verify("op-verify", lambda: ("resource-B", {"created": False}))
+        self.assertEqual(failed.status, "VERIFICATION_FAILED")
+        self.assertIsNone(failed.verified_at)
 
     def test_skill_atomic_update(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -140,15 +198,20 @@ class HardeningV2Tests(unittest.TestCase):
 
     def test_execution_receipt(self) -> None:
         ledger = runtime.ActionLedger()
-        ledger.request("op-3", "create", "human")
-        ledger.approve(runtime.Approval("ap-3", "op-3", "human", True))
+        ledger.request("op-3", "create", "human", "new-resource")
+        ledger.approve(runtime.Approval(
+            "ap-3", "op-3", "human", True, "create", "new-resource",
+            time.time() + 60, "nonce-3",
+            ledger.request_hash("op-3", "create", "human", "new-resource"), "policy-v1"
+        ))
         executed = ledger.execute_once(
             "op-3", "create", lambda: ("new-resource", {"id": 3})
         )
         self.assertTrue(executed.result_hash and executed.result_hash.startswith("sha256:"))
         self.assertEqual(executed.resource_id, "new-resource")
-        verified = ledger.verify("op-3", "new-resource")
+        verified = ledger.verify("op-3", lambda: ("new-resource", {"exists": True}))
         self.assertIsNotNone(verified.verified_at)
+        self.assertIsNotNone(verified.verification_hash)
 
 
 if __name__ == "__main__":
