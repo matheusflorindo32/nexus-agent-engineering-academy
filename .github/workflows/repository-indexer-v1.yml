@@ -21,8 +21,8 @@ jobs:
   indexer-v1:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.12'
       - name: Verify or capture frozen hashes
@@ -72,7 +72,7 @@ jobs:
           print('Repository Indexer V1 evidence boundary verified')
           PY
       - name: Upload Repository Indexer V1 evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: nexus-repository-indexer-v1
           path: indexer-v1-evidence/
