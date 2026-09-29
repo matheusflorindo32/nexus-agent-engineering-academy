@@ -156,6 +156,28 @@ class HardeningV2Tests(unittest.TestCase):
         self.assertEqual(failed.status, "VERIFICATION_FAILED")
         self.assertIsNone(failed.verified_at)
 
+    def test_verification_failure_does_not_repeat_effect(self) -> None:
+        ledger = runtime.ActionLedger()
+        ledger.request("op-no-repeat", "create", "human", "resource-A")
+        ledger.approve(runtime.Approval(
+            "approval-no-repeat", "op-no-repeat", "human", True, "create", "resource-A",
+            time.time() + 60, "nonce-no-repeat",
+            ledger.request_hash("op-no-repeat", "create", "human", "resource-A"), "policy-v1"
+        ))
+        calls = {"count": 0}
+
+        def effect():
+            calls["count"] += 1
+            return "resource-A", {"created": True}
+
+        ledger.execute_once("op-no-repeat", "create", effect)
+        failed = ledger.verify("op-no-repeat", lambda: ("resource-B", {"created": False}))
+        self.assertEqual(failed.status, "VERIFICATION_FAILED")
+        retried = ledger.execute_once("op-no-repeat", "create", effect)
+        self.assertEqual(calls["count"], 1)
+        self.assertEqual(retried.status, "VERIFICATION_FAILED")
+        self.assertEqual(retried.retry_count, 1)
+
     def test_skill_atomic_update(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             registry = runtime.SkillRegistry(Path(tmp))
