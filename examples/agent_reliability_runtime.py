@@ -178,7 +178,7 @@ class ActionLedger:
         receipt = self._require(operation_id)
         if receipt.tool_name != tool_name:
             raise ValueError("tool does not match requested operation")
-        if receipt.status in {"EXECUTED", "VERIFIED"}:
+        if receipt.status in {"EXECUTED", "VERIFYING", "VERIFIED", "VERIFICATION_FAILED", "RECONCILIATION_REQUIRED"}:
             retried = replace(receipt, retry_count=receipt.retry_count + 1)
             self._receipts[operation_id] = retried
             return retried
