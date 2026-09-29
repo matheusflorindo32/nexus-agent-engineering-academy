@@ -79,6 +79,12 @@ class Approval:
     operation_id: str
     principal: str
     approved: bool
+    tool_name: str
+    resource_id: str
+    expires_at: float
+    nonce: str
+    request_hash: str
+    policy_version: str
 
 
 @dataclass(frozen=True)
@@ -93,19 +99,42 @@ class ExecutionReceipt:
     verified_at: float | None = None
     resource_id: str | None = None
     result_hash: str | None = None
+    verification_hash: str | None = None
+    verification_status: str | None = None
     retry_count: int = 0
 
 
 class ActionLedger:
     """In-memory reference ledger for approval, idempotency and verification."""
 
-    def __init__(self) -> None:
+    def __init__(self, policy_version: str = "policy-v1") -> None:
+        if not policy_version:
+            raise ValueError("policy_version is required")
+        self.policy_version = policy_version
         self._receipts: dict[str, ExecutionReceipt] = {}
         self._approvals: dict[str, Approval] = {}
+        self._used_approval_ids: set[str] = set()
+        self._used_nonces: set[str] = set()
 
-    def request(self, operation_id: str, tool_name: str, principal: str) -> ExecutionReceipt:
+    @staticmethod
+    def request_hash(operation_id: str, tool_name: str, principal: str, resource_id: str) -> str:
+        payload = {
+            "operation_id": operation_id,
+            "tool_name": tool_name,
+            "principal": principal,
+            "resource_id": resource_id,
+        }
+        return "sha256:" + sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+    def request(self, operation_id: str, tool_name: str, principal: str, resource_id: str) -> ExecutionReceipt:
         existing = self._receipts.get(operation_id)
         if existing is not None:
+            if (
+                existing.tool_name != tool_name
+                or existing.principal != principal
+                or existing.resource_id != resource_id
+            ):
+                raise ValueError("operation_id reused with different request binding")
             return existing
         receipt = ExecutionReceipt(
             operation_id=operation_id,
@@ -113,14 +142,37 @@ class ActionLedger:
             principal=principal,
             status="REQUESTED",
             requested_at=time.time(),
+            resource_id=resource_id,
         )
         self._receipts[operation_id] = receipt
         return receipt
 
-    def approve(self, approval: Approval) -> ExecutionReceipt:
+    def approve(self, approval: Approval, *, now: float | None = None) -> ExecutionReceipt:
         receipt = self._require(approval.operation_id)
+        now = time.time() if now is None else now
+        if approval.approval_id in self._used_approval_ids:
+            raise PermissionError("approval replay detected")
+        if approval.nonce in self._used_nonces:
+            raise PermissionError("approval nonce replay detected")
         if approval.principal != receipt.principal:
             raise PermissionError("approval principal does not match operation principal")
+        if approval.tool_name != receipt.tool_name:
+            raise PermissionError("approval tool does not match operation")
+        if approval.resource_id != receipt.resource_id:
+            raise PermissionError("approval resource does not match operation")
+        if approval.expires_at < now:
+            raise PermissionError("approval expired")
+        if not approval.nonce:
+            raise PermissionError("approval nonce missing")
+        if approval.policy_version != self.policy_version:
+            raise PermissionError("approval policy version mismatch")
+        expected_hash = self.request_hash(
+            receipt.operation_id, receipt.tool_name, receipt.principal, receipt.resource_id or ""
+        )
+        if approval.request_hash != expected_hash:
+            raise PermissionError("approval request hash mismatch")
+        self._used_approval_ids.add(approval.approval_id)
+        self._used_nonces.add(approval.nonce)
         if not approval.approved:
             denied = replace(receipt, status="DENIED")
             self._receipts[receipt.operation_id] = denied
@@ -141,7 +193,7 @@ class ActionLedger:
         receipt = self._require(operation_id)
         if receipt.tool_name != tool_name:
             raise ValueError("tool does not match requested operation")
-        if receipt.status in {"EXECUTED", "VERIFIED"}:
+        if receipt.status in {"EXECUTED", "VERIFYING", "VERIFIED", "VERIFICATION_FAILED", "RECONCILIATION_REQUIRED"}:
             retried = replace(receipt, retry_count=receipt.retry_count + 1)
             self._receipts[operation_id] = retried
             return retried
@@ -150,6 +202,8 @@ class ActionLedger:
         if receipt.status == "DENIED":
             raise PermissionError("operation was denied")
         resource_id, result = effect()
+        if resource_id != receipt.resource_id:
+            raise RuntimeError("executor resource does not match approved resource")
         digest = sha256(json.dumps(result, sort_keys=True, default=str).encode()).hexdigest()
         executed = replace(
             receipt,
@@ -161,13 +215,37 @@ class ActionLedger:
         self._receipts[operation_id] = executed
         return executed
 
-    def verify(self, operation_id: str, resource_id: str) -> ExecutionReceipt:
+    def verify(
+        self,
+        operation_id: str,
+        observer: Callable[[], tuple[str, object]],
+    ) -> ExecutionReceipt:
+        """Verify an effect through an observation channel distinct from executor output."""
         receipt = self._require(operation_id)
         if receipt.status != "EXECUTED":
             raise RuntimeError("only executed operations can be verified")
-        if receipt.resource_id != resource_id:
-            raise RuntimeError("verification resource does not match execution receipt")
-        verified = replace(receipt, status="VERIFIED", verified_at=time.time())
+        verifying = replace(receipt, status="VERIFYING")
+        self._receipts[operation_id] = verifying
+        observed_resource_id, observed_state = observer()
+        observed_digest = sha256(
+            json.dumps(observed_state, sort_keys=True, default=str).encode()
+        ).hexdigest()
+        if observed_resource_id != receipt.resource_id:
+            failed = replace(
+                verifying,
+                status="VERIFICATION_FAILED",
+                verification_status="resource_mismatch",
+                verification_hash=f"sha256:{observed_digest}",
+            )
+            self._receipts[operation_id] = failed
+            return failed
+        verified = replace(
+            verifying,
+            status="VERIFIED",
+            verified_at=time.time(),
+            verification_status="independent_observation",
+            verification_hash=f"sha256:{observed_digest}",
+        )
         self._receipts[operation_id] = verified
         return verified
 
@@ -260,8 +338,14 @@ def run_self_tests() -> int:
         checks.append(("terminal failure propagates to future reader", False))
 
     ledger = ActionLedger()
-    ledger.request("op-1", "publish", "human-1")
-    ledger.approve(Approval("approval-1", "op-1", "human-1", True))
+    ledger.request("op-1", "publish", "human-1", "resource-1")
+    req_hash = ledger.request_hash("op-1", "publish", "human-1", "resource-1")
+    ledger.approve(
+        Approval(
+            "approval-1", "op-1", "human-1", True, "publish", "resource-1",
+            time.time() + 60, "nonce-1", req_hash, "policy-v1"
+        )
+    )
     calls = {"count": 0}
 
     def effect() -> tuple[str, object]:
@@ -270,10 +354,10 @@ def run_self_tests() -> int:
 
     ledger.execute_once("op-1", "publish", effect)
     retried = ledger.execute_once("op-1", "publish", effect)
-    verified = ledger.verify("op-1", "resource-1")
+    verified = ledger.verify("op-1", lambda: ("resource-1", {"exists": True}))
     checks.append(("idempotent side effect", calls["count"] == 1))
     checks.append(("retry receipt persisted", retried.retry_count == 1 and verified.retry_count == 1))
-    checks.append(("verified receipt", verified.status == "VERIFIED"))
+    checks.append(("verified receipt", verified.status == "VERIFIED" and verified.verification_hash is not None))
 
     with tempfile.TemporaryDirectory() as tmp:
         registry = SkillRegistry(Path(tmp))

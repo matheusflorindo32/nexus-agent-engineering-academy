@@ -32,8 +32,19 @@ async def run_trial() -> dict[str, object]:
         raise RuntimeError(f"unexpected openai-agents version: {package_version}")
 
     ledger = ActionLedger()
-    ledger.request("openai-op-1", "synthetic_write", "nexus-human")
-    ledger.approve(Approval("openai-approval-1", "openai-op-1", "nexus-human", True))
+    ledger.request("openai-op-1", "synthetic_write", "nexus-human", "synthetic-resource-1")
+    ledger.approve(Approval(
+        "openai-approval-1",
+        "openai-op-1",
+        "nexus-human",
+        True,
+        "synthetic_write",
+        "synthetic-resource-1",
+        time.time() + 60,
+        "openai-nonce-1",
+        ledger.request_hash("openai-op-1", "synthetic_write", "nexus-human", "synthetic-resource-1"),
+        "policy-v1",
+    ))
     effect_calls = {"count": 0}
 
     @tool
@@ -70,7 +81,10 @@ async def run_trial() -> dict[str, object]:
     duration_ms = round((time.monotonic() - started) * 1000, 3)
     model.assert_complete()
 
-    verified = ledger.verify("openai-op-1", "synthetic-resource-1")
+    verified = ledger.verify(
+        "openai-op-1",
+        lambda: ("synthetic-resource-1", {"marker": marker, "observed": True}),
+    )
     task_success = 1.0 if result.final_output == marker else 0.0
     var = 1.0 if verified.status == "VERIFIED" else 0.0
     dser = 0.0 if effect_calls["count"] == 1 else 1.0
@@ -123,6 +137,7 @@ async def run_trial() -> dict[str, object]:
         "No real model was used; ScriptedModel is the official deterministic SDK testing boundary.",
         "Provider latency, tokens and cost are NOT_EXECUTED.",
         "The idempotency/receipt authority is the NEXUS ActionLedger, exercised through the real SDK tool pipeline.",
+        "Effect verification uses a deterministic independent observer callback; it is REFERENCE TEST evidence, not an external provider read-back.",
     ]
     return payload
 
