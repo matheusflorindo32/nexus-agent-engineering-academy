@@ -178,6 +178,36 @@ class HardeningV2Tests(unittest.TestCase):
         self.assertEqual(retried.status, "VERIFICATION_FAILED")
         self.assertEqual(retried.retry_count, 1)
 
+    def test_operation_id_cannot_rebind_resource(self) -> None:
+        ledger = runtime.ActionLedger()
+        ledger.request("op-rebind", "delete", "human", "resource-A")
+        with self.assertRaises(ValueError):
+            ledger.request("op-rebind", "delete", "human", "resource-B")
+
+    def test_nonce_replay_denied_even_with_new_approval_id(self) -> None:
+        ledger = runtime.ActionLedger()
+        ledger.request("op-nonce", "delete", "human", "resource-A")
+        request_hash = ledger.request_hash("op-nonce", "delete", "human", "resource-A")
+        ledger.approve(runtime.Approval(
+            "approval-nonce-1", "op-nonce", "human", True, "delete", "resource-A",
+            time.time() + 60, "shared-nonce", request_hash, "policy-v1"
+        ))
+        with self.assertRaises(PermissionError):
+            ledger.approve(runtime.Approval(
+                "approval-nonce-2", "op-nonce", "human", True, "delete", "resource-A",
+                time.time() + 60, "shared-nonce", request_hash, "policy-v1"
+            ))
+
+    def test_policy_version_mismatch_denied(self) -> None:
+        ledger = runtime.ActionLedger(policy_version="policy-v2")
+        ledger.request("op-policy", "delete", "human", "resource-A")
+        with self.assertRaises(PermissionError):
+            ledger.approve(runtime.Approval(
+                "approval-policy", "op-policy", "human", True, "delete", "resource-A",
+                time.time() + 60, "nonce-policy",
+                ledger.request_hash("op-policy", "delete", "human", "resource-A"), "policy-v1"
+            ))
+
     def test_skill_atomic_update(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             registry = runtime.SkillRegistry(Path(tmp))
