@@ -107,10 +107,14 @@ class ExecutionReceipt:
 class ActionLedger:
     """In-memory reference ledger for approval, idempotency and verification."""
 
-    def __init__(self) -> None:
+    def __init__(self, policy_version: str = "policy-v1") -> None:
+        if not policy_version:
+            raise ValueError("policy_version is required")
+        self.policy_version = policy_version
         self._receipts: dict[str, ExecutionReceipt] = {}
         self._approvals: dict[str, Approval] = {}
         self._used_approval_ids: set[str] = set()
+        self._used_nonces: set[str] = set()
 
     @staticmethod
     def request_hash(operation_id: str, tool_name: str, principal: str, resource_id: str) -> str:
@@ -125,6 +129,12 @@ class ActionLedger:
     def request(self, operation_id: str, tool_name: str, principal: str, resource_id: str) -> ExecutionReceipt:
         existing = self._receipts.get(operation_id)
         if existing is not None:
+            if (
+                existing.tool_name != tool_name
+                or existing.principal != principal
+                or existing.resource_id != resource_id
+            ):
+                raise ValueError("operation_id reused with different request binding")
             return existing
         receipt = ExecutionReceipt(
             operation_id=operation_id,
@@ -142,6 +152,8 @@ class ActionLedger:
         now = time.time() if now is None else now
         if approval.approval_id in self._used_approval_ids:
             raise PermissionError("approval replay detected")
+        if approval.nonce in self._used_nonces:
+            raise PermissionError("approval nonce replay detected")
         if approval.principal != receipt.principal:
             raise PermissionError("approval principal does not match operation principal")
         if approval.tool_name != receipt.tool_name:
@@ -152,12 +164,15 @@ class ActionLedger:
             raise PermissionError("approval expired")
         if not approval.nonce:
             raise PermissionError("approval nonce missing")
+        if approval.policy_version != self.policy_version:
+            raise PermissionError("approval policy version mismatch")
         expected_hash = self.request_hash(
             receipt.operation_id, receipt.tool_name, receipt.principal, receipt.resource_id or ""
         )
         if approval.request_hash != expected_hash:
             raise PermissionError("approval request hash mismatch")
         self._used_approval_ids.add(approval.approval_id)
+        self._used_nonces.add(approval.nonce)
         if not approval.approved:
             denied = replace(receipt, status="DENIED")
             self._receipts[receipt.operation_id] = denied
