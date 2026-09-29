@@ -39,8 +39,14 @@ def run(iterations: int) -> dict[str, object]:
     for index in range(iterations):
         ledger = runtime.ActionLedger()
         operation_id = f"op-{index}"
-        ledger.request(operation_id, "publish", "human")
-        ledger.approve(runtime.Approval(f"ap-{index}", operation_id, "human", True))
+        resource_id = f"resource-{index}"
+        ledger.request(operation_id, "publish", "human", resource_id)
+        ledger.approve(runtime.Approval(
+            f"ap-{index}", operation_id, "human", True, "publish", resource_id,
+            time.time() + 60, f"nonce-{index}",
+            ledger.request_hash(operation_id, "publish", "human", resource_id),
+            "policy-v1",
+        ))
         declared_actions += 1
         calls = {"count": 0}
 
@@ -54,7 +60,7 @@ def run(iterations: int) -> dict[str, object]:
         ledger.execute_once(operation_id, "publish", effect)
         if calls["count"] > 1:
             duplicate_side_effects += calls["count"] - 1
-        receipt = ledger.verify(operation_id, f"resource-{index}")
+        receipt = ledger.verify(operation_id, lambda rid=resource_id, i=index: (rid, {"iteration": i, "observed": True}))
         if receipt.status == "VERIFIED":
             verified_actions += 1
 
@@ -95,6 +101,7 @@ def run(iterations: int) -> dict[str, object]:
         "limitations": [
             "No LLM, provider, network, database or external framework is used.",
             "Results validate only the deterministic NEXUS reference controls.",
+            "Verification uses a deterministic observer callback and is not evidence of external read-back.",
             "Do not compare these values directly with framework benchmarks.",
         ],
     }
